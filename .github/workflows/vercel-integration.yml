@@ -19,12 +19,18 @@ jobs:
         node-version: '18'
         
     - name: Install dependencies
-      run: npm install
+      run: |
+        echo "Installing dependencies..."
+        npm clean-install || npm install
+        echo "Verifying Next.js installation..."
+        npx next --version || echo "Next.js not found in PATH"
+        ls -la node_modules/.bin/ | grep next || echo "Next.js binary not found"
       
     - name: Build and test
       run: |
         echo "🔨 Building Next.js application..."
-        npm run build
+        echo "Using npx to ensure Next.js is available..."
+        npx next build || npm run build
         echo "✅ Build completed successfully"
         
         echo "🧹 Running linter..."
