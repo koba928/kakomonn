@@ -80,7 +80,8 @@ const mockComments: Comment[] = [
   }
 ]
 
-export default function ThreadDetailPage({ params }: { params: { id: string } }) {
+export default async function ThreadDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const [newComment, setNewComment] = useState('')
   const [comments, setComments] = useState<Comment[]>(mockComments)
 
