@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -36,12 +38,12 @@ export default function Home() {
           </div>
           
           <div className="mt-16">
-            <a 
+            <Link 
               href="/threads"
               className="bg-indigo-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition-colors inline-block"
             >
               スレッドを見る
-            </a>
+            </Link>
           </div>
         </div>
       </div>
