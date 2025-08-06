@@ -1,12 +1,11 @@
 import NextAuth from 'next-auth'
-import type { NextAuthConfig } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 
 export const config = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID || 'demo-client-id',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'demo-client-secret',
     }),
   ],
   callbacks: {
@@ -17,7 +16,7 @@ export const config = {
       
       if (isOnDashboard) {
         if (isLoggedIn) return true
-        return false // Redirect unauthenticated users to login page
+        return false
       } else if (isLoggedIn && !isOnLogin) {
         return Response.redirect(new URL('/dashboard', nextUrl))
       }
@@ -27,6 +26,6 @@ export const config = {
   pages: {
     signIn: '/login',
   },
-} satisfies NextAuthConfig
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth(config)

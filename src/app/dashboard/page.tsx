@@ -21,11 +21,9 @@ export default async function Dashboard() {
             
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <img
-                  src={session.user.image || ''}
-                  alt={session.user.name || ''}
-                  className="w-8 h-8 rounded-full"
-                />
+                <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold text-sm">
+                  {session.user.name?.charAt(0) || 'U'}
+                </div>
                 <span className="text-sm font-medium text-gray-700">
                   {session.user.name}
                 </span>
