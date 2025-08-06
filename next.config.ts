@@ -1,9 +1,7 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  experimental: {
-    appDir: true,
-  },
+  // Configuration options can be added here as needed
 }
 
 export default nextConfig
