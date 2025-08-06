@@ -62,8 +62,17 @@ jobs:
     steps:
     - name: Wait for Vercel deployment
       run: |
-        echo "⏳ Waiting for Vercel deployment (90 seconds)..."
-        sleep 90
+        echo "⏳ Waiting for Vercel deployment..."
+        echo "Commit SHA: ${{ github.sha }}"
+        echo "Timestamp: $(date)"
+        
+        # Wait for deployment with progress updates
+        for i in {1..6}; do
+          echo "⏳ Waiting... ${i}/6 (${i}0 seconds elapsed)"
+          sleep 15
+        done
+        
+        echo "✅ Wait completed. Starting verification..."
         
     - name: Comprehensive site check
       run: |
@@ -77,13 +86,20 @@ jobs:
           
           echo "Checking $name at $url"
           
-          response=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+          # Get both status code and response time
+          response=$(curl -s -o /tmp/response.html -w "%{http_code}:%{time_total}" "$url")
+          status_code=$(echo $response | cut -d: -f1)
+          response_time=$(echo $response | cut -d: -f2)
           
-          if [ $response -eq 200 ]; then
-            echo "✅ $name: HTTP $response - OK"
+          echo "Status: $status_code, Time: ${response_time}s"
+          
+          if [ $status_code -eq 200 ]; then
+            echo "✅ $name: HTTP $status_code - OK (${response_time}s)"
             return 0
           else
-            echo "❌ $name: HTTP $response - FAILED"
+            echo "❌ $name: HTTP $status_code - FAILED"
+            echo "Response preview:"
+            head -10 /tmp/response.html | grep -E "(error|Error|404|500)" || echo "No obvious error message found"
             return 1
           fi
         }
