@@ -1,0 +1,91 @@
+name: Deploy Status Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run build
+      run: npm run build
+      
+    - name: Run lint
+      run: npm run lint
+      
+    - name: Check build output
+      run: |
+        echo "Build completed successfully"
+        ls -la .next/
+        
+    - name: Deploy status notification
+      run: |
+        echo "✅ Build successful on commit: ${{ github.sha }}"
+        echo "🚀 Ready for Vercel deployment"
+
+  deployment-check:
+    needs: build-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Wait for deployment
+      run: |
+        echo "Waiting for Vercel deployment to complete..."
+        sleep 30
+        
+    - name: Check deployment status
+      run: |
+        echo "Checking deployment status..."
+        response=$(curl -s -o /dev/null -w "%{http_code}" https://kakomonn-com.vercel.app/)
+        if [ $response -eq 200 ]; then
+          echo "✅ Deployment successful - Site is live!"
+          echo "🌐 URL: https://kakomonn-com.vercel.app"
+        else
+          echo "❌ Deployment may have issues - HTTP $response"
+          exit 1
+        fi
+        
+    - name: Check all pages
+      run: |
+        echo "Testing all pages..."
+        
+        # Test main page
+        main_status=$(curl -s -o /dev/null -w "%{http_code}" https://kakomonn-com.vercel.app/)
+        echo "Main page: HTTP $main_status"
+        
+        # Test threads page  
+        threads_status=$(curl -s -o /dev/null -w "%{http_code}" https://kakomonn-com.vercel.app/threads)
+        echo "Threads page: HTTP $threads_status"
+        
+        # Test thread detail page
+        detail_status=$(curl -s -o /dev/null -w "%{http_code}" https://kakomonn-com.vercel.app/threads/1)
+        echo "Thread detail: HTTP $detail_status"
+        
+        # Test upload page
+        upload_status=$(curl -s -o /dev/null -w "%{http_code}" https://kakomonn-com.vercel.app/upload)
+        echo "Upload page: HTTP $upload_status"
+        
+        # Check if all pages are working
+        if [ $main_status -eq 200 ] && [ $threads_status -eq 200 ] && [ $detail_status -eq 200 ] && [ $upload_status -eq 200 ]; then
+          echo "✅ All pages are working correctly!"
+        else
+          echo "❌ Some pages have issues"
+          exit 1
+        fi
