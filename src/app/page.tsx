@@ -36,12 +36,9 @@ export default function Home() {
           </div>
           
           <div className="mt-16">
-            <a 
-              href="/login"
-              className="bg-indigo-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition-colors inline-block"
-            >
-              今すぐ始める
-            </a>
+            <button className="bg-indigo-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition-colors">
+              近日公開
+            </button>
           </div>
         </div>
       </div>
