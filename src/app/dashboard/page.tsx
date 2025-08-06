@@ -1,11 +1,25 @@
 import { auth, signOut } from '@/app/auth'
 import { redirect } from 'next/navigation'
+import { prisma } from '@/lib/prisma'
 
 export default async function Dashboard() {
   const session = await auth()
   
   if (!session?.user) {
     redirect('/login')
+  }
+
+  // Check if user has completed onboarding
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email! },
+    include: {
+      university: true,
+      faculty: true,
+    },
+  })
+
+  if (!user?.universityId || !user?.facultyId || !user?.grade) {
+    redirect('/onboarding')
   }
 
   return (
@@ -55,7 +69,10 @@ export default async function Dashboard() {
             ようこそ、{session.user.name}さん！
           </h2>
           <p className="text-gray-600">
-            大学・学部・学年を設定して、過去問hubを始めましょう。
+            {user.university?.name} {user.faculty?.name} {user.grade}年生
+          </p>
+          <p className="text-gray-500 text-sm mt-1">
+            あなたの過去問hubダッシュボードです。
           </p>
         </div>
         

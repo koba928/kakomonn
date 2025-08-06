@@ -16,11 +16,13 @@ export const config = {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user
       const isOnDashboard = nextUrl.pathname.startsWith('/dashboard')
+      const isOnOnboarding = nextUrl.pathname.startsWith('/onboarding')
       
-      if (isOnDashboard) {
+      if (isOnDashboard || isOnOnboarding) {
         if (isLoggedIn) return true
         return false // Redirect unauthenticated users to login page
       } else if (isLoggedIn) {
+        // Let the dashboard page handle onboarding redirect
         return Response.redirect(new URL('/dashboard', nextUrl))
       }
       return true
