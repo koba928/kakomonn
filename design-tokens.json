@@ -1,0 +1,245 @@
+{
+  "$schema": "https://schemas.figma.com/design-tokens/v1.0.0/design-tokens.json",
+  "name": "過去問hub Design System",
+  "version": "1.0.0",
+  "colors": {
+    "primary": {
+      "50": { "value": "#EEF2FF", "description": "Lightest indigo for backgrounds" },
+      "100": { "value": "#E0E7FF", "description": "Very light indigo for subtle backgrounds" },
+      "200": { "value": "#C7D2FE", "description": "Light indigo for hover states" },
+      "300": { "value": "#A5B4FC", "description": "Medium light indigo" },
+      "400": { "value": "#818CF8", "description": "Medium indigo" },
+      "500": { "value": "#6366F1", "description": "Base indigo" },
+      "600": { "value": "#4F46E5", "description": "Primary brand color" },
+      "700": { "value": "#4338CA", "description": "Dark indigo for hover" },
+      "800": { "value": "#3730A3", "description": "Darker indigo" },
+      "900": { "value": "#312E81", "description": "Darkest indigo" }
+    },
+    "secondary": {
+      "50": { "value": "#FAF5FF", "description": "Lightest purple" },
+      "100": { "value": "#F3E8FF", "description": "Very light purple" },
+      "200": { "value": "#E9D5FF", "description": "Light purple" },
+      "300": { "value": "#D8B4FE", "description": "Medium light purple" },
+      "400": { "value": "#C084FC", "description": "Medium purple" },
+      "500": { "value": "#A855F7", "description": "Base purple" },
+      "600": { "value": "#9333EA", "description": "Secondary brand color" },
+      "700": { "value": "#7C3AED", "description": "Dark purple" },
+      "800": { "value": "#6B21A8", "description": "Darker purple" },
+      "900": { "value": "#581C87", "description": "Darkest purple" }
+    },
+    "semantic": {
+      "success": {
+        "50": { "value": "#F0FDF4", "description": "Success background" },
+        "500": { "value": "#22C55E", "description": "Success color" },
+        "600": { "value": "#16A34A", "description": "Success hover" }
+      },
+      "warning": {
+        "50": { "value": "#FFFBEB", "description": "Warning background" },
+        "500": { "value": "#F59E0B", "description": "Warning color" },
+        "600": { "value": "#D97706", "description": "Warning hover" }
+      },
+      "error": {
+        "50": { "value": "#FEF2F2", "description": "Error background" },
+        "500": { "value": "#EF4444", "description": "Error color" },
+        "600": { "value": "#DC2626", "description": "Error hover" }
+      },
+      "info": {
+        "50": { "value": "#EFF6FF", "description": "Info background" },
+        "500": { "value": "#3B82F6", "description": "Info color" },
+        "600": { "value": "#2563EB", "description": "Info hover" }
+      }
+    },
+    "neutral": {
+      "50": { "value": "#F8FAFC", "description": "Lightest gray" },
+      "100": { "value": "#F1F5F9", "description": "Very light gray" },
+      "200": { "value": "#E2E8F0", "description": "Light gray for borders" },
+      "300": { "value": "#CBD5E1", "description": "Medium light gray" },
+      "400": { "value": "#94A3B8", "description": "Medium gray" },
+      "500": { "value": "#64748B", "description": "Base gray" },
+      "600": { "value": "#475569", "description": "Dark gray for text" },
+      "700": { "value": "#334155", "description": "Darker gray" },
+      "800": { "value": "#1E293B", "description": "Very dark gray" },
+      "900": { "value": "#0F172A", "description": "Darkest gray" }
+    },
+    "gradients": {
+      "primary": {
+        "value": "linear-gradient(135deg, #4F46E5 0%, #9333EA 100%)",
+        "description": "Primary gradient (indigo to purple)"
+      },
+      "hero": {
+        "value": "linear-gradient(135deg, #0F172A 0%, #312E81 50%, #4F46E5 100%)",
+        "description": "Hero text gradient"
+      },
+      "background": {
+        "value": "linear-gradient(135deg, #F8FAFC 0%, #FFFFFF 50%, #EEF2FF 100%)",
+        "description": "Page background gradient"
+      },
+      "success": {
+        "value": "linear-gradient(135deg, #22C55E 0%, #16A34A 100%)",
+        "description": "Success gradient"
+      },
+      "warning": {
+        "value": "linear-gradient(135deg, #F59E0B 0%, #D97706 100%)",
+        "description": "Warning gradient"
+      },
+      "error": {
+        "value": "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
+        "description": "Error gradient"
+      },
+      "info": {
+        "value": "linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)",
+        "description": "Info gradient"
+      }
+    }
+  },
+  "typography": {
+    "fontFamily": {
+      "primary": {
+        "value": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "description": "Primary font stack"
+      },
+      "mono": {
+        "value": "'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace",
+        "description": "Monospace font stack"
+      }
+    },
+    "fontSize": {
+      "xs": { "value": "12px", "description": "Extra small text" },
+      "sm": { "value": "14px", "description": "Small text" },
+      "base": { "value": "16px", "description": "Base font size" },
+      "lg": { "value": "18px", "description": "Large text" },
+      "xl": { "value": "20px", "description": "Extra large text" },
+      "2xl": { "value": "24px", "description": "2X large text" },
+      "3xl": { "value": "30px", "description": "3X large text" },
+      "4xl": { "value": "36px", "description": "4X large text" },
+      "5xl": { "value": "48px", "description": "5X large text" },
+      "6xl": { "value": "60px", "description": "6X large text" },
+      "7xl": { "value": "72px", "description": "7X large text" }
+    },
+    "fontWeight": {
+      "normal": { "value": "400", "description": "Normal weight" },
+      "medium": { "value": "500", "description": "Medium weight" },
+      "semibold": { "value": "600", "description": "Semi-bold weight" },
+      "bold": { "value": "700", "description": "Bold weight" }
+    },
+    "lineHeight": {
+      "tight": { "value": "1.25", "description": "Tight line height" },
+      "normal": { "value": "1.5", "description": "Normal line height" },
+      "relaxed": { "value": "1.625", "description": "Relaxed line height" },
+      "loose": { "value": "2", "description": "Loose line height" }
+    }
+  },
+  "spacing": {
+    "0": { "value": "0px", "description": "No spacing" },
+    "1": { "value": "4px", "description": "Extra small spacing" },
+    "2": { "value": "8px", "description": "Small spacing" },
+    "3": { "value": "12px", "description": "Medium small spacing" },
+    "4": { "value": "16px", "description": "Medium spacing" },
+    "6": { "value": "24px", "description": "Medium large spacing" },
+    "8": { "value": "32px", "description": "Large spacing" },
+    "10": { "value": "40px", "description": "Extra large spacing" },
+    "12": { "value": "48px", "description": "2X large spacing" },
+    "16": { "value": "64px", "description": "3X large spacing" },
+    "20": { "value": "80px", "description": "4X large spacing" },
+    "24": { "value": "96px", "description": "5X large spacing" }
+  },
+  "borderRadius": {
+    "none": { "value": "0px", "description": "No border radius" },
+    "sm": { "value": "2px", "description": "Small border radius" },
+    "base": { "value": "4px", "description": "Base border radius" },
+    "md": { "value": "6px", "description": "Medium border radius" },
+    "lg": { "value": "8px", "description": "Large border radius" },
+    "xl": { "value": "12px", "description": "Extra large border radius" },
+    "2xl": { "value": "16px", "description": "2X large border radius" },
+    "3xl": { "value": "24px", "description": "3X large border radius" },
+    "full": { "value": "9999px", "description": "Full border radius" }
+  },
+  "shadows": {
+    "sm": {
+      "value": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+      "description": "Small shadow"
+    },
+    "base": {
+      "value": "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
+      "description": "Base shadow"
+    },
+    "md": {
+      "value": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+      "description": "Medium shadow"
+    },
+    "lg": {
+      "value": "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+      "description": "Large shadow"
+    },
+    "xl": {
+      "value": "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+      "description": "Extra large shadow"
+    },
+    "2xl": {
+      "value": "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+      "description": "2X large shadow"
+    }
+  },
+  "motion": {
+    "duration": {
+      "fast": { "value": "150ms", "description": "Fast animation duration" },
+      "normal": { "value": "200ms", "description": "Normal animation duration" },
+      "slow": { "value": "300ms", "description": "Slow animation duration" },
+      "slower": { "value": "500ms", "description": "Slower animation duration" }
+    },
+    "easing": {
+      "linear": { "value": "cubic-bezier(0, 0, 1, 1)", "description": "Linear easing" },
+      "ease": { "value": "cubic-bezier(0.25, 0.1, 0.25, 1)", "description": "Ease easing" },
+      "easeIn": { "value": "cubic-bezier(0.42, 0, 1, 1)", "description": "Ease in" },
+      "easeOut": { "value": "cubic-bezier(0, 0, 0.58, 1)", "description": "Ease out" },
+      "easeInOut": { "value": "cubic-bezier(0.42, 0, 0.58, 1)", "description": "Ease in out" }
+    }
+  },
+  "layout": {
+    "containers": {
+      "narrow": { "value": "768px", "description": "Narrow container (upload page)" },
+      "wide": { "value": "1024px", "description": "Wide container (thread detail)" },
+      "full": { "value": "1280px", "description": "Full container (threads, nav)" }
+    },
+    "breakpoints": {
+      "sm": { "value": "640px", "description": "Small screen breakpoint" },
+      "md": { "value": "768px", "description": "Medium screen breakpoint" },
+      "lg": { "value": "1024px", "description": "Large screen breakpoint" },
+      "xl": { "value": "1280px", "description": "Extra large screen breakpoint" },
+      "2xl": { "value": "1536px", "description": "2X large screen breakpoint" }
+    }
+  },
+  "components": {
+    "button": {
+      "primary": {
+        "background": "gradients.primary",
+        "color": "neutral.50",
+        "padding": "spacing.3 spacing.6",
+        "borderRadius": "borderRadius.xl",
+        "fontSize": "typography.fontSize.base",
+        "fontWeight": "typography.fontWeight.semibold"
+      },
+      "secondary": {
+        "background": "neutral.50",
+        "color": "primary.600",
+        "border": "2px solid primary.600",
+        "padding": "spacing.3 spacing.6",
+        "borderRadius": "borderRadius.xl"
+      }
+    },
+    "card": {
+      "background": "rgba(255, 255, 255, 0.9)",
+      "backdropFilter": "blur(8px)",
+      "borderRadius": "borderRadius.2xl",
+      "border": "1px solid neutral.200",
+      "shadow": "shadows.lg"
+    },
+    "input": {
+      "background": "neutral.50",
+      "border": "2px solid neutral.200",
+      "borderRadius": "borderRadius.xl",
+      "padding": "spacing.4",
+      "focusBorder": "primary.500"
+    }
+  }
+}
