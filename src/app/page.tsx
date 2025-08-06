@@ -37,10 +37,10 @@ export default function Home() {
           
           <div className="mt-16">
             <a 
-              href="/login"
+              href="/threads"
               className="bg-indigo-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition-colors inline-block"
             >
-              今すぐ始める
+              スレッドを見る
             </a>
           </div>
         </div>
