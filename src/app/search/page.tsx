@@ -199,37 +199,39 @@ export default function SearchPage() {
   }
 
   // 検索フィルター関数
-  const filterItems = <T extends { name: string }>(items: T[], searchTerm: string): T[] => {
-    if (!searchTerm.trim()) return items
-    
-    return items.filter(item => {
-      const searchVariations = normalizeText(searchTerm)
-      const nameVariations = normalizeText(item.name)
+  const filterItems = useMemo(() => {
+    return <T extends { name: string }>(items: T[], searchTerm: string): T[] => {
+      if (!searchTerm.trim()) return items
       
-      return searchVariations.some(searchVar => 
-        nameVariations.some(nameVar => 
-          nameVar.includes(searchVar) || searchVar.includes(nameVar)
+      return items.filter(item => {
+        const searchVariations = normalizeText(searchTerm)
+        const nameVariations = normalizeText(item.name)
+        
+        return searchVariations.some(searchVar => 
+          nameVariations.some(nameVar => 
+            nameVar.includes(searchVar) || searchVar.includes(nameVar)
+          )
         )
-      )
-    })
-  }
+      })
+    }
+  }, [])
 
   // フィルタリングされた大学リスト
   const filteredUniversities = useMemo(() => {
     return filterItems(universityDataDetailed, universitySearchTerm)
-  }, [universitySearchTerm])
+  }, [filterItems, universitySearchTerm])
 
   // フィルタリングされた学部リスト
   const filteredFaculties = useMemo(() => {
     if (!selectedUniversity) return []
     return filterItems(selectedUniversity.faculties, facultySearchTerm)
-  }, [selectedUniversity, facultySearchTerm])
+  }, [filterItems, selectedUniversity, facultySearchTerm])
 
   // フィルタリングされた学科リスト
   const filteredDepartments = useMemo(() => {
     if (!selectedFaculty) return []
     return filterItems(selectedFaculty.departments, departmentSearchTerm)
-  }, [selectedFaculty, departmentSearchTerm])
+  }, [filterItems, selectedFaculty, departmentSearchTerm])
 
   // 大学選択時の処理
   const handleUniversitySelect = (university: University) => {
