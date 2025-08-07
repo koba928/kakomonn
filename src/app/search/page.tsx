@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { universityDataDetailed, type University, type Faculty, type Department } from '@/data/universityDataDetailed'
 import { COURSE_CATEGORIES } from '@/constants/courses'
@@ -101,7 +101,6 @@ export default function SearchPage() {
     'なご': ['名古屋大学'],
     'なごや': ['名古屋大学'],
     'なごやだいがく': ['名古屋大学'],
-    'めいだい': ['名古屋大学'],
     
     // 北海道大学
     'ほく': ['北海道大学'],
@@ -233,7 +232,7 @@ export default function SearchPage() {
   }
 
   // 日本語をひらがな、カタカナ、ローマ字に変換する関数
-  const normalizeText = (text: string): string[] => {
+  const normalizeText = useCallback((text: string): string[] => {
     const variations = [text.toLowerCase()]
     
     // 検索マップから直接マッチするものを追加
@@ -271,7 +270,7 @@ export default function SearchPage() {
     if (katakana !== text) variations.push(katakana.toLowerCase())
     
     return [...new Set(variations)] // 重複を除去
-  }
+  }, [searchMap])
 
   // 検索フィルター関数
   const filterItems = useMemo(() => {
