@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { SearchIcon, PlusIcon } from '@/components/icons/IconSystem'
-import { AnimatedButton, FloatingActionButton } from '@/components/ui/MicroInteractions'
+import { SearchIcon } from '@/components/icons/IconSystem'
+import { AnimatedButton } from '@/components/ui/MicroInteractions'
 import { HomeContent } from '@/components/home/HomeContent'
 
 export default function Home() {
@@ -12,13 +12,6 @@ export default function Home() {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
         <div className="absolute top-40 left-40 w-80 h-80 bg-pink-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
       </div>
-      
-      {/* プラスマークで投稿ボタン */}
-      <FloatingActionButton
-        icon={<PlusIcon size={24} />}
-        onClick={() => window.location.href = '/upload'}
-        position="bottom-right"
-      />
 
       <div className="container mx-auto px-4 py-6 sm:py-8 md:py-12 relative z-10 flex items-center min-h-screen">
         <div className="text-center max-w-5xl mx-auto">
@@ -67,8 +60,7 @@ export default function Home() {
                   📝 質問・相談を投稿
                 </span>
                 <span className="flex items-center gap-1 bg-white/50 px-2 py-1 rounded-full">
-                  <PlusIcon size={12} className="text-green-600" />
-                  右下で新規投稿
+                  ➕ 右下で新規投稿
                 </span>
               </div>
               <div className="mt-4">

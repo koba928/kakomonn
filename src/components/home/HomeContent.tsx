@@ -1,8 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { UserIcon } from '@/components/icons/IconSystem'
+import { UserIcon, PlusIcon } from '@/components/icons/IconSystem'
 import { ThemeToggle } from '@/components/theme/ThemeProvider'
+import { FloatingActionButton } from '@/components/ui/MicroInteractions'
 import { useUser } from '@/contexts/UserContext'
 
 export function HomeContent() {
@@ -36,6 +37,13 @@ export function HomeContent() {
           </div>
         )}
       </div>
+      
+      {/* プラスマークで投稿ボタン */}
+      <FloatingActionButton
+        icon={<PlusIcon size={24} />}
+        onClick={() => window.location.href = '/upload'}
+        position="bottom-right"
+      />
     </>
   )
 }
