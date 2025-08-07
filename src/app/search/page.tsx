@@ -4,8 +4,10 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { universityDataDetailed, type University, type Faculty, type Department } from '@/data/universityDataDetailed'
 import { COURSE_CATEGORIES } from '@/constants/courses'
+import { useUser } from '@/contexts/UserContext'
 
 export default function SearchPage() {
+  const { user, isLoggedIn } = useUser()
   const [selectedUniversity, setSelectedUniversity] = useState<University | null>(null)
   const [selectedFaculty, setSelectedFaculty] = useState<Faculty | null>(null)
   const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null)
@@ -17,10 +19,41 @@ export default function SearchPage() {
   const [showDepartmentDropdown, setShowDepartmentDropdown] = useState(false)
   const [courseType, setCourseType] = useState<'faculty' | 'general' | ''>('')
   const [searchExecuted, setSearchExecuted] = useState(false)
+  const [useQuickSearch, setUseQuickSearch] = useState(false)
   
   const universityRef = useRef<HTMLDivElement>(null)
   const facultyRef = useRef<HTMLDivElement>(null)
   const departmentRef = useRef<HTMLDivElement>(null)
+
+  // ログインユーザーの大学情報を自動設定
+  useEffect(() => {
+    if (isLoggedIn && user) {
+      // ユーザーの大学を検索して設定
+      const userUniversity = universityDataDetailed.find(uni => uni.name === user.university)
+      if (userUniversity) {
+        setSelectedUniversity(userUniversity)
+        setUniversitySearchTerm(userUniversity.name)
+        
+        // 学部を検索して設定
+        const userFaculty = userUniversity.faculties.find(fac => fac.name === user.faculty)
+        if (userFaculty) {
+          setSelectedFaculty(userFaculty)
+          setFacultySearchTerm(userFaculty.name)
+          
+          // 学科を検索して設定
+          const userDepartment = userFaculty.departments.find(dept => dept.name === user.department)
+          if (userDepartment) {
+            setSelectedDepartment(userDepartment)
+            setDepartmentSearchTerm(userDepartment.name)
+          }
+        }
+        
+        // ログインユーザーは直接科目タイプ選択に進む
+        setSearchExecuted(true)
+        setUseQuickSearch(true)
+      }
+    }
+  }, [isLoggedIn, user])
 
   // ドロップダウンを閉じるイベントハンドラ
   useEffect(() => {
@@ -346,11 +379,31 @@ export default function SearchPage() {
             </h1>
           </Link>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">過去問を検索</h2>
-          <p className="text-gray-600">大学・学部・学科から過去問を見つけよう（ローマ字・ひらがな対応）</p>
+          <p className="text-gray-600">
+            {isLoggedIn && user ? 
+              `${user.name}さん、${user.university} ${user.faculty}の過去問を探そう` : 
+              '大学・学部・学科から過去問を見つけよう（ローマ字・ひらがな対応）'
+            }
+          </p>
+          {isLoggedIn && user && useQuickSearch && (
+            <div className="mt-4">
+              <button
+                onClick={() => {
+                  setUseQuickSearch(false)
+                  setSearchExecuted(false)
+                  setCourseType('')
+                }}
+                className="text-sm text-indigo-600 hover:text-indigo-800 transition-colors"
+              >
+                別の大学で検索 →
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* 検索フィルター */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 mb-8">
+        {/* 検索フィルター - ログインユーザーがクイック検索を使わない場合のみ表示 */}
+        {(!isLoggedIn || !useQuickSearch) && (
+          <div className="bg-white rounded-2xl shadow-xl p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             {/* 大学選択 */}
             <div className="relative" ref={universityRef}>
@@ -495,6 +548,7 @@ export default function SearchPage() {
             </button>
           </div>
         </div>
+        )}
 
         {/* 学部・全学共通選択エリア - 検索実行後に表示 */}
         {selectedUniversity && searchExecuted && !courseType && (
@@ -502,10 +556,14 @@ export default function SearchPage() {
             <div className="text-center py-12 animate-slide-up">
               <div className="text-indigo-400 text-6xl mb-4">📋</div>
               <h4 className="text-lg font-medium text-gray-900 mb-2">
-                どの種類の過去問をお探しですか？
+                {useQuickSearch ? 
+                  `${user?.name}さん、どの種類の過去問をお探しですか？` : 
+                  'どの種類の過去問をお探しですか？'
+                }
               </h4>
               <p className="text-gray-600 mb-8">
                 {selectedUniversity.name}{selectedFaculty && ` ${selectedFaculty.name}`}で探したい過去問の種類を選択してください
+                {useQuickSearch && <><br /><span className="text-indigo-600 text-sm">✨ あなたの登録情報をもとに自動設定しました</span></>}
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
