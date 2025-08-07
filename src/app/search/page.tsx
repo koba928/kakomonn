@@ -498,8 +498,8 @@ export default function SearchPage() {
 
         {/* 学部・全学共通選択エリア - 検索実行後に表示 */}
         {selectedUniversity && searchExecuted && !courseType && (
-          <div className="bg-white rounded-2xl shadow-xl p-6">
-            <div className="text-center py-12">
+          <div className="bg-white rounded-2xl shadow-xl p-6 animate-fade-in">
+            <div className="text-center py-12 animate-slide-up">
               <div className="text-indigo-400 text-6xl mb-4">📋</div>
               <h4 className="text-lg font-medium text-gray-900 mb-2">
                 どの種類の過去問をお探しですか？
@@ -511,7 +511,7 @@ export default function SearchPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
                 <button
                   onClick={() => setCourseType('faculty')}
-                  className="group p-6 border-2 border-gray-200 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all duration-200"
+                  className="group p-6 border-2 border-gray-200 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
                 >
                   <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">🏫</div>
                   <h5 className="text-lg font-semibold text-gray-900 mb-2">学部専門科目</h5>
@@ -522,7 +522,7 @@ export default function SearchPage() {
                 
                 <button
                   onClick={() => setCourseType('general')}
-                  className="group p-6 border-2 border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all duration-200"
+                  className="group p-6 border-2 border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
                 >
                   <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">🌐</div>
                   <h5 className="text-lg font-semibold text-gray-900 mb-2">全学共通科目</h5>
@@ -547,8 +547,8 @@ export default function SearchPage() {
 
         {/* 検索結果エリア - 科目タイプが選択された場合 */}
         {selectedUniversity && searchExecuted && courseType && (
-          <div className="bg-white rounded-2xl shadow-xl p-6">
-            <div className="text-center py-12">
+          <div className="bg-white rounded-2xl shadow-xl p-6 animate-fade-in">
+            <div className="text-center py-12 animate-slide-up">
               <div className="text-orange-400 text-6xl mb-4">📝</div>
               <h4 className="text-lg font-medium text-gray-900 mb-2">
                 過去問が見つかりませんでした
