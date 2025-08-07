@@ -40,15 +40,15 @@ export default function Home() {
             </div>
             
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-gray-900 via-indigo-800 to-indigo-600 dark:from-gray-100 dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent animate-slide-in leading-tight">
-              過去問<span className="text-indigo-600">hub</span>
+              過去問<span className="text-indigo-600 dark:text-indigo-400">hub</span>
             </h1>
             
-            <p className="text-xl sm:text-2xl md:text-3xl text-gray-700 dark:text-gray-300 mb-3 sm:mb-4 font-medium animate-slide-in">
+            <p className="text-xl sm:text-2xl md:text-3xl text-gray-800 dark:text-gray-200 mb-3 sm:mb-4 font-medium animate-slide-in">
               過去問を探せて、話せる。
             </p>
             
-            <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-400 mb-8 sm:mb-12 max-w-2xl mx-auto animate-slide-in leading-relaxed">
-              全国の大学生が集まる、勉強記録と情報交換のコミュニティ。
+            <p className="text-base sm:text-lg md:text-xl text-gray-700 dark:text-gray-300 mb-8 sm:mb-12 max-w-2xl mx-auto animate-slide-in leading-relaxed">
+              全国の大学生が集まる、勉強記録と情報交換のコミュニティ。<br className="hidden sm:block" />
               先輩の知識を活用して、効率的な試験対策を。
             </p>
 
@@ -56,20 +56,27 @@ export default function Home() {
             <div className="flex justify-center animate-slide-in mb-4">
               <Link href="/threads">
                 <AnimatedButton variant="primary" size="lg" className="flex items-center gap-2">
-                  過去問を探す
                   <SearchIcon size={20} />
+                  過去問を探す
                 </AnimatedButton>
               </Link>
             </div>
             
             {/* 使い方ガイド */}
-            <div className="text-center text-sm text-gray-500 dark:text-gray-400 animate-fade-in">
-              <p className="mb-2">💡 <strong>使い方:</strong></p>
-              <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-xs opacity-75">
-                <span>📚 大学・学部で検索</span>
-                <span>💬 質問・相談を投稿</span>
-                <span className="flex items-center gap-1">
-                  ➕ 右下の<PlusIcon size={12} className="inline" />で新規投稿
+            <div className="text-center text-sm text-gray-600 dark:text-gray-300 animate-fade-in">
+              <p className="mb-3 font-medium text-gray-700 dark:text-gray-200">💡 使い方</p>
+              <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-xs opacity-90">
+                <span className="flex items-center gap-1 bg-white/50 dark:bg-gray-800/50 px-2 py-1 rounded-full">
+                  <SearchIcon size={12} className="text-blue-600 dark:text-blue-400" />
+                  大学・学部で検索
+                </span>
+                <span className="flex items-center gap-1 bg-white/50 dark:bg-gray-800/50 px-2 py-1 rounded-full">
+                  <ThreadIcon size={12} className="text-purple-600 dark:text-purple-400" />
+                  質問・相談を投稿
+                </span>
+                <span className="flex items-center gap-1 bg-white/50 dark:bg-gray-800/50 px-2 py-1 rounded-full">
+                  <PlusIcon size={12} className="text-green-600 dark:text-green-400" />
+                  右下で新規投稿
                 </span>
               </div>
             </div>
