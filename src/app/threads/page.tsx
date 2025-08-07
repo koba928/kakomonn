@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+import { universityData, getUniversitiesWithDeviationAbove, getFacultiesWithDeviationAbove } from '@/data/universityData'
 
 interface Thread {
   id: string
@@ -14,6 +15,7 @@ interface Thread {
   createdAt: string
   commentCount: number
   examYear?: number
+  deviationValue?: number
 }
 
 const mockThreads: Thread[] = [
@@ -62,6 +64,74 @@ const mockThreads: Thread[] = [
     faculty: '理学部',
     createdAt: '2024-01-12',
     commentCount: 6
+  },
+  {
+    id: '5',
+    title: '国際経営論 期末試験の出題範囲について',
+    content: '国際経営論の期末試験、教科書の何章まで出るんでしょうか？過去問見る限りケーススタディが重要そうですが...',
+    author: '商学3年',
+    course: '国際経営論',
+    university: '慶應義塾大学',
+    faculty: '商学部',
+    createdAt: '2024-01-11',
+    commentCount: 9,
+    examYear: 2024
+  },
+  {
+    id: '6',
+    title: '線形代数 固有値の求め方教えて',
+    content: '線形代数の固有値・固有ベクトルの計算で詰まってます。特に3×3行列の場合の効率的な解法があれば...',
+    author: '理工2年',
+    course: '線形代数II',
+    university: '早稲田大学',
+    faculty: '理工学部',
+    createdAt: '2024-01-10',
+    commentCount: 7
+  },
+  {
+    id: '7',
+    title: '社会政策論 レポート課題のテーマ相談',
+    content: '社会政策論のレポート、「現代日本の社会保障制度」について書こうと思うのですが、どの角度から切り込むべき？',
+    author: '社会1年',
+    course: '社会政策論',
+    university: '一橋大学',
+    faculty: '社会学部',
+    createdAt: '2024-01-09',
+    commentCount: 11
+  },
+  {
+    id: '8',
+    title: '細胞生物学 顕微鏡観察のコツ',
+    content: '細胞生物学の実習で顕微鏡観察がうまくいかない...細胞分裂の各段階を見分けるポイントを教えてください！',
+    author: '医学1年',
+    course: '細胞生物学実習',
+    university: '大阪大学',
+    faculty: '医学部',
+    createdAt: '2024-01-08',
+    commentCount: 5
+  },
+  {
+    id: '9',
+    title: '刑法総論 構成要件該当性の判断',
+    content: '刑法総論で構成要件該当性の判断に苦戦中。具体的な事例問題での当てはめ方のコツがあれば教えてください。',
+    author: '法学2年',
+    course: '刑法総論',
+    university: '名古屋大学',
+    faculty: '法学部',
+    createdAt: '2024-01-07',
+    commentCount: 13
+  },
+  {
+    id: '10',
+    title: '電磁気学 マクスウェル方程式の理解',
+    content: 'マクスウェル方程式の物理的意味がいまいち掴めない...数式は覚えたけど、現象との対応が難しいです。',
+    author: '物理3年',
+    course: '電磁気学II',
+    university: '東北大学',
+    faculty: '理学部',
+    createdAt: '2024-01-06',
+    commentCount: 8,
+    examYear: 2023
   }
 ]
 
@@ -75,7 +145,9 @@ export default function ThreadsPage() {
     const matchesFaculty = !selectedFaculty || thread.faculty === selectedFaculty
     const matchesSearch = !searchQuery || 
       thread.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      thread.course.toLowerCase().includes(searchQuery.toLowerCase())
+      thread.course.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      thread.university.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      thread.faculty.toLowerCase().includes(searchQuery.toLowerCase())
     
     return matchesUniversity && matchesFaculty && matchesSearch
   })
@@ -142,6 +214,7 @@ export default function ThreadsPage() {
             </div>
             <h3 className="text-xl font-bold text-gray-900">検索・フィルター</h3>
           </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-3">
@@ -149,7 +222,10 @@ export default function ThreadsPage() {
               </label>
               <select
                 value={selectedUniversity}
-                onChange={(e) => setSelectedUniversity(e.target.value)}
+                onChange={(e) => {
+                  setSelectedUniversity(e.target.value)
+                  setSelectedFaculty('') // 大学を変更したら学部選択をリセット
+                }}
                 className="w-full p-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white hover:border-indigo-200"
               >
                 <option value="">すべての大学</option>
@@ -184,7 +260,7 @@ export default function ThreadsPage() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="授業名、タイトルで検索..."
+                  placeholder="授業名、大学名、学部名、タイトルで検索..."
                   className="w-full p-3 pl-10 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white hover:border-indigo-200"
                 />
                 <svg className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

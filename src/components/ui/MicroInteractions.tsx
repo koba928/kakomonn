@@ -49,7 +49,7 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
       onClick={onClick}
       disabled={disabled}
     >
-      <span className="relative z-10">
+      <span className="relative z-10 flex items-center gap-2">
         {children}
       </span>
       <div className="absolute inset-0 bg-white/20 translate-y-full transition-transform duration-300 group-hover:translate-y-0" />

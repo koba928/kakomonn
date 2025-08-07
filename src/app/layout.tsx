@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
+import { UserProvider } from '@/contexts/UserContext'
 
 export const metadata: Metadata = {
   title: '過去問hub - 大学生のための過去問共有プラットフォーム',
@@ -15,9 +16,11 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className="antialiased bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+        <UserProvider>
+          <ThemeProvider>
+            {children}
+          </ThemeProvider>
+        </UserProvider>
       </body>
     </html>
   )
