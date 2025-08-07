@@ -67,7 +67,16 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
   // ローディング中は何も表示しない（フラッシュを防ぐ）
   if (!isLoaded) {
-    return null
+    return (
+      <UserContext.Provider value={{
+        user: null,
+        setUser: () => {},
+        isLoggedIn: false,
+        logout: () => {}
+      }}>
+        {children}
+      </UserContext.Provider>
+    )
   }
 
   return (

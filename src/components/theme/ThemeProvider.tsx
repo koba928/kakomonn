@@ -27,6 +27,7 @@ interface ThemeProviderProps {
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>('system')
   const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>('light')
+  const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
     // Get theme from localStorage or default to 'system'
@@ -36,6 +37,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         setTheme(savedTheme)
       }
     }
+    setIsLoaded(true)
   }, [])
 
   useEffect(() => {
@@ -81,6 +83,19 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     theme,
     setTheme,
     currentTheme
+  }
+
+  // ローディング中はデフォルト値でプロバイダーを提供
+  if (!isLoaded) {
+    return (
+      <ThemeContext.Provider value={{
+        theme: 'system',
+        setTheme: () => {},
+        currentTheme: 'light'
+      }}>
+        {children}
+      </ThemeContext.Provider>
+    )
   }
 
   return (
