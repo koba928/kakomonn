@@ -16,7 +16,7 @@ export default function Home() {
       </div>
 
       {/* Theme Toggle */}
-      <div className="absolute top-6 right-6 z-20">
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
         <ThemeToggle />
       </div>
       
@@ -27,7 +27,7 @@ export default function Home() {
         position="bottom-right"
       />
 
-      <div className="container mx-auto px-4 py-12 md:py-20 relative z-10">
+      <div className="container mx-auto px-4 py-8 sm:py-12 md:py-20 relative z-10">
         <div className="text-center max-w-5xl mx-auto">
           {/* ヒーローセクション */}
           <div className="mb-16">
@@ -39,15 +39,15 @@ export default function Home() {
               大学生のための学習プラットフォーム
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-indigo-800 to-indigo-600 dark:from-gray-100 dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent animate-slide-in">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-gray-900 via-indigo-800 to-indigo-600 dark:from-gray-100 dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent animate-slide-in leading-tight">
               過去問<span className="text-indigo-600">hub</span>
             </h1>
             
-            <p className="text-2xl md:text-3xl text-gray-700 dark:text-gray-300 mb-4 font-medium animate-slide-in">
+            <p className="text-xl sm:text-2xl md:text-3xl text-gray-700 dark:text-gray-300 mb-3 sm:mb-4 font-medium animate-slide-in">
               過去問を探せて、話せる。
             </p>
             
-            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto animate-slide-in">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-400 mb-8 sm:mb-12 max-w-2xl mx-auto animate-slide-in leading-relaxed">
               全国の大学生が集まる、勉強記録と情報交換のコミュニティ。
               先輩の知識を活用して、効率的な試験対策を。
             </p>
@@ -64,32 +64,32 @@ export default function Home() {
           </div>
           
           {/* 統計情報 */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16 max-w-3xl mx-auto animate-fade-in">
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
-              <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">50+</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">大学</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-12 sm:mb-16 max-w-3xl mx-auto animate-fade-in">
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-3 sm:p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
+              <div className="text-2xl sm:text-3xl font-bold text-indigo-600 dark:text-indigo-400">50+</div>
+              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">大学</div>
             </div>
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
-              <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">1,000+</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">スレッド</div>
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-3 sm:p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
+              <div className="text-2xl sm:text-3xl font-bold text-indigo-600 dark:text-indigo-400">1,000+</div>
+              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">スレッド</div>
             </div>
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
-              <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">5,000+</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">ユーザー</div>
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-3 sm:p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
+              <div className="text-2xl sm:text-3xl font-bold text-indigo-600 dark:text-indigo-400">5,000+</div>
+              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">ユーザー</div>
             </div>
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
-              <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">10,000+</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">コメント</div>
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-3 sm:p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
+              <div className="text-2xl sm:text-3xl font-bold text-indigo-600 dark:text-indigo-400">10,000+</div>
+              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">コメント</div>
             </div>
           </div>
           
           {/* 機能カード */}
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-12 animate-fade-in">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8 sm:mb-12 animate-fade-in">
               過去問hubでできること
             </h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 animate-slide-in">
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+              <div className="group bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 animate-slide-in">
                 <div className="bg-gradient-to-br from-blue-400 to-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <BookIcon size={32} color="white" />
                 </div>
@@ -99,7 +99,7 @@ export default function Home() {
                 </p>
               </div>
               
-              <div className="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 animate-slide-in">
+              <div className="group bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 animate-slide-in">
                 <div className="bg-gradient-to-br from-purple-400 to-purple-600 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <ThreadIcon size={32} color="white" />
                 </div>
@@ -109,7 +109,7 @@ export default function Home() {
                 </p>
               </div>
               
-              <div className="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 animate-slide-in">
+              <div className="group bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 animate-slide-in">
                 <div className="bg-gradient-to-br from-pink-400 to-pink-600 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <SearchIcon size={32} color="white" />
                 </div>
@@ -122,11 +122,11 @@ export default function Home() {
           </div>
 
           {/* CTA セクション */}
-          <div className="mt-20 bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-700 dark:to-purple-700 rounded-3xl p-8 md:p-12 text-white shadow-2xl animate-fade-in">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <div className="mt-16 sm:mt-20 bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-700 dark:to-purple-700 rounded-3xl p-6 sm:p-8 md:p-12 text-white shadow-2xl animate-fade-in">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
               今すぐ始めよう
             </h2>
-            <p className="text-lg md:text-xl mb-8 opacity-90">
+            <p className="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 opacity-90 leading-relaxed">
               全国の大学生が参加する学習コミュニティに参加して、
               効率的な試験対策を始めましょう
             </p>

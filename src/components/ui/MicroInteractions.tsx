@@ -30,9 +30,9 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   }
   
   const sizeStyles = {
-    sm: 'px-3 py-1.5 text-sm rounded-md',
-    md: 'px-4 py-2 text-base rounded-lg',
-    lg: 'px-6 py-3 text-lg rounded-xl'
+    sm: 'px-3 py-2 text-sm rounded-md min-h-[44px]',
+    md: 'px-4 py-2.5 text-base rounded-lg min-h-[44px]',
+    lg: 'px-6 py-3 text-base sm:text-lg rounded-xl min-h-[48px] sm:min-h-[52px]'
   }
   
   return (
@@ -43,6 +43,7 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
         ${variantStyles[variant]}
         ${sizeStyles[size]}
         ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+        touch-manipulation select-none
         ${className}
       `}
       onClick={onClick}
@@ -184,25 +185,31 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   className = ''
 }) => {
   const positionStyles = {
-    'bottom-right': 'bottom-6 right-6',
-    'bottom-left': 'bottom-6 left-6',
-    'top-right': 'top-6 right-6',
-    'top-left': 'top-6 left-6'
+    'bottom-right': 'bottom-4 right-4 md:bottom-6 md:right-6',
+    'bottom-left': 'bottom-4 left-4 md:bottom-6 md:left-6',
+    'top-right': 'top-4 right-4 md:top-6 md:right-6',
+    'top-left': 'top-4 left-4 md:top-6 md:left-6'
   }
   
   return (
     <button
       onClick={onClick}
       className={`
-        fixed z-50 w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 
+        fixed z-50 
+        w-14 h-14 sm:w-16 sm:h-16
+        bg-gradient-to-r from-blue-500 to-purple-600 
         text-white rounded-full shadow-lg hover:shadow-xl
         transition-all duration-300 transform hover:scale-110 active:scale-95
         flex items-center justify-center
+        touch-manipulation
         ${positionStyles[position]}
         ${className}
       `}
+      style={{ minHeight: '44px', minWidth: '44px' }}
     >
-      {icon}
+      <span className="w-6 h-6 sm:w-7 sm:h-7">
+        {icon}
+      </span>
     </button>
   )
 }
