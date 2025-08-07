@@ -173,8 +173,10 @@ export default function SearchPage() {
     // 検索マップから直接マッチするものを追加
     const lowerText = text.toLowerCase()
     Object.entries(searchMap).forEach(([key, translations]) => {
-      // キーが入力文字列に含まれる場合、または入力文字列がキーに含まれる場合
-      if (key.includes(lowerText) || lowerText.includes(key) || key === lowerText) {
+      // より柔軟な部分一致：キーが入力文字列の先頭に含まれる場合、または入力文字列がキーの先頭に含まれる場合
+      if (key.startsWith(lowerText) || lowerText.startsWith(key) || 
+          key.includes(lowerText) || lowerText.includes(key) || 
+          key === lowerText) {
         variations.push(...translations.map(t => t.toLowerCase()))
       }
     })
@@ -184,6 +186,14 @@ export default function SearchPage() {
     if (hiraganaFromRomaji !== lowerText) {
       variations.push(hiraganaFromRomaji)
       variations.push(hiraganaToKatakana(hiraganaFromRomaji))
+      
+      // ローマ字から変換されたひらがなでも検索マップをチェック
+      Object.entries(searchMap).forEach(([key, translations]) => {
+        if (key.startsWith(hiraganaFromRomaji) || hiraganaFromRomaji.startsWith(key) ||
+            key.includes(hiraganaFromRomaji) || hiraganaFromRomaji.includes(key)) {
+          variations.push(...translations.map(t => t.toLowerCase()))
+        }
+      })
     }
     
     // カタカナをひらがなに変換
