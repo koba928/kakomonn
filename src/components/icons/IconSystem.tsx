@@ -140,7 +140,11 @@ export const HeartIcon: React.FC<IconProps> = ({
   </svg>
 )
 
-export const StarIcon: React.FC<IconProps> = ({ 
+interface StarIconProps extends IconProps {
+  filled?: boolean
+}
+
+export const StarIcon: React.FC<StarIconProps> = ({ 
   size = 24, 
   color = 'currentColor', 
   className = '',
