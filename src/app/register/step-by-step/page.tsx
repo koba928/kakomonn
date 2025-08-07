@@ -350,7 +350,7 @@ export default function StepByStepRegisterPage() {
     }
   }
 
-  if (currentStep === 'complete') {
+  if ((currentStep as Step) === 'complete') {
     return (
       <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50">
         <div className="container mx-auto px-4 py-12">
@@ -393,13 +393,13 @@ export default function StepByStepRegisterPage() {
             {renderStepContent()}
             
             {/* ナビゲーションボタン */}
-            {currentStep !== 'complete' && (
+            {(currentStep as Step) !== 'complete' && (
               <div className="flex justify-between items-center mt-12">
                 <button
                   onClick={goToPrevStep}
-                  disabled={currentStep === 'university'}
+                  disabled={(currentStep as Step) === 'university'}
                   className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
-                    currentStep === 'university'
+                    (currentStep as Step) === 'university'
                       ? 'text-gray-400 cursor-not-allowed'
                       : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                   }`}
@@ -414,7 +414,7 @@ export default function StepByStepRegisterPage() {
                   onClick={goToNextStep}
                   className="flex items-center gap-2"
                 >
-                  {currentStep === 'name' ? (
+                  {(currentStep as Step) === 'name' ? (
                     isSubmitting ? '登録中...' : '登録完了'
                   ) : (
                     <>
