@@ -1,0 +1,17 @@
+# Vercel build cache
+.vercel
+.next
+
+# Dependencies
+node_modules
+
+# Logs
+*.log
+
+# IDE
+.vscode
+.idea
+
+# Temporary files
+*.tmp
+*.temp
