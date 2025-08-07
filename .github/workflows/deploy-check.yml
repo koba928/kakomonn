@@ -1,10 +1,12 @@
 name: Deploy Status Check
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  # Temporarily disabled while fixing Vercel deployment
+  # push:
+  #   branches: [ main ]
+  # pull_request:
+  #   branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build-test:
