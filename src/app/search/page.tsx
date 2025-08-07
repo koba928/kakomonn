@@ -270,7 +270,7 @@ export default function SearchPage() {
             </h1>
           </Link>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">過去問を検索</h2>
-          <p className="text-gray-600">大学・学部・科目から過去問を見つけよう</p>
+          <p className="text-gray-600">大学・学部・学科から過去問を見つけよう（ローマ字・ひらがな対応）</p>
         </div>
 
         {/* 検索フィルター */}
