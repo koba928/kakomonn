@@ -32,7 +32,7 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   const sizeStyles = {
     sm: 'px-3 py-2 text-sm rounded-md min-h-[44px]',
     md: 'px-4 py-2.5 text-base rounded-lg min-h-[44px]',
-    lg: 'px-6 py-3 text-base sm:text-lg rounded-xl min-h-[48px] sm:min-h-[52px]'
+    lg: 'px-8 py-4 text-lg sm:text-xl rounded-xl min-h-[56px] sm:min-h-[64px]'
   }
   
   return (

@@ -90,7 +90,7 @@ export default function Home() {
             <div className="flex justify-center animate-slide-in mb-4">
               <Link href="/threads">
                 <AnimatedButton variant="primary" size="lg">
-                  <SearchIcon size={20} />
+                  <SearchIcon size={24} />
                   過去問を探す
                 </AnimatedButton>
               </Link>
