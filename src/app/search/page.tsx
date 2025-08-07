@@ -15,6 +15,8 @@ export default function SearchPage() {
   const [showUniversityDropdown, setShowUniversityDropdown] = useState(false)
   const [showFacultyDropdown, setShowFacultyDropdown] = useState(false)
   const [showDepartmentDropdown, setShowDepartmentDropdown] = useState(false)
+  const [courseType, setCourseType] = useState<'faculty' | 'general' | ''>('')
+  const [searchExecuted, setSearchExecuted] = useState(false)
   
   const universityRef = useRef<HTMLDivElement>(null)
   const facultyRef = useRef<HTMLDivElement>(null)
@@ -481,7 +483,7 @@ export default function SearchPage() {
             <button
               onClick={() => {
                 if (selectedUniversity) {
-                  alert(`検索実行: ${selectedUniversity.name}${selectedFaculty ? ' ' + selectedFaculty.name : ''}${selectedDepartment ? ' ' + selectedDepartment.name : ''}`)
+                  setSearchExecuted(true)
                 } else {
                   alert('大学を選択してください')
                 }
@@ -494,27 +496,109 @@ export default function SearchPage() {
           </div>
         </div>
 
-        {/* 検索結果エリア - 大学が選択されている場合のみ表示 */}
-        {selectedUniversity && (
+        {/* 学部・全学共通選択エリア - 検索実行後に表示 */}
+        {selectedUniversity && searchExecuted && !courseType && (
           <div className="bg-white rounded-2xl shadow-xl p-6">
             <div className="text-center py-12">
-              <div className="text-indigo-400 text-6xl mb-4">🎓</div>
+              <div className="text-indigo-400 text-6xl mb-4">📋</div>
               <h4 className="text-lg font-medium text-gray-900 mb-2">
-                {selectedUniversity.name}の過去問を検索中...
+                どの種類の過去問をお探しですか？
+              </h4>
+              <p className="text-gray-600 mb-8">
+                {selectedUniversity.name}{selectedFaculty && ` ${selectedFaculty.name}`}で探したい過去問の種類を選択してください
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                <button
+                  onClick={() => setCourseType('faculty')}
+                  className="group p-6 border-2 border-gray-200 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all duration-200"
+                >
+                  <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">🏫</div>
+                  <h5 className="text-lg font-semibold text-gray-900 mb-2">学部専門科目</h5>
+                  <p className="text-sm text-gray-600">
+                    {selectedFaculty ? selectedFaculty.name : '学部'}の専門的な授業の過去問
+                  </p>
+                </button>
+                
+                <button
+                  onClick={() => setCourseType('general')}
+                  className="group p-6 border-2 border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all duration-200"
+                >
+                  <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">🌐</div>
+                  <h5 className="text-lg font-semibold text-gray-900 mb-2">全学共通科目</h5>
+                  <p className="text-sm text-gray-600">
+                    学部を問わず履修できる一般教養科目の過去問
+                  </p>
+                </button>
+              </div>
+              
+              <button
+                onClick={() => {
+                  setSearchExecuted(false)
+                  setCourseType('')
+                }}
+                className="mt-6 text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                ← 検索条件に戻る
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 検索結果エリア - 科目タイプが選択された場合 */}
+        {selectedUniversity && searchExecuted && courseType && (
+          <div className="bg-white rounded-2xl shadow-xl p-6">
+            <div className="text-center py-12">
+              <div className="text-orange-400 text-6xl mb-4">📝</div>
+              <h4 className="text-lg font-medium text-gray-900 mb-2">
+                過去問が見つかりませんでした
               </h4>
               <p className="text-gray-600 mb-6">
-                現在、この機能は開発中です。検索機能は近日公開予定です。
+                {selectedUniversity.name}{selectedFaculty && ` ${selectedFaculty.name}`}の
+                {courseType === 'faculty' ? '学部専門科目' : '全学共通科目'}の過去問はまだ投稿されていません
               </p>
-              <div className="space-y-2 text-sm text-gray-500">
-                <p>選択中の条件:</p>
-                <p><strong>大学:</strong> {selectedUniversity.name}</p>
-                {selectedFaculty && <p><strong>学部:</strong> {selectedFaculty.name}</p>}
-                {selectedDepartment && <p><strong>学科:</strong> {selectedDepartment.name}</p>}
-              </div>
-              <div className="mt-6">
-                <Link href="/upload" className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
-                  過去問を投稿する
+              
+              <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-6 mb-6">
+                <div className="text-4xl mb-4">✨</div>
+                <h5 className="text-lg font-semibold text-gray-900 mb-2">
+                  あなたが最初の投稿者になりませんか？
+                </h5>
+                <p className="text-gray-700 mb-4">
+                  勉強の記録や過去問を共有して、後輩たちの学習をサポートしましょう！<br />
+                  あなたの投稿が誰かの試験対策に役立ちます。
+                </p>
+                <Link href="/upload" className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  過去問・勉強記録を投稿する
                 </Link>
+              </div>
+              
+              <div className="space-y-2 text-sm text-gray-500 mb-6">
+                <p><strong>検索条件:</strong></p>
+                <p>🏛️ {selectedUniversity.name}</p>
+                {selectedFaculty && <p>🏫 {selectedFaculty.name}</p>}
+                {selectedDepartment && <p>📚 {selectedDepartment.name}</p>}
+                <p>📋 {courseType === 'faculty' ? '学部専門科目' : '全学共通科目'}</p>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <button
+                  onClick={() => setCourseType('')}
+                  className="px-4 py-2 text-indigo-600 hover:text-indigo-800 transition-colors"
+                >
+                  ← 科目タイプ選択に戻る
+                </button>
+                <button
+                  onClick={() => {
+                    setSearchExecuted(false)
+                    setCourseType('')
+                  }}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                >
+                  ← 検索条件に戻る
+                </button>
               </div>
             </div>
           </div>
