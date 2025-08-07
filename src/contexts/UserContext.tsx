@@ -30,24 +30,27 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
   useEffect(() => {
     // ローカルストレージからユーザー情報を読み込み
-    try {
-      const storedUser = localStorage.getItem('userProfile')
-      if (storedUser) {
-        setUser(JSON.parse(storedUser))
+    if (typeof window !== 'undefined') {
+      try {
+        const storedUser = localStorage.getItem('userProfile')
+        if (storedUser) {
+          setUser(JSON.parse(storedUser))
+        }
+      } catch (error) {
+        console.error('Failed to load user profile:', error)
       }
-    } catch (error) {
-      console.error('Failed to load user profile:', error)
-    } finally {
-      setIsLoaded(true)
     }
+    setIsLoaded(true)
   }, [])
 
   const updateUser = (newUser: UserProfile | null) => {
     setUser(newUser)
-    if (newUser) {
-      localStorage.setItem('userProfile', JSON.stringify(newUser))
-    } else {
-      localStorage.removeItem('userProfile')
+    if (typeof window !== 'undefined') {
+      if (newUser) {
+        localStorage.setItem('userProfile', JSON.stringify(newUser))
+      } else {
+        localStorage.removeItem('userProfile')
+      }
     }
   }
 

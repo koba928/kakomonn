@@ -30,13 +30,17 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   useEffect(() => {
     // Get theme from localStorage or default to 'system'
-    const savedTheme = localStorage.getItem('theme') as Theme
-    if (savedTheme) {
-      setTheme(savedTheme)
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('theme') as Theme
+      if (savedTheme) {
+        setTheme(savedTheme)
+      }
     }
   }, [])
 
   useEffect(() => {
+    if (typeof window === 'undefined') return
+
     const updateTheme = () => {
       let resolvedTheme: 'light' | 'dark'
       
