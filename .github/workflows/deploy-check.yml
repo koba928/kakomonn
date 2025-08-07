@@ -61,22 +61,22 @@ jobs:
     if: github.ref == 'refs/heads/main'
     
     steps:
-    - name: Wait for deployment
+    - name: Wait for deployment (poll)
       run: |
-        echo "Waiting for Vercel deployment to complete..."
-        sleep 30
-        
-    - name: Check deployment status
-      run: |
-        echo "Checking deployment status..."
-        response=$(curl -s -o /dev/null -w "%{http_code}" https://kakomonn-com.vercel.app/)
-        if [ $response -eq 200 ]; then
-          echo "✅ Deployment successful - Site is live!"
-          echo "🌐 URL: https://kakomonn-com.vercel.app"
-        else
-          echo "❌ Deployment may have issues - HTTP $response"
-          exit 1
-        fi
+        echo "Polling Vercel deployment status..."
+        for i in {1..15}; do
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://kakomonn-com.vercel.app/)
+          echo "Check $i/15: HTTP $response"
+          if [ "$response" -eq 200 ]; then
+            echo "✅ Deployment successful - Site is live!"
+            echo "🌐 URL: https://kakomonn-com.vercel.app"
+            exit 0
+          fi
+          echo "⏳ Waiting for deployment... ($i/15)"
+          sleep 20
+        done
+        echo "❌ Timeout: deployment not live after 5 minutes"
+        exit 1
         
     - name: Check all pages
       run: |
