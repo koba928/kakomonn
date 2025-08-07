@@ -1,177 +1,147 @@
 'use client'
 
 import Link from 'next/link'
-import { SearchIcon, ThreadIcon, BookIcon, ArrowRightIcon, UploadIcon, UserIcon } from '@/components/icons/IconSystem'
+import { SearchIcon, ThreadIcon, BookIcon, ArrowRightIcon } from '@/components/icons/IconSystem'
+import { AnimatedButton, FloatingActionButton } from '@/components/ui/MicroInteractions'
 import { ThemeToggle } from '@/components/theme/ThemeProvider'
-import { MDButton, MDCard, MDSurface, MDFAB, MDAppBar } from '@/components/ui/MaterialComponents'
-import { materialTheme, cn } from '@/styles/material-design'
 
 export default function Home() {
   return (
-    <main className={cn("min-h-screen", materialTheme.colors.background, "relative overflow-hidden transition-colors duration-300")}>
-      {/* Simplified background - Google style */}
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900 relative overflow-hidden transition-colors duration-300">
+      {/* 背景装飾 */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-50 dark:bg-blue-900/20 rounded-full blur-3xl opacity-50"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-50 dark:bg-indigo-900/20 rounded-full blur-3xl opacity-50"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-indigo-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-40 left-40 w-80 h-80 bg-pink-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
       </div>
 
-      {/* App Bar */}
-      <MDAppBar
-        title="過去問hub"
-        actions={[
-          <ThemeToggle key="theme" />,
-          <UserIcon key="user" size={24} />
-        ]}
-      />
+      {/* Theme Toggle */}
+      <div className="absolute top-6 right-6 z-20">
+        <ThemeToggle />
+      </div>
       
-      {/* Material Design FAB */}
-      <MDFAB
-        icon={<UploadIcon size={24} />}
-        onClick={() => window.location.href = '/upload'}
-        extended
-        label="投稿する"
+      {/* Floating Action Button */}
+      <FloatingActionButton
+        icon={<SearchIcon size={24} />}
+        onClick={() => window.location.href = '/threads'}
+        position="bottom-right"
       />
 
-      <div className="container mx-auto px-4 py-8 md:py-16 relative z-10">
-        <div className="max-w-4xl mx-auto">
-          {/* Hero Section - Google Style */}
-          <div className="mb-12 md:mb-16">
-            {/* Simple, clear messaging */}
-            <h1 className={cn(
-              materialTheme.typography.displayLarge,
-              "mb-4 text-center",
-              materialTheme.colors.onBackground,
-              "md:text-6xl"
-            )}>
-              大学生のための<br className="md:hidden" />
-              <span className="text-blue-600 dark:text-blue-400">勉強記録共有</span>プラットフォーム
+      <div className="container mx-auto px-4 py-12 md:py-20 relative z-10">
+        <div className="text-center max-w-5xl mx-auto">
+          {/* ヒーローセクション */}
+          <div className="mb-16">
+            <div className="inline-flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 px-4 py-2 rounded-full text-sm font-medium mb-6 animate-fade-in">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+              </span>
+              大学生のための学習プラットフォーム
+            </div>
+            
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-indigo-800 to-indigo-600 dark:from-gray-100 dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent animate-slide-in">
+              過去問<span className="text-indigo-600">hub</span>
             </h1>
             
-            <p className={cn(
-              materialTheme.typography.bodyLarge,
-              "text-center mb-8 max-w-2xl mx-auto",
-              materialTheme.colors.onSurfaceVariant
-            )}>
-              過去問を探して、話せる。全国の大学生が集まる学習コミュニティで、
-              効率的な試験対策を始めましょう。
+            <p className="text-2xl md:text-3xl text-gray-700 dark:text-gray-300 mb-4 font-medium animate-slide-in">
+              過去問を探せて、話せる。
+            </p>
+            
+            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto animate-slide-in">
+              全国の大学生が集まる、勉強記録と情報交換のコミュニティ。
+              先輩の知識を活用して、効率的な試験対策を。
             </p>
 
-            {/* Clear CTAs - Google style */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-in">
               <Link href="/threads">
-                <MDButton
-                  variant="filled"
-                  size="large"
-                  endIcon={<ArrowRightIcon size={20} />}
-                >
-                  スレッドを探す
-                </MDButton>
+                <AnimatedButton variant="primary" size="lg" className="flex items-center gap-2">
+                  スレッドを見る
+                  <ArrowRightIcon size={20} />
+                </AnimatedButton>
               </Link>
               
               <Link href="/upload">
-                <MDButton
-                  variant="outlined"
-                  size="large"
-                  startIcon={<UploadIcon size={20} />}
-                >
-                  勉強記録を投稿
-                </MDButton>
+                <AnimatedButton variant="secondary" size="lg">
+                  勉強記録を共有
+                </AnimatedButton>
               </Link>
             </div>
           </div>
           
-          {/* Key metrics - Simple and clear */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12 max-w-3xl mx-auto">
-            {[
-              { value: "50+", label: "大学" },
-              { value: "1,000+", label: "スレッド" },
-              { value: "5,000+", label: "ユーザー" },
-              { value: "10,000+", label: "コメント" },
-            ].map((stat, index) => (
-              <MDSurface key={index} elevation={1} className="text-center">
-                <div className={cn(materialTheme.typography.headlineMedium, "text-blue-600 dark:text-blue-400")}>
-                  {stat.value}
-                </div>
-                <div className={cn(materialTheme.typography.bodyMedium, materialTheme.colors.onSurfaceVariant)}>
-                  {stat.label}
-                </div>
-              </MDSurface>
-            ))}
+          {/* 統計情報 */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16 max-w-3xl mx-auto animate-fade-in">
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
+              <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">50+</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">大学</div>
+            </div>
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
+              <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">1,000+</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">スレッド</div>
+            </div>
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
+              <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">5,000+</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">ユーザー</div>
+            </div>
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
+              <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">10,000+</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">コメント</div>
+            </div>
           </div>
           
-          {/* Features Section - Material Design style */}
-          <div className="max-w-4xl mx-auto">
-            <h2 className={cn(
-              materialTheme.typography.headlineLarge,
-              "text-center mb-8",
-              materialTheme.colors.onBackground
-            )}>
-              主な機能
+          {/* 機能カード */}
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-12 animate-fade-in">
+              過去問hubでできること
             </h2>
-            <div className="grid md:grid-cols-3 gap-6">
-              <MDCard variant="elevated" className="p-6">
-                <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-4">
-                  <BookIcon size={24} color="currentColor" className="text-blue-600 dark:text-blue-400" />
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 animate-slide-in">
+                <div className="bg-gradient-to-br from-blue-400 to-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <BookIcon size={32} color="white" />
                 </div>
-                <h3 className={cn(materialTheme.typography.titleLarge, "mb-2")}>
-                  勉強記録アーカイブ
-                </h3>
-                <p className={cn(materialTheme.typography.bodyMedium, materialTheme.colors.onSurfaceVariant)}>
-                  学部・授業名・年度で簡単検索。先輩の知識を活用して効率的に学習
+                <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">過去問アーカイブ</h3>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                  学部・授業名・年度で簡単検索。先輩の勉強記録から効率的な試験対策を見つけよう
                 </p>
-              </MDCard>
-              <MDCard variant="elevated" className="p-6">
-                <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center mb-4">
-                  <ThreadIcon size={24} color="currentColor" className="text-purple-600 dark:text-purple-400" />
+              </div>
+              
+              <div className="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 animate-slide-in">
+                <div className="bg-gradient-to-br from-purple-400 to-purple-600 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <ThreadIcon size={32} color="white" />
                 </div>
-                <h3 className={cn(materialTheme.typography.titleLarge, "mb-2")}>
-                  リアルタイムディスカッション
-                </h3>
-                <p className={cn(materialTheme.typography.bodyMedium, materialTheme.colors.onSurfaceVariant)}>
-                  質問や相談をスレッド形式で投稿。同じ授業を受ける仲間と情報交換
+                <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">リアルタイム情報交換</h3>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                  「この問題どう解く？」「今年の傾向は？」Discord風のスレッドで気軽に質問・相談
                 </p>
-              </MDCard>
-              <MDCard variant="elevated" className="p-6">
-                <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mb-4">
-                  <SearchIcon size={24} color="currentColor" className="text-green-600 dark:text-green-400" />
+              </div>
+              
+              <div className="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 animate-slide-in">
+                <div className="bg-gradient-to-br from-pink-400 to-pink-600 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <SearchIcon size={32} color="white" />
                 </div>
-                <h3 className={cn(materialTheme.typography.titleLarge, "mb-2")}>
-                  スマート検索
-                </h3>
-                <p className={cn(materialTheme.typography.bodyMedium, materialTheme.colors.onSurfaceVariant)}>
-                  大学・学部・学年でフィルタリング。必要な情報にすばやくアクセス
+                <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">スマートな推薦</h3>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                  あなたの大学・学部・学年に最適化された情報をお届け。必要な情報に素早くアクセス
                 </p>
-              </MDCard>
+              </div>
             </div>
           </div>
 
-          {/* Final CTA - Clean and focused */}
-          <MDSurface elevation={2} className="mt-16 text-center p-8 md:p-12 bg-blue-50 dark:bg-blue-900/20">
-            <h2 className={cn(
-              materialTheme.typography.headlineMedium,
-              "mb-4",
-              materialTheme.colors.onBackground
-            )}>
-              今すぐ始めましょう
+          {/* CTA セクション */}
+          <div className="mt-20 bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-700 dark:to-purple-700 rounded-3xl p-8 md:p-12 text-white shadow-2xl animate-fade-in">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              今すぐ始めよう
             </h2>
-            <p className={cn(
-              materialTheme.typography.bodyLarge,
-              "mb-6 max-w-xl mx-auto",
-              materialTheme.colors.onSurfaceVariant
-            )}>
-              全国の大学生が参加する学習コミュニティで、
+            <p className="text-lg md:text-xl mb-8 opacity-90">
+              全国の大学生が参加する学習コミュニティに参加して、
               効率的な試験対策を始めましょう
             </p>
             <Link href="/threads">
-              <MDButton
-                variant="filled"
-                size="large"
-                endIcon={<ArrowRightIcon size={20} />}
-              >
+              <AnimatedButton variant="secondary" size="lg" className="inline-flex items-center gap-2 text-indigo-600">
                 無料で始める
-              </MDButton>
+                <ArrowRightIcon size={20} />
+              </AnimatedButton>
             </Link>
-          </MDSurface>
+          </div>
         </div>
       </div>
 
