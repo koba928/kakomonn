@@ -15,7 +15,7 @@
 - ✅ TypeScript型エラー完全解決
 - ✅ UIサイズ改善：「過去問を探す」ボタン拡大
 - ✅ 8大学から10大学へデータ拡張
-- 🚀 Vercel最新デプロイ実行 (TypeScriptエラー解決済)
+- 🚀 Vercel設定修正・デプロイ実行 (DEPLOYMENT_NOT_FOUND解決済)
 
 ## 技術スタック
 
