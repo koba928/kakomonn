@@ -66,7 +66,6 @@ export default function SearchPage() {
     'わせ': ['早稲田大学'],
     'わせだ': ['早稲田大学'],
     
-    'けい': ['慶應義塾大学'],
     'けいお': ['慶應義塾大学'],
     
     'きょう': ['京都大学'],
@@ -214,7 +213,7 @@ export default function SearchPage() {
         )
       })
     }
-  }, [])
+  }, [normalizeText])
 
   // フィルタリングされた大学リスト
   const filteredUniversities = useMemo(() => {
