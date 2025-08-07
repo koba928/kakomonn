@@ -36,4 +36,8 @@ npm run dev
 ```bash
 npm run build
 npm start
-```# Force deploy trigger
+```
+
+## デプロイ状況
+- 最新更新: 2025-08-07 16:35 JST
+- 全10大学の正確な学部学科データ実装済
