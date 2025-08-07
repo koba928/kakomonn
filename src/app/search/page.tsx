@@ -39,7 +39,7 @@ export default function SearchPage() {
   }, [])
 
   // ローマ字・ひらがな変換マップ
-  const searchMap: Record<string, string[]> = {
+  const searchMap = useMemo(() => ({
     // ローマ字
     'todai': ['東京大学', 'とうだい', 'トウダイ'],
     'waseda': ['早稲田大学', 'わせだ', 'ワセダ'],
@@ -79,7 +79,6 @@ export default function SearchPage() {
     'わせだだいがく': ['早稲田大学'],
     
     // 慶應義塾大学
-    'けい': ['慶應義塾大学'],
     'けいお': ['慶應義塾大学'],
     'けいおう': ['慶應義塾大学'],
     'けいおうぎじゅく': ['慶應義塾大学'],
@@ -173,7 +172,7 @@ export default function SearchPage() {
     'いがく': ['医学部'],
     'やく': ['薬学部'],
     'やくがく': ['薬学部'],
-  }
+  }), [])
 
   // ひらがな・カタカナ変換マップ
   const hiraganaToKatakana = (str: string): string => {
