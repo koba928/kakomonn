@@ -1,4 +1,3 @@
-'use client'
 
 import Link from 'next/link'
 import ThreadDetailClient from './ThreadDetailClient'
@@ -80,8 +79,8 @@ const mockComments: Comment[] = [
   }
 ]
 
-export default function ThreadDetailPage({ params }: { params: { id: string } }) {
-  const { id } = params
+export default async function ThreadDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 relative">
