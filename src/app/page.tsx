@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { SearchIcon, ThreadIcon, BookIcon, ArrowRightIcon } from '@/components/icons/IconSystem'
+import { SearchIcon, ThreadIcon, BookIcon, ArrowRightIcon, PlusIcon } from '@/components/icons/IconSystem'
 import { AnimatedButton, FloatingActionButton } from '@/components/ui/MicroInteractions'
 import { ThemeToggle } from '@/components/theme/ThemeProvider'
 
@@ -20,10 +20,10 @@ export default function Home() {
         <ThemeToggle />
       </div>
       
-      {/* Floating Action Button */}
+      {/* プラスマークで投稿ボタン */}
       <FloatingActionButton
-        icon={<SearchIcon size={24} />}
-        onClick={() => window.location.href = '/threads'}
+        icon={<PlusIcon size={24} />}
+        onClick={() => window.location.href = '/upload'}
         position="bottom-right"
       />
 
@@ -52,17 +52,12 @@ export default function Home() {
               先輩の知識を活用して、効率的な試験対策を。
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-in">
+            {/* メインアクション - 過去問を探すボタンのみ */}
+            <div className="flex justify-center animate-slide-in">
               <Link href="/threads">
                 <AnimatedButton variant="primary" size="lg" className="flex items-center gap-2">
-                  スレッドを見る
-                  <ArrowRightIcon size={20} />
-                </AnimatedButton>
-              </Link>
-              
-              <Link href="/upload">
-                <AnimatedButton variant="secondary" size="lg">
-                  勉強記録を共有
+                  過去問を探す
+                  <SearchIcon size={20} />
                 </AnimatedButton>
               </Link>
             </div>
@@ -137,8 +132,8 @@ export default function Home() {
             </p>
             <Link href="/threads">
               <AnimatedButton variant="secondary" size="lg" className="inline-flex items-center gap-2 text-indigo-600">
-                無料で始める
-                <ArrowRightIcon size={20} />
+                過去問を探してみる
+                <SearchIcon size={20} />
               </AnimatedButton>
             </Link>
           </div>
