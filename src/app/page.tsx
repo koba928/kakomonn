@@ -27,11 +27,11 @@ export default function Home() {
         position="bottom-right"
       />
 
-      <div className="container mx-auto px-4 py-8 sm:py-12 md:py-20 relative z-10">
+      <div className="container mx-auto px-4 py-6 sm:py-8 md:py-12 relative z-10 flex items-center min-h-screen">
         <div className="text-center max-w-5xl mx-auto">
           {/* ヒーローセクション */}
-          <div className="mb-16">
-            <div className="inline-flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 px-4 py-2 rounded-full text-sm font-medium mb-6 animate-fade-in">
+          <div className="mb-8 sm:mb-12">
+            <div className="inline-flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 px-4 py-2 rounded-full text-sm font-medium mb-4 sm:mb-6 animate-fade-in">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
@@ -53,7 +53,7 @@ export default function Home() {
             </p>
 
             {/* メインアクション - 過去問を探すボタンのみ */}
-            <div className="flex justify-center animate-slide-in">
+            <div className="flex justify-center animate-slide-in mb-4">
               <Link href="/threads">
                 <AnimatedButton variant="primary" size="lg" className="flex items-center gap-2">
                   過去問を探す
@@ -61,81 +61,18 @@ export default function Home() {
                 </AnimatedButton>
               </Link>
             </div>
-          </div>
-          
-          {/* 統計情報 */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-12 sm:mb-16 max-w-3xl mx-auto animate-fade-in">
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-3 sm:p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
-              <div className="text-2xl sm:text-3xl font-bold text-indigo-600 dark:text-indigo-400">50+</div>
-              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">大学</div>
-            </div>
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-3 sm:p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
-              <div className="text-2xl sm:text-3xl font-bold text-indigo-600 dark:text-indigo-400">1,000+</div>
-              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">スレッド</div>
-            </div>
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-3 sm:p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
-              <div className="text-2xl sm:text-3xl font-bold text-indigo-600 dark:text-indigo-400">5,000+</div>
-              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">ユーザー</div>
-            </div>
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-3 sm:p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
-              <div className="text-2xl sm:text-3xl font-bold text-indigo-600 dark:text-indigo-400">10,000+</div>
-              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">コメント</div>
-            </div>
-          </div>
-          
-          {/* 機能カード */}
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8 sm:mb-12 animate-fade-in">
-              過去問hubでできること
-            </h2>
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
-              <div className="group bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 animate-slide-in">
-                <div className="bg-gradient-to-br from-blue-400 to-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <BookIcon size={32} color="white" />
-                </div>
-                <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">過去問アーカイブ</h3>
-                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                  学部・授業名・年度で簡単検索。先輩の勉強記録から効率的な試験対策を見つけよう
-                </p>
-              </div>
-              
-              <div className="group bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 animate-slide-in">
-                <div className="bg-gradient-to-br from-purple-400 to-purple-600 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <ThreadIcon size={32} color="white" />
-                </div>
-                <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">リアルタイム情報交換</h3>
-                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                  「この問題どう解く？」「今年の傾向は？」Discord風のスレッドで気軽に質問・相談
-                </p>
-              </div>
-              
-              <div className="group bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 animate-slide-in">
-                <div className="bg-gradient-to-br from-pink-400 to-pink-600 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <SearchIcon size={32} color="white" />
-                </div>
-                <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">スマートな推薦</h3>
-                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                  あなたの大学・学部・学年に最適化された情報をお届け。必要な情報に素早くアクセス
-                </p>
+            
+            {/* 使い方ガイド */}
+            <div className="text-center text-sm text-gray-500 dark:text-gray-400 animate-fade-in">
+              <p className="mb-2">💡 <strong>使い方:</strong></p>
+              <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-xs opacity-75">
+                <span>📚 大学・学部で検索</span>
+                <span>💬 質問・相談を投稿</span>
+                <span className="flex items-center gap-1">
+                  ➕ 右下の<PlusIcon size={12} className="inline" />で新規投稿
+                </span>
               </div>
             </div>
-          </div>
-
-          {/* CTA セクション */}
-          <div className="mt-16 sm:mt-20 bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-700 dark:to-purple-700 rounded-3xl p-6 sm:p-8 md:p-12 text-white shadow-2xl animate-fade-in">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
-              今すぐ始めよう
-            </h2>
-            <p className="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 opacity-90 leading-relaxed">
-              全国の大学生が参加する学習コミュニティに参加して、
-              効率的な試験対策を始めましょう
-            </p>
-            <Link href="/threads">
-              <AnimatedButton variant="secondary" size="lg" className="inline-flex items-center gap-2 text-indigo-600">
-                過去問を探してみる
-                <SearchIcon size={20} />
-              </AnimatedButton>
-            </Link>
           </div>
         </div>
       </div>
