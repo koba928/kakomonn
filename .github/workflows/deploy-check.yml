@@ -66,11 +66,11 @@ jobs:
       run: |
         echo "Polling Vercel deployment status..."
         for i in {1..15}; do
-          response=$(curl -s -o /dev/null -w "%{http_code}" https://kakomonn-com.vercel.app/)
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://kakomonn.vercel.app/)
           echo "Check $i/15: HTTP $response"
           if [ "$response" -eq 200 ]; then
             echo "✅ Deployment successful - Site is live!"
-            echo "🌐 URL: https://kakomonn-com.vercel.app"
+            echo "🌐 URL: https://kakomonn.vercel.app"
             exit 0
           fi
           echo "⏳ Waiting for deployment... ($i/15)"
@@ -84,19 +84,19 @@ jobs:
         echo "Testing all pages..."
         
         # Test main page
-        main_status=$(curl -s -o /dev/null -w "%{http_code}" https://kakomonn-com.vercel.app/)
+        main_status=$(curl -s -o /dev/null -w "%{http_code}" https://kakomonn.vercel.app/)
         echo "Main page: HTTP $main_status"
         
         # Test threads page  
-        threads_status=$(curl -s -o /dev/null -w "%{http_code}" https://kakomonn-com.vercel.app/threads)
+        threads_status=$(curl -s -o /dev/null -w "%{http_code}" https://kakomonn.vercel.app/threads)
         echo "Threads page: HTTP $threads_status"
         
         # Test thread detail page
-        detail_status=$(curl -s -o /dev/null -w "%{http_code}" https://kakomonn-com.vercel.app/threads/1)
+        detail_status=$(curl -s -o /dev/null -w "%{http_code}" https://kakomonn.vercel.app/threads/1)
         echo "Thread detail: HTTP $detail_status"
         
         # Test upload page
-        upload_status=$(curl -s -o /dev/null -w "%{http_code}" https://kakomonn-com.vercel.app/upload)
+        upload_status=$(curl -s -o /dev/null -w "%{http_code}" https://kakomonn.vercel.app/upload)
         echo "Upload page: HTTP $upload_status"
         
         # Check if all pages are working
