@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useMemo, useCallback } from 'react'
+import { useMemo, useCallback } from 'react'
 import { VirtualizedAutocompleteSelect } from './VirtualizedAutocompleteSelect'
 import { universityDataDetailed } from '@/data/universityDataDetailed'
 
