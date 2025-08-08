@@ -1,11 +1,48 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
 
 export default function AuthMethodSelectPage() {
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null)
+  const [isChecking, setIsChecking] = useState(true)
+
+  useEffect(() => {
+    // 既にログイン済みかつ大学情報が登録済みかチェック
+    const checkExistingUser = () => {
+      const savedUserInfo = localStorage.getItem('kakomonn_user')
+      
+      if (savedUserInfo) {
+        try {
+          const parsed = JSON.parse(savedUserInfo)
+          // 大学情報が完全に登録済みの場合、直接検索ページへリダイレクト
+          if (parsed.university && parsed.faculty && parsed.department && parsed.isLoggedIn) {
+            window.location.href = '/search'
+            return
+          }
+        } catch (error) {
+          console.error('Failed to parse user info:', error)
+        }
+      }
+      
+      setIsChecking(false)
+    }
+
+    checkExistingUser()
+  }, [])
+
+  // チェック中はローディング表示
+  if (isChecking) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">確認中...</p>
+        </div>
+      </main>
+    )
+  }
 
   const authMethods = [
     {

@@ -1,10 +1,36 @@
+'use client'
+
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { SearchIcon } from '@/components/icons/IconSystem'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
 import HomeContent from '@/components/home/HomeContent'
 import { APP_CONFIG } from '@/constants/app'
 
 export default function Home() {
+  const [mainButtonHref, setMainButtonHref] = useState('/auth/method-select')
+
+  useEffect(() => {
+    // ログイン済みかつ大学情報が登録済みかチェック
+    const checkExistingUser = () => {
+      const savedUserInfo = localStorage.getItem('kakomonn_user')
+      
+      if (savedUserInfo) {
+        try {
+          const parsed = JSON.parse(savedUserInfo)
+          // 大学情報が完全に登録済みの場合、直接検索ページへ
+          if (parsed.university && parsed.faculty && parsed.department && parsed.isLoggedIn) {
+            setMainButtonHref('/search')
+          }
+        } catch (error) {
+          console.error('Failed to parse user info:', error)
+        }
+      }
+    }
+
+    checkExistingUser()
+  }, [])
+
   return (
     <main id="main-content" className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 relative overflow-hidden transition-colors duration-300">
       {/* 背景装飾 */}
@@ -40,7 +66,7 @@ export default function Home() {
 
             {/* メインアクション - 過去問を探すボタン */}
             <nav className="flex justify-center animate-slide-in mb-4" aria-label="メインナビゲーション">
-              <Link href="/auth/method-select">
+              <Link href={mainButtonHref}>
                 <AnimatedButton variant="primary" size="lg" aria-label="過去問を検索する">
                   <SearchIcon size={24} aria-hidden={true} />
                   過去問を探す

@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
 import { AcademicInfoSelector, AcademicInfo } from '@/components/ui/AcademicInfoSelector'
 import { VirtualizedAutocompleteSelect } from '@/components/ui/VirtualizedAutocompleteSelect'
@@ -18,6 +18,43 @@ export default function UniversityInfoPage() {
   const [year, setYear] = useState('')
   const [penName, setPenName] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isChecking, setIsChecking] = useState(true)
+
+  useEffect(() => {
+    // 既に大学情報が完了しているかチェック
+    const checkExistingInfo = () => {
+      const savedUserInfo = localStorage.getItem('kakomonn_user')
+      
+      if (savedUserInfo) {
+        try {
+          const parsed = JSON.parse(savedUserInfo)
+          // 大学情報が既に完了している場合、検索ページへリダイレクト
+          if (parsed.university && parsed.faculty && parsed.department && parsed.universityInfoCompleted) {
+            window.location.href = '/search'
+            return
+          }
+        } catch (error) {
+          console.error('Failed to parse user info:', error)
+        }
+      }
+      
+      setIsChecking(false)
+    }
+
+    checkExistingInfo()
+  }, [])
+
+  // チェック中はローディング表示
+  if (isChecking) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">確認中...</p>
+        </div>
+      </main>
+    )
+  }
 
   const handleAcademicInfoChange = (newInfo: AcademicInfo) => {
     setAcademicInfo(newInfo)
@@ -69,7 +106,9 @@ export default function UniversityInfoPage() {
       year,
       penName: penName || '匿名さん',
       isLoggedIn: true,
-      completedAt: new Date().toISOString()
+      completedAt: new Date().toISOString(),
+      // 次回以降はスキップするための完了フラグ
+      universityInfoCompleted: true
     }
     
     localStorage.setItem('kakomonn_user', JSON.stringify(userInfo))
