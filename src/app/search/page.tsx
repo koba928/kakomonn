@@ -72,7 +72,7 @@ interface LivePost {
 }
 */
 
-type MainSection = 'search' | 'exams'
+type MainSection = 'specialized' | 'general'
 
 const mockResults: SearchResult[] = [
   {
@@ -134,7 +134,7 @@ interface UserInfo {
 
 function SearchPageClient() {
   const searchParams = useSearchParams()
-  const [activeSection, setActiveSection] = useState<MainSection>('exams')
+  const [activeSection, setActiveSection] = useState<MainSection>('specialized')
   const [query, setQuery] = useState('')
   const [selectedTab, setSelectedTab] = useState<'all' | 'threads' | 'users' | 'courses'>('all')
   const [results, setResults] = useState<SearchResult[]>([])
@@ -236,7 +236,7 @@ function SearchPageClient() {
               </Link>
             )}
             <div className="text-sm text-gray-500">
-              {query && activeSection === 'search' && `"${query}" の検索結果`}
+              {query && `"${query}" の検索結果 - ${activeSection === 'specialized' ? '学部専門科目' : '全学共通科目'}`}
             </div>
           </div>
         </div>
@@ -245,26 +245,36 @@ function SearchPageClient() {
         <div className="text-center mb-8">
           <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-6 px-8 rounded-2xl shadow-lg mb-6">
             <h2 className="text-2xl font-bold mb-2">📝 過去問データベース</h2>
-            <p className="text-lg opacity-90">大学の過去問を検索・共有・分析できるプラットフォーム</p>
+            <p className="text-lg opacity-90">あなたの学部に合わせた過去問を簡単検索</p>
           </div>
           
+          {userInfo && (
+            <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-6 max-w-2xl mx-auto">
+              <div className="flex items-center justify-center space-x-2">
+                <span className="text-indigo-600">🏫</span>
+                <span className="text-indigo-800 font-medium">{userInfo.university} {userInfo.faculty}</span>
+                <span className="text-indigo-600">の情報を優先表示中</span>
+              </div>
+            </div>
+          )}
+          
           <div className="flex justify-center mb-6">
-            <div className="flex bg-white rounded-xl shadow-sm border border-gray-200 p-1">
+            <div className="flex bg-white rounded-xl shadow-sm border border-gray-200 p-1 max-w-2xl">
               {[
-                { key: 'exams', label: '📝 過去問検索', desc: 'メイン機能' },
-                { key: 'search', label: '🔍 統合検索', desc: 'その他の検索' }
+                { key: 'specialized', label: '🎓 学部専門科目', desc: 'メジャーの専門科目' },
+                { key: 'general', label: '🌍 全学共通科目', desc: '教養・言語科目' }
               ].map(section => (
                 <button
                   key={section.key}
                   onClick={() => setActiveSection(section.key as MainSection)}
-                  className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`flex-1 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
                     activeSection === section.key
                       ? 'bg-indigo-600 text-white shadow-md'
                       : 'text-gray-600 hover:text-indigo-600 hover:bg-indigo-50'
                   }`}
                 >
                   <div className="text-center">
-                    <div className="text-base">{section.label}</div>
+                    <div className="text-base mb-1">{section.label}</div>
                     <div className="text-xs opacity-80">{section.desc}</div>
                   </div>
                 </button>
@@ -273,17 +283,6 @@ function SearchPageClient() {
           </div>
         </div>
 
-        {/* Personalized Welcome Message */}
-        {userInfo && !query && (
-          <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-8">
-            <h3 className="text-lg font-semibold text-indigo-900 mb-2">
-              こんにちは、{userInfo.penName || '匿名ユーザー'}さん！
-            </h3>
-            <p className="text-indigo-700 text-sm">
-              {userInfo.university} {userInfo.faculty} {userInfo.department} {userInfo.year}の情報を優先的に表示します。
-            </p>
-          </div>
-        )}
 
         {/* Search Bar */}
         <div className="mb-8">
@@ -295,8 +294,9 @@ function SearchPageClient() {
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch(query)}
                 placeholder={
-                  activeSection === 'exams' ? "科目名、大学名、年度で過去問を検索..." :
-                  "過去問、授業、教授を検索..."
+                  activeSection === 'specialized' 
+                    ? `${userInfo?.faculty || '学部'}の専門科目を検索... (例: 線形代数、マクロ経済学)` 
+                    : "全学共通科目を検索... (例: 英語コミュニケーション、体育実技)"
                 }
                 className="w-full px-4 py-4 pl-12 text-lg border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white/80 backdrop-blur-sm"
               />
@@ -310,11 +310,11 @@ function SearchPageClient() {
             {/* Sample searches based on active section */}
             <div className="mt-3">
               <div className="text-sm text-gray-500 mb-2">
-                {activeSection === 'exams' ? '人気の過去問: ' : '人気の検索: '}
+                {activeSection === 'specialized' ? `${userInfo?.faculty || '学部'}の人気科目:` : '人気の全学共通科目:'}
               </div>
               <div className="flex flex-wrap gap-2 justify-center">
-                {activeSection === 'exams' ? [
-                  '線形代数 2024', '有機化学 期末', 'マクロ経済学', 'データ構造'
+                {activeSection === 'specialized' ? [
+                  '線形代数', 'マクロ経済学', '有機化学', 'データ構造', '統計学', '国際関係論'
                 ].map(term => (
                   <button
                     key={term}
@@ -322,12 +322,12 @@ function SearchPageClient() {
                       setQuery(term)
                       handleSearch(term)
                     }}
-                    className="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full text-sm transition-colors"
+                    className="px-3 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-full text-sm transition-colors font-medium"
                   >
                     {term}
                   </button>
                 )) : [
-                  '線形代数', 'マクロ経済学', '有機化学', 'プログラミング基礎'
+                  '英語コミュニケーション', '体育実技', '数学基礎', '物理学実験', '情報リテラシー', '哲学概論'
                 ].map(term => (
                   <button
                     key={term}
@@ -335,7 +335,7 @@ function SearchPageClient() {
                       setQuery(term)
                       handleSearch(term)
                     }}
-                    className="px-3 py-1 bg-gray-100 hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 rounded-full text-sm transition-colors"
+                    className="px-3 py-1 bg-green-100 hover:bg-green-200 text-green-700 rounded-full text-sm transition-colors font-medium"
                   >
                     {term}
                   </button>
@@ -358,8 +358,8 @@ function SearchPageClient() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-3">
-            {/* Search Section */}
-            {activeSection === 'search' && query && (
+            {/* Search Results */}
+            {query && (
               <>
                 {/* Tabs */}
                 <div className="flex space-x-1 bg-gray-100 rounded-lg p-1 mb-6">
@@ -471,177 +471,144 @@ function SearchPageClient() {
               </>
             )}
 
-            {activeSection === 'search' && !query && (
-              <div className="text-center py-12">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">何をお探しですか？</h2>
-                <p className="text-gray-600 mb-8">過去問、授業情報、教授について検索できます</p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto mb-8">
-                  <button 
-                    onClick={() => {
-                      setQuery('線形代数')
-                      handleSearch('線形代数')
-                    }}
-                    className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md hover:border-indigo-300 transition-all group cursor-pointer"
-                  >
-                    <div className="text-indigo-600 text-3xl mb-4 group-hover:scale-110 transition-transform">📝</div>
-                    <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-indigo-600">過去問・試験情報</h3>
-                    <p className="text-sm text-gray-600">過去の試験問題や傾向を検索</p>
-                    <div className="mt-2 text-xs text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                      クリックして試してみる →
-                    </div>
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setQuery('マクロ経済学')
-                      handleSearch('マクロ経済学')
-                    }}
-                    className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md hover:border-purple-300 transition-all group cursor-pointer"
-                  >
-                    <div className="text-purple-600 text-3xl mb-4 group-hover:scale-110 transition-transform">📚</div>
-                    <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-purple-600">授業・講義情報</h3>
-                    <p className="text-sm text-gray-600">授業の内容や評価を検索</p>
-                    <div className="mt-2 text-xs text-purple-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                      クリックして試してみる →
-                    </div>
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setQuery('田中教授')
-                      handleSearch('田中教授')
-                    }}
-                    className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md hover:border-green-300 transition-all group cursor-pointer"
-                  >
-                    <div className="text-green-600 text-3xl mb-4 group-hover:scale-110 transition-transform">👨‍🏫</div>
-                    <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-green-600">教授・講師情報</h3>
-                    <p className="text-sm text-gray-600">教授の授業スタイルや評価を検索</p>
-                    <div className="mt-2 text-xs text-green-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                      クリックして試してみる →
-                    </div>
-                  </button>
-                </div>
-                
-                {/* Quick action buttons */}
-                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                  <div className="text-sm text-gray-500">メイン機能を試してみよう:</div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setActiveSection('exams')}
-                      className="px-6 py-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium border-2 border-blue-200"
-                    >
-                      📝 過去問データベースを見る
-                    </button>
-                    <button
-                      onClick={() => {
-                        setQuery('線形代数 2024')
-                        handleSearch('線形代数 2024')
-                      }}
-                      className="px-6 py-3 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors text-sm font-medium"
-                    >
-                      🔍 サンプル検索を試す
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-
-            {/* Past Exams Section */}
-            {activeSection === 'exams' && (
+            {/* Faculty Specialized Section */}
+            {activeSection === 'specialized' && !query && (
               <div className="space-y-6">
-                <div className="text-center py-12">
-                  <div className="text-indigo-600 text-6xl mb-6">📝</div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-4">過去問データベース</h2>
-                  <p className="text-gray-600 mb-8">年度別・学期別に整理された過去問をチェック</p>
-                  
-                  {/* Past Exam Features */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100">
-                      <div className="text-blue-600 text-3xl mb-4">📅</div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-2">年度別検索</h3>
-                      <p className="text-gray-600 text-sm mb-4">2020年〜2024年の過去問を年度別に検索</p>
-                      <div className="bg-white p-3 rounded-lg">
-                        <div className="flex justify-between text-sm text-gray-600">
-                          <span>2024年</span>
-                          <span className="text-blue-600 font-medium">234件</span>
-                        </div>
-                        <div className="flex justify-between text-sm text-gray-600">
-                          <span>2023年</span>
-                          <span className="text-blue-600 font-medium">189件</span>
-                        </div>
-                      </div>
+                <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-8 border border-indigo-100">
+                  <div className="text-center">
+                    <div className="text-indigo-600 text-5xl mb-4">🎓</div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-3">学部専門科目</h2>
+                    <p className="text-gray-600 mb-6">
+                      {userInfo ? `${userInfo.faculty} ${userInfo.department}` : 'あなたの学部'}の専門科目の過去問を検索
+                    </p>
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                      {[
+                        { subject: '線形代数', icon: '📊', count: '45' },
+                        { subject: 'マクロ経済学', icon: '💹', count: '32' },
+                        { subject: '有機化学', icon: '🧪', count: '28' },
+                        { subject: 'データ構造', icon: '💻', count: '38' },
+                        { subject: '統計学', icon: '📈', count: '24' },
+                        { subject: '国際関係論', icon: '🌍', count: '19' },
+                        { subject: '機械学習', icon: '🤖', count: '41' },
+                        { subject: '会計学', icon: '💼', count: '26' }
+                      ].map((item, index) => (
+                        <button
+                          key={index}
+                          onClick={() => {
+                            setQuery(item.subject)
+                            handleSearch(item.subject)
+                          }}
+                          className="bg-white p-4 rounded-lg border border-gray-200 hover:border-indigo-300 hover:shadow-md transition-all group"
+                        >
+                          <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">{item.icon}</div>
+                          <div className="text-sm font-medium text-gray-900 mb-1">{item.subject}</div>
+                          <div className="text-xs text-gray-500">{item.count}件の過去問</div>
+                        </button>
+                      ))}
                     </div>
                     
-                    <div className="bg-gradient-to-br from-orange-50 to-red-50 p-6 rounded-xl border border-orange-100">
-                      <div className="text-orange-600 text-3xl mb-4">📊</div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-2">出題傾向</h3>
-                      <p className="text-gray-600 text-sm mb-4">過去3年間の出題傾向を分析</p>
-                      <div className="bg-white p-3 rounded-lg">
-                        <div className="space-y-1">
-                          <div className="flex items-center justify-between text-sm">
-                            <span>計算問題</span>
-                            <div className="w-12 bg-gray-200 rounded-full h-2">
-                              <div className="bg-orange-500 h-2 rounded-full" style={{width: '80%'}}></div>
-                            </div>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span>論述問題</span>
-                            <div className="w-12 bg-gray-200 rounded-full h-2">
-                              <div className="bg-orange-500 h-2 rounded-full" style={{width: '60%'}}></div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border border-green-100">
-                      <div className="text-green-600 text-3xl mb-4">✅</div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-2">解答・解説</h3>
-                      <p className="text-gray-600 text-sm mb-4">詳細な解答と先輩からのアドバイス</p>
-                      <div className="bg-white p-3 rounded-lg">
-                        <div className="text-sm text-gray-600">
-                          <div className="flex items-center mb-1">
-                            <span className="text-green-600">✓</span>
-                            <span className="ml-2">解答付き: 156件</span>
-                          </div>
-                          <div className="flex items-center">
-                            <span className="text-blue-600">💡</span>
-                            <span className="ml-2">解説付き: 89件</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-8 space-y-4">
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-yellow-600">⚠️</span>
-                        <span className="text-sm text-yellow-800 font-medium">このセクションは開発中です</span>
-                      </div>
-                      <p className="text-xs text-yellow-700 mt-1">過去問データベースと分析機能を準備中です！</p>
-                    </div>
-                    
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                      <button 
-                        onClick={() => setActiveSection('search')}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2 rounded-lg transition-colors"
-                      >
-                        🔍 統合検索に戻る
-                      </button>
-                      <button 
-                        onClick={() => {
-                          setQuery('線形代数 2024')
-                          handleSearch('線形代数 2024')
-                        }}
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition-colors"
-                      >
-                        📝 サンプル過去問を見る
-                      </button>
+                    <div className="text-sm text-gray-500">
+                      お探しの科目が見つからない場合は、上の検索ボックスで直接検索してください
                     </div>
                   </div>
                 </div>
               </div>
             )}
+
+            {/* General Education Section */}
+            {activeSection === 'general' && !query && (
+              <div className="space-y-6">
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 border border-green-100">
+                  <div className="text-center">
+                    <div className="text-green-600 text-5xl mb-4">🌍</div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-3">全学共通科目</h2>
+                    <p className="text-gray-600 mb-6">
+                      教養科目・言語科目・基礎科目の過去問を検索
+                    </p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                      <div className="bg-white p-6 rounded-xl border border-gray-200">
+                        <div className="text-blue-600 text-3xl mb-3">💬</div>
+                        <h3 className="font-bold text-gray-900 mb-3">言語科目</h3>
+                        <div className="space-y-2">
+                          {[
+                            '英語コミュニケーション',
+                            '中国語',
+                            'ドイツ語',
+                            'フランス語'
+                          ].map(subject => (
+                            <button
+                              key={subject}
+                              onClick={() => {
+                                setQuery(subject)
+                                handleSearch(subject)
+                              }}
+                              className="w-full text-sm py-2 px-3 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition-colors"
+                            >
+                              {subject}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="bg-white p-6 rounded-xl border border-gray-200">
+                        <div className="text-purple-600 text-3xl mb-3">🧠</div>
+                        <h3 className="font-bold text-gray-900 mb-3">教養科目</h3>
+                        <div className="space-y-2">
+                          {[
+                            '哲学概論',
+                            '心理学入門',
+                            '文学史',
+                            '社会学概論'
+                          ].map(subject => (
+                            <button
+                              key={subject}
+                              onClick={() => {
+                                setQuery(subject)
+                                handleSearch(subject)
+                              }}
+                              className="w-full text-sm py-2 px-3 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg transition-colors"
+                            >
+                              {subject}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="bg-white p-6 rounded-xl border border-gray-200">
+                        <div className="text-orange-600 text-3xl mb-3">🏃</div>
+                        <h3 className="font-bold text-gray-900 mb-3">基礎・実技科目</h3>
+                        <div className="space-y-2">
+                          {[
+                            '体育実技',
+                            '情報リテラシー',
+                            '数学基礎',
+                            '物理学実験'
+                          ].map(subject => (
+                            <button
+                              key={subject}
+                              onClick={() => {
+                                setQuery(subject)
+                                handleSearch(subject)
+                              }}
+                              className="w-full text-sm py-2 px-3 bg-orange-50 hover:bg-orange-100 text-orange-700 rounded-lg transition-colors"
+                            >
+                              {subject}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="text-sm text-gray-500">
+                      お探しの科目が見つからない場合は、上の検索ボックスで直接検索してください
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
 
           </div>
 
