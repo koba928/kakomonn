@@ -130,13 +130,21 @@ function SearchPageClient() {
   const [specializedCategory, setSpecializedCategory] = useState<SpecializedCategory | null>(null)
   const [generalStep, setGeneralStep] = useState<GeneralStep>('genre')
   const [generalGenre, setGeneralGenre] = useState<GeneralGenre | null>(null)
-  const [subjectSearchQuery, setSubjectSearchQuery] = useState('')
   
   // Professor search flow state
   const [professorStep, setProfessorStep] = useState<ProfessorStep>('search')
   const [professorQuery, setProfessorQuery] = useState('')
   const [selectedProfessor, setSelectedProfessor] = useState<string | null>(null)
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null)
+
+  const handleSearch = useCallback(async (searchQuery: string) => {
+    if (!searchQuery.trim()) {
+      return
+    }
+
+    // In a real app, this would navigate to search results page
+    console.log('Searching for:', searchQuery)
+  }, [])
 
   useEffect(() => {
     const q = searchParams.get('q')
@@ -176,15 +184,6 @@ function SearchPageClient() {
       // No user info found, show university selection modal
       setShowUniversityModal(true)
     }
-  }, [])
-
-  const handleSearch = useCallback(async (searchQuery: string) => {
-    if (!searchQuery.trim()) {
-      return
-    }
-
-    // In a real app, this would navigate to search results page
-    console.log('Searching for:', searchQuery)
   }, [])
 
   const handleAcademicInfoChange = (newInfo: AcademicInfo) => {
@@ -284,77 +283,12 @@ function SearchPageClient() {
   }
 
 
-  const getSubjectsByCategory = () => {
-    const subjectData = {
-      specialized: {
-        department: [
-          { subject: '線形代数学', icon: '📐', count: '68' },
-          { subject: '解析学', icon: '📊', count: '45' },
-          { subject: 'マクロ経済学', icon: '📈', count: '55' },
-          { subject: 'ミクロ経済学', icon: '📉', count: '48' },
-          { subject: '有機化学', icon: '🧪', count: '38' },
-          { subject: 'データ構造', icon: '🗂️', count: '44' },
-          { subject: '物理学', icon: '🔬', count: '52' },
-          { subject: '機械工学', icon: '⚙️', count: '29' },
-          { subject: '経営学原理', icon: '📋', count: '39' },
-          { subject: '憲法', icon: '⚖️', count: '41' },
-          { subject: '統計学', icon: '📊', count: '33' },
-          { subject: 'プログラミング', icon: '💻', count: '58' }
-        ],
-        other: [
-          { subject: '生物学', icon: '🧬', count: '29' },
-          { subject: '化学実験', icon: '🧪', count: '32' },
-          { subject: '電子工学', icon: '🔌', count: '26' },
-          { subject: '社会学', icon: '👥', count: '24' },
-          { subject: '心理学', icon: '🧠', count: '31' },
-          { subject: '哲学', icon: '🤔', count: '25' },
-          { subject: '機械学習', icon: '🤖', count: '41' },
-          { subject: '国際関係論', icon: '🌍', count: '28' }
-        ]
-      },
-      general: {
-        language: [
-          { subject: '英語コミュニケーション', icon: '🇺🇸', count: '89' },
-          { subject: '中国語', icon: '🇨🇳', count: '45' },
-          { subject: 'ドイツ語', icon: '🇩🇪', count: '32' },
-          { subject: 'フランス語', icon: '🇫🇷', count: '28' },
-          { subject: 'スペイン語', icon: '🇪🇸', count: '22' },
-          { subject: '日本語(留学生向け)', icon: '🇯🇵', count: '18' },
-          { subject: 'TOEFL対策', icon: '📝', count: '34' },
-          { subject: '英語読解', icon: '📚', count: '56' }
-        ],
-        liberal: [
-          { subject: '哲学概論', icon: '🤔', count: '42' },
-          { subject: '心理学入門', icon: '🧠', count: '67' },
-          { subject: '文学史', icon: '📖', count: '38' },
-          { subject: '社会学概論', icon: '👥', count: '51' },
-          { subject: '日本史', icon: '🏛️', count: '45' },
-          { subject: '世界史', icon: '🌍', count: '39' },
-          { subject: '政治学', icon: '🏛️', count: '33' },
-          { subject: '経済学入門', icon: '💰', count: '48' }
-        ],
-        other: [
-          { subject: '体育実技', icon: '🏃', count: '76' },
-          { subject: '情報リテラシー', icon: '💻', count: '84' },
-          { subject: '数学基礎', icon: '🔢', count: '63' },
-          { subject: '物理学実験', icon: '⚗️', count: '41' },
-          { subject: '生物学実験', icon: '🧬', count: '29' },
-          { subject: '化学実験', icon: '🧪', count: '35' },
-          { subject: '地学', icon: '🌍', count: '22' },
-          { subject: '環境科学', icon: '🌱', count: '27' }
-        ]
-      }
-    }
-    return subjectData
-  }
-
   const resetFlow = () => {
     setActiveSection(null)
     setSpecializedStep('category')
     setSpecializedCategory(null)
     setGeneralStep('genre')
     setGeneralGenre(null)
-    setSubjectSearchQuery('')
     setProfessorStep('search')
     setProfessorQuery('')
     setSelectedProfessor(null)
