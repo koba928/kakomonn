@@ -126,7 +126,7 @@ export function AcademicInfoSelector({
 
   const renderUniversityStep = () => (
     <div className={`space-y-6 ${className}`}>
-      {showSteps && <StepIndicator current={1} total={3} />}
+      {showSteps && <StepIndicator current={1} total={5} />}
       
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">{title.university}</h2>
@@ -144,7 +144,7 @@ export function AcademicInfoSelector({
 
   const renderFacultyStep = () => (
     <div className={`space-y-6 ${className}`}>
-      {showSteps && <StepIndicator current={2} total={3} />}
+      {showSteps && <StepIndicator current={2} total={5} />}
       
       <div className="text-center">
         {value.university && (
@@ -166,7 +166,7 @@ export function AcademicInfoSelector({
 
   const renderDepartmentStep = () => (
     <div className={`space-y-6 ${className}`}>
-      {showSteps && <StepIndicator current={3} total={3} />}
+      {showSteps && <StepIndicator current={3} total={5} />}
       
       <div className="text-center">
         {value.university && value.faculty && (

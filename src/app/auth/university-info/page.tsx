@@ -67,7 +67,7 @@ export default function UniversityInfoPage() {
     const userInfo = {
       ...academicInfo,
       year,
-      penName,
+      penName: penName || '匿名さん',
       isLoggedIn: true,
       completedAt: new Date().toISOString()
     }
@@ -190,7 +190,7 @@ export default function UniversityInfoPage() {
           maxLength={20}
         />
         <p className="mt-1 text-xs text-gray-500">
-          {penName ? `${penName.length}/20文字` : '空欄の場合は「匿名ユーザー」として表示されます'}
+          {penName ? `${penName.length}/20文字` : '空欄の場合は「匿名さん」として表示されます'}
         </p>
       </div>
 
@@ -198,7 +198,7 @@ export default function UniversityInfoPage() {
       <div className="bg-gray-50 rounded-lg p-4">
         <h4 className="text-sm font-medium text-gray-900 mb-2">プロフィールプレビュー</h4>
         <div className="space-y-2 text-sm text-gray-600">
-          <p><strong>表示名:</strong> {penName || '匿名ユーザー'}</p>
+          <p><strong>表示名:</strong> {penName || '匿名さん'}</p>
           <p><strong>所属:</strong> {academicInfo.university} {academicInfo.faculty} {academicInfo.department}</p>
           <p><strong>学年:</strong> {year}</p>
         </div>
