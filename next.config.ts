@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
   compress: true,
   
   // パフォーマンス最適化
-  swcMinify: true,
+  // swcMinify: true, // Next.js 15ではデフォルトで有効
   
   // セキュリティヘッダー
   async headers() {

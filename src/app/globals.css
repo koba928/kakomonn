@@ -223,7 +223,9 @@ html {
 
 /* テキストの省略 */
 .text-ellipsis {
-  @apply overflow-hidden text-ellipsis whitespace-nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* レスポンシブグリッド */
