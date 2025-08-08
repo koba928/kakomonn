@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { flexibleMatch } from '@/utils/kanaUtils'
 import { matchUniversityName } from '@/data/universityReadings'
+import { matchFacultyName } from '@/data/facultyReadings'
 
 interface Option {
   value: string
@@ -36,6 +37,8 @@ export function VirtualizedAutocompleteSelect({
       if (flexibleMatch(option.label, searchQuery)) return true
       // 大学名専用の読み仮名マッチング
       if (matchUniversityName(option.label, searchQuery)) return true
+      // 学部・学科名専用の読み仮名マッチング
+      if (matchFacultyName(option.label, searchQuery)) return true
       return false
     })
   }, [options, searchQuery])
