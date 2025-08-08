@@ -38,29 +38,14 @@ export default function Home() {
               {APP_CONFIG.fullDescription}
             </p>
 
-            {/* メインアクション - 利用方法選択 */}
-            <nav className="space-y-4 animate-slide-in mb-8" aria-label="メインナビゲーション">
-              <div className="flex flex-col gap-4 justify-center items-center max-w-sm mx-auto">
-                <Link href="/auth/method-select" className="w-full">
-                  <AnimatedButton variant="primary" size="lg" className="w-full" aria-label="ログインして始める">
-                    <span aria-hidden="true">👤</span>
-                    ログインして始める
-                  </AnimatedButton>
-                </Link>
-                
-                <div className="text-gray-400 text-sm">または</div>
-                
-                <Link href="/search" className="w-full">
-                  <AnimatedButton variant="secondary" size="lg" className="w-full" aria-label="ログインせずに使う">
-                    <SearchIcon size={24} aria-hidden={true} />
-                    ログインせずに使う
-                  </AnimatedButton>
-                </Link>
-              </div>
-              
-              <div className="text-center text-sm text-gray-600 mt-6">
-                <p>ログインすると、あなたの大学に最適化された情報を表示します</p>
-              </div>
+            {/* メインアクション - 過去問を探すボタン */}
+            <nav className="flex justify-center animate-slide-in mb-4" aria-label="メインナビゲーション">
+              <Link href="/auth/method-select">
+                <AnimatedButton variant="primary" size="lg" aria-label="過去問を検索する">
+                  <SearchIcon size={24} aria-hidden={true} />
+                  過去問を探す
+                </AnimatedButton>
+              </Link>
             </nav>
             
             {/* 使い方ガイド */}
