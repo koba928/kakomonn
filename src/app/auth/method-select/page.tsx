@@ -21,7 +21,7 @@ export default function AuthMethodSelectPage() {
       title: 'Google',
       description: 'Googleアカウントでログイン',
       icon: '🌐',
-      href: '/auth/google',
+      href: '/auth/university-info',
       popular: true
     },
     {

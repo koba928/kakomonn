@@ -28,6 +28,7 @@ export function VirtualizedAutocompleteSelect({
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredOptions = useMemo(() => {
+    console.log('Options available:', options.length, 'Search query:', searchQuery)
     if (!searchQuery) return options
     return options.filter(option =>
       option.label.toLowerCase().includes(searchQuery.toLowerCase())
