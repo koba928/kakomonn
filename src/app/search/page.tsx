@@ -18,6 +18,8 @@ interface SearchResult {
   likeCount?: number
 }
 
+// Future interfaces for new sections
+/*
 interface Course {
   id: string
   name: string
@@ -68,6 +70,7 @@ interface LivePost {
   replies: number
   isAnonymous: boolean
 }
+*/
 
 type MainSection = 'search' | 'courses' | 'exams' | 'live'
 
