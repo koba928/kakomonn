@@ -1,0 +1,55 @@
+
+> kakomonn-hub@0.1.2 dev
+> next dev
+
+   ▲ Next.js 15.1.7
+   - Local:        http://localhost:3000
+   - Network:      http://10.255.255.254:3000
+
+ ✓ Starting...
+ ✓ Ready in 31s
+ ○ Compiling /search ...
+ ✓ Compiled /search in 27.4s (617 modules)
+ ✓ Compiled in 2.9s (306 modules)
+ GET /search 200 in 30476ms
+ ✓ Compiled in 220ms (292 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 1394ms (619 modules)
+ GET / 200 in 2183ms
+ GET / 200 in 143ms
+ GET /search 200 in 345ms
+ GET / 200 in 250ms
+ GET /search 200 in 301ms
+ GET /search 200 in 434ms
+ GET /search 200 in 315ms
+ GET /search 200 in 296ms
+ GET / 200 in 235ms
+ GET /search 200 in 313ms
+ GET / 200 in 850ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 3s (623 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /search 404 in 3953ms
+ GET /_next/static/webpack/dac40eba0f17840f.webpack.hot-update.json 404 in 1335ms
+ ⨯ Error: Could not find the module "C:\Users\junju\OneDrive\Desktop\kakkomonn.com\kakomonn.com\src\components\ui\MicroInteractions.tsx#AnimatedButton" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '2917665564'
+}
+ ⨯ Error: Could not find the module "C:\Users\junju\OneDrive\Desktop\kakkomonn.com\kakomonn.com\src\components\icons\IconSystem.tsx#SearchIcon" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '2464890300'
+}
+ ⨯ Error: Could not find the module "C:\Users\junju\OneDrive\Desktop\kakkomonn.com\kakomonn.com\src\components\icons\IconSystem.tsx#SearchIcon" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '2464890300'
+}
+ ⨯ Error: Could not find the module "C:\Users\junju\OneDrive\Desktop\kakkomonn.com\kakomonn.com\src\components\home\HomeContent.tsx#HomeContent" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '2383541372'
+}
+ GET /search 200 in 2661ms
+ GET / 500 in 2677ms

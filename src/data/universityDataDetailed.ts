@@ -16,7 +16,10 @@ export interface University {
   faculties: Faculty[]
 }
 
-export const universityDataDetailed: University[] = [
+// import { additionalUniversities } from './additionalUniversities'
+
+const baseUniversities: University[] = [
+  // 国立大学
   {
     id: 'todai',
     name: '東京大学',
@@ -1884,3 +1887,6 @@ export const getDepartmentsByFaculty = (universityId: string, facultyId: string)
   
   return faculty.departments
 }
+
+// 全大学データの統合
+export const universityDataDetailed: University[] = baseUniversities

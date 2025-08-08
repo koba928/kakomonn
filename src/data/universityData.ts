@@ -124,34 +124,7 @@ export const universityData: University[] = [
       { id: 'kyodai-agriculture', name: '農学部', deviationValue: 63, departments: [] }
     ]
   },
-  {
-    id: 'waseda',
-    name: '早稲田大学',
-    faculties: [
-      { id: 'waseda-law', name: '法学部', deviationValue: 65, departments: [] },
-      { id: 'waseda-politics', name: '政治経済学部', deviationValue: 67, departments: [] },
-      { id: 'waseda-literature', name: '文学部', deviationValue: 63, departments: [] },
-      { id: 'waseda-science', name: '理工学部', deviationValue: 64, departments: [] },
-      { id: 'waseda-commerce', name: '商学部', deviationValue: 65, departments: [] },
-      { id: 'waseda-social', name: '社会科学部', deviationValue: 64, departments: [] },
-      { id: 'waseda-education', name: '教育学部', deviationValue: 62, departments: [] },
-      { id: 'waseda-international', name: '国際教養学部', deviationValue: 68, departments: [] }
-    ]
-  },
-  {
-    id: 'keio',
-    name: '慶應義塾大学',
-    faculties: [
-      { id: 'keio-law', name: '法学部', deviationValue: 67, departments: [] },
-      { id: 'keio-economics', name: '経済学部', deviationValue: 68, departments: [] },
-      { id: 'keio-literature', name: '文学部', deviationValue: 65, departments: [] },
-      { id: 'keio-commerce', name: '商学部', deviationValue: 66, departments: [] },
-      { id: 'keio-medicine', name: '医学部', deviationValue: 72, departments: [] },
-      { id: 'keio-science', name: '理工学部', deviationValue: 64, departments: [] },
-      { id: 'keio-policy', name: '総合政策学部', deviationValue: 65, departments: [] },
-      { id: 'keio-environment', name: '環境情報学部', deviationValue: 63, departments: [] }
-    ]
-  },
+  // wasedaとkeioはuniversityDataDetailed.tsで定義済みのため削除
   {
     id: 'osaka',
     name: '大阪大学',

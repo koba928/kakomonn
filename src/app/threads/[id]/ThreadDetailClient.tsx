@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useUser } from '@/contexts/UserContext'
 
 interface Comment {
   id: string
@@ -8,15 +9,22 @@ interface Comment {
   author: string
   createdAt: string
   likes: number
+  isLiked?: boolean
 }
 
 interface ThreadDetailClientProps {
   initialComments: Comment[]
+  threadId: string
 }
 
-export default function ThreadDetailClient({ initialComments }: ThreadDetailClientProps) {
+export default function ThreadDetailClient({ initialComments, threadId }: ThreadDetailClientProps) {
+  const { user, isLoggedIn } = useUser()
   const [newComment, setNewComment] = useState('')
   const [comments, setComments] = useState<Comment[]>(initialComments)
+  const [isBookmarked, setIsBookmarked] = useState(false)
+  const [isLiked, setIsLiked] = useState(false)
+  const [likeCount, setLikeCount] = useState(89)
+  const [shareCount] = useState(32)
 
   const handleSubmitComment = (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,9 +33,15 @@ export default function ThreadDetailClient({ initialComments }: ThreadDetailClie
     const comment: Comment = {
       id: Date.now().toString(),
       content: newComment,
-      author: '匿名ユーザー',
-      createdAt: new Date().toLocaleString('ja-JP'),
-      likes: 0
+      author: user?.name || '匿名ユーザー',
+      createdAt: new Date().toLocaleString('ja-JP', {
+        month: 'numeric',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
+      likes: 0,
+      isLiked: false
     }
 
     setComments([...comments, comment])
@@ -37,95 +51,161 @@ export default function ThreadDetailClient({ initialComments }: ThreadDetailClie
   const handleLike = (commentId: string) => {
     setComments(comments.map(comment => 
       comment.id === commentId 
-        ? { ...comment, likes: comment.likes + 1 }
+        ? { 
+            ...comment, 
+            likes: comment.isLiked ? comment.likes - 1 : comment.likes + 1,
+            isLiked: !comment.isLiked
+          }
         : comment
     ))
   }
 
+  const handleThreadLike = () => {
+    setIsLiked(!isLiked)
+    setLikeCount(prev => isLiked ? prev - 1 : prev + 1)
+  }
+
+  const handleBookmark = () => {
+    setIsBookmarked(!isBookmarked)
+  }
+
   return (
     <>
-      {/* コメント投稿フォーム */}
-      <div className="bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-lg border border-gray-100 mb-8">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="bg-gradient-to-br from-indigo-400 to-indigo-600 w-8 h-8 rounded-lg flex items-center justify-center">
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-            </svg>
-          </div>
-          <h3 className="text-xl font-bold text-gray-900">コメントを投稿</h3>
+      {/* Comment form */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="p-4">
+          <form onSubmit={handleSubmitComment}>
+            <div className="flex space-x-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center">
+                <span className="text-white font-bold">
+                  {user?.name?.charAt(0) || '匿'}
+                </span>
+              </div>
+              <div className="flex-1">
+                <textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder={isLoggedIn ? "返信をツイート" : "ログインしてコメントする"}
+                  className="w-full text-xl placeholder-gray-500 border-none resize-none focus:outline-none"
+                  rows={3}
+                  disabled={!isLoggedIn}
+                />
+                {isLoggedIn && (
+                  <div className="flex items-center justify-between mt-3">
+                    <div className="flex items-center space-x-4 text-indigo-500">
+                      <button type="button" className="hover:bg-indigo-50 p-2 rounded-full transition-colors">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </button>
+                      <button type="button" className="hover:bg-indigo-50 p-2 rounded-full transition-colors">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h4a1 1 0 110 2h-1v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6H3a1 1 0 110-2h4z" />
+                        </svg>
+                      </button>
+                      <button type="button" className="hover:bg-indigo-50 p-2 rounded-full transition-colors">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1a3 3 0 015.83 1M15 10h1a3 3 0 01-1.001 2.249M9 10v3.001M15 10v3.001" />
+                        </svg>
+                      </button>
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={!newComment.trim()}
+                      className="bg-indigo-600 text-white px-4 py-2 rounded-full font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      返信
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </form>
         </div>
-        <form onSubmit={handleSubmitComment} className="space-y-6">
-          <textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="このスレッドについてコメントする..."
-            className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white hover:border-indigo-200 resize-none"
-            rows={4}
-            required
-          />
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              className="group bg-indigo-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center gap-2"
-            >
-              コメント投稿
-              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
-            </button>
-          </div>
-        </form>
       </div>
 
-      {/* コメント一覧 */}
-      <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <div className="bg-gradient-to-br from-purple-400 to-purple-600 w-8 h-8 rounded-lg flex items-center justify-center">
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900">
-            コメント ({comments.length}件)
-          </h3>
-        </div>
-        
-        {comments.map((comment) => (
-          <div key={comment.id} className="bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-200">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center">
-                  <span className="text-lg font-bold text-white">
+      {/* Comments list */}
+      <div>
+        {comments.map((comment, index) => (
+          <div key={comment.id} className="bg-white border-b border-gray-200 hover:bg-gray-50 transition-colors">
+            <div className="p-4">
+              <div className="flex space-x-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center">
+                  <span className="text-white font-bold">
                     {comment.author.charAt(0)}
                   </span>
                 </div>
-                <div>
-                  <p className="font-bold text-gray-900 text-lg">{comment.author}</p>
-                  <p className="text-sm text-gray-500 font-medium">{comment.createdAt}</p>
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2">
+                    <span className="font-bold text-gray-900">{comment.author}</span>
+                    <span className="text-gray-500">·</span>
+                    <span className="text-gray-500 text-sm">{comment.createdAt}</span>
+                  </div>
+                  
+                  <div className="mt-2 text-gray-700 whitespace-pre-line">
+                    {comment.content}
+                  </div>
+                  
+                  {/* Comment actions */}
+                  <div className="flex items-center justify-between max-w-md mt-3">
+                    <button className="flex items-center space-x-2 text-gray-500 hover:text-blue-600 transition-colors group">
+                      <div className="p-2 rounded-full group-hover:bg-blue-50 transition-colors">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                      </div>
+                      <span className="text-sm">0</span>
+                    </button>
+                    
+                    <button className="flex items-center space-x-2 text-gray-500 hover:text-green-600 transition-colors group">
+                      <div className="p-2 rounded-full group-hover:bg-green-50 transition-colors">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                      </div>
+                      <span className="text-sm">0</span>
+                    </button>
+                    
+                    <button
+                      onClick={() => handleLike(comment.id)}
+                      className={`flex items-center space-x-2 transition-colors group ${
+                        comment.isLiked ? 'text-red-600' : 'text-gray-500 hover:text-red-600'
+                      }`}
+                    >
+                      <div className="p-2 rounded-full group-hover:bg-red-50 transition-colors">
+                        <svg className={`w-4 h-4 ${comment.isLiked ? 'fill-current' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                      </div>
+                      <span className="text-sm">{comment.likes}</span>
+                    </button>
+                    
+                    <button className="flex items-center space-x-2 text-gray-500 hover:text-gray-700 transition-colors group">
+                      <div className="p-2 rounded-full group-hover:bg-gray-100 transition-colors">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                        </svg>
+                      </div>
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-            
-            <p className="text-gray-700 mb-6 leading-relaxed text-lg">{comment.content}</p>
-            
-            <div className="flex items-center gap-6">
-              <button
-                onClick={() => handleLike(comment.id)}
-                className="flex items-center gap-2 text-gray-500 hover:text-red-500 transition-colors px-3 py-2 rounded-lg hover:bg-red-50"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-                <span className="font-medium">{comment.likes}</span>
-              </button>
-              
-              <button className="text-gray-500 hover:text-indigo-600 transition-colors px-3 py-2 rounded-lg hover:bg-indigo-50 font-medium">
-                返信
-              </button>
             </div>
           </div>
         ))}
       </div>
+
+      {/* Login prompt if not logged in */}
+      {!isLoggedIn && (
+        <div className="bg-white border-b border-gray-200 p-4">
+          <div className="text-center">
+            <p className="text-gray-700 mb-4">ログインしてコメントに参加しよう</p>
+            <button className="bg-indigo-600 text-white px-6 py-2 rounded-full font-medium hover:bg-indigo-700 transition-colors">
+              ログイン
+            </button>
+          </div>
+        </div>
+      )}
     </>
   )
 }

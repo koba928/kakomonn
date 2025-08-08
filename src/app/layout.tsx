@@ -14,7 +14,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body className="antialiased bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+      <body className="antialiased bg-white text-gray-900 transition-colors duration-300" suppressHydrationWarning>
+        {/* Skip navigation link for keyboard users */}
+        <a 
+          href="#main-content" 
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
+        >
+          メインコンテンツへスキップ
+        </a>
         <ClientProviders>
           {children}
         </ClientProviders>

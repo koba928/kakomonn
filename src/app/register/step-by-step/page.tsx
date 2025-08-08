@@ -1,15 +1,18 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { universityDataDetailed, getDepartmentsByFaculty } from '@/data/universityDataDetailed'
+import { universityDataDetailed } from '@/data/universityDataDetailed'
 import { UserRegistrationData } from '@/types/user'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
 import Link from 'next/link'
 import { ArrowRightIcon, CheckIcon } from '@/components/icons/IconSystem'
+import { APP_CONFIG, UI_CONFIG, MESSAGES, STORAGE_KEYS } from '@/constants/app'
+import { useFormErrorHandler } from '@/hooks/useErrorHandler'
 
 type Step = 'university' | 'faculty' | 'department' | 'year' | 'name' | 'complete'
 
 export default function StepByStepRegisterPage() {
+  const formErrorHandler = useFormErrorHandler()
   const [currentStep, setCurrentStep] = useState<Step>('university')
   const [formData, setFormData] = useState<UserRegistrationData>({
     name: '',
@@ -39,13 +42,41 @@ export default function StepByStepRegisterPage() {
   }, [formData.university, formData.faculty])
 
   const handleSelection = (field: keyof UserRegistrationData, value: string | number) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value,
-      // 上位選択が変更された場合は下位をリセット
-      ...(field === 'university' && { faculty: '', department: '' }),
-      ...(field === 'faculty' && { department: '' })
-    }))
+    try {
+      // Validate selection based on field type
+      if (field === 'name' && typeof value === 'string') {
+        if (value.trim().length < 1) {
+          formErrorHandler.handleValidationError('名前は必須です', field)
+          return
+        }
+        if (value.trim().length > 50) {
+          formErrorHandler.handleValidationError('名前は50文字以下で入力してください', field)
+          return
+        }
+      }
+
+      if (field === 'year' && typeof value === 'number') {
+        if (value < 1 || value > 6) {
+          formErrorHandler.handleValidationError('学年は1年から6年の間で選択してください', field)
+          return
+        }
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        [field]: value,
+        // 上位選択が変更された場合は下位をリセット
+        ...(field === 'university' && { faculty: '', department: '' }),
+        ...(field === 'faculty' && { department: '' })
+      }))
+
+      // Clear any previous errors for this field
+      formErrorHandler.clearErrors()
+    } catch (error) {
+      formErrorHandler.handleSubmissionError(
+        error instanceof Error ? error : `${field}の選択中にエラーが発生しました`
+      )
+    }
   }
 
   const goToNextStep = () => {
@@ -86,20 +117,65 @@ export default function StepByStepRegisterPage() {
   }
 
   const handleSubmit = async () => {
-    setIsSubmitting(true)
-    
     try {
-      const userProfile = {
-        id: Date.now().toString(),
-        ...formData,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }
+      // Validate all required fields before submission
+      const validationErrors = []
       
-      localStorage.setItem('userProfile', JSON.stringify(userProfile))
-      setCurrentStep('complete')
+      if (!formData.university.trim()) {
+        validationErrors.push('大学が選択されていません')
+      }
+      if (!formData.faculty.trim()) {
+        validationErrors.push('学部が選択されていません')
+      }
+      if (!formData.department.trim()) {
+        validationErrors.push('学科が選択されていません')
+      }
+      if (!formData.name.trim()) {
+        validationErrors.push('名前が入力されていません')
+      }
+      if (formData.year < 1 || formData.year > 6) {
+        validationErrors.push('学年が正しく選択されていません')
+      }
+
+      if (validationErrors.length > 0) {
+        formErrorHandler.handleValidationError(
+          `登録情報に不備があります: ${validationErrors.join(', ')}`
+        )
+        return
+      }
+
+      setIsSubmitting(true)
+
+      // Use error handler's withLoading method for registration
+      const result = await formErrorHandler.withLoading(async () => {
+        const userProfile = {
+          id: Date.now().toString(),
+          ...formData,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+        
+        // Save to localStorage with error handling
+        try {
+          localStorage.setItem(STORAGE_KEYS.userProfile, JSON.stringify(userProfile))
+        } catch (storageError) {
+          throw new Error('ユーザー情報の保存に失敗しました。ブラウザの設定をご確認ください')
+        }
+        
+        // Simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
+        return { success: true }
+      }, 'ユーザー登録に失敗しました')
+
+      if (result?.success) {
+        setCurrentStep('complete')
+      }
+
     } catch (error) {
-      console.error('Registration failed:', error)
+      formErrorHandler.handleSubmissionError(
+        error instanceof Error ? error : 'ユーザー登録中にエラーが発生しました'
+      )
     } finally {
       setIsSubmitting(false)
     }
@@ -123,13 +199,7 @@ export default function StepByStepRegisterPage() {
   }
 
   const renderStepIndicator = () => {
-    const steps = [
-      { key: 'university', label: '大学', number: 1 },
-      { key: 'faculty', label: '学部', number: 2 },
-      { key: 'department', label: '学科', number: 3 },
-      { key: 'year', label: '学年', number: 4 },
-      { key: 'name', label: '名前', number: 5 }
-    ]
+    const steps = UI_CONFIG.stepIndicator.steps
 
     const getCurrentStepNumber = () => {
       const stepMap = { university: 1, faculty: 2, department: 3, year: 4, name: 5, complete: 6 }
@@ -139,35 +209,39 @@ export default function StepByStepRegisterPage() {
     const currentStepNumber = getCurrentStepNumber()
 
     return (
-      <div className="flex items-center justify-center mb-8">
-        {steps.map((step, index) => (
-          <div key={step.key} className="flex items-center">
-            <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-200 ${
-              step.number < currentStepNumber
-                ? 'bg-green-500 border-green-500 text-white'
-                : step.number === currentStepNumber
-                ? 'bg-indigo-600 border-indigo-600 text-white'
-                : 'bg-gray-100 border-gray-300 text-gray-400'
-            }`}>
-              {step.number < currentStepNumber ? (
-                <CheckIcon size={16} />
-              ) : (
-                <span className="text-sm font-bold">{step.number}</span>
+      <nav className="mb-8" aria-label="登録手順">
+        <ol className="flex items-center justify-center" role="list">
+          {steps.map((step, index) => (
+            <li key={step.key} className="flex items-center">
+              <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-200 ${
+                step.number < currentStepNumber
+                  ? 'bg-green-500 border-green-500 text-white'
+                  : step.number === currentStepNumber
+                  ? 'bg-indigo-600 border-indigo-600 text-white'
+                  : 'bg-gray-100 border-gray-300 text-gray-400'
+              }`}
+              aria-current={step.number === currentStepNumber ? 'step' : undefined}
+              aria-label={`ステップ ${step.number}: ${step.label}${step.number === currentStepNumber ? ' (現在のステップ)' : step.number < currentStepNumber ? ' (完了)' : ' (未完了)'}`}>
+                {step.number < currentStepNumber ? (
+                  <CheckIcon size={16} aria-hidden={true} />
+                ) : (
+                  <span className="text-sm font-bold">{step.number}</span>
+                )}
+              </div>
+              <span className={`ml-2 text-sm font-medium ${
+                step.number <= currentStepNumber ? 'text-gray-900' : 'text-gray-400'
+              }`}>
+                {step.label}
+              </span>
+              {index < steps.length - 1 && (
+                <div className={`w-8 h-0.5 mx-4 ${
+                  step.number < currentStepNumber ? 'bg-green-500' : 'bg-gray-300'
+                }`} aria-hidden="true" />
               )}
-            </div>
-            <span className={`ml-2 text-sm font-medium ${
-              step.number <= currentStepNumber ? 'text-gray-900' : 'text-gray-400'
-            }`}>
-              {step.label}
-            </span>
-            {index < steps.length - 1 && (
-              <div className={`w-8 h-0.5 mx-4 ${
-                step.number < currentStepNumber ? 'bg-green-500' : 'bg-gray-300'
-              }`} />
-            )}
-          </div>
-        ))}
-      </div>
+            </li>
+          ))}
+        </ol>
+      </nav>
     )
   }
 
@@ -175,11 +249,14 @@ export default function StepByStepRegisterPage() {
     switch (currentStep) {
       case 'university':
         return (
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">あなたの大学を選択してください</h2>
-            <p className="text-gray-600 mb-8">まずは通っている大学を教えてください</p>
+          <fieldset>
+            <legend className="sr-only">大学選択</legend>
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2" id="university-heading">あなたの大学を選択してください</h2>
+              <p className="text-gray-600 mb-8">まずは通っている大学を教えてください</p>
+            </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-4xl mx-auto" role="group" aria-labelledby="university-heading">
               {universityDataDetailed.map(university => (
                 <button
                   key={university.id}
@@ -189,13 +266,15 @@ export default function StepByStepRegisterPage() {
                       ? 'border-indigo-500 bg-indigo-50 shadow-lg'
                       : 'border-gray-200 bg-white hover:border-indigo-300'
                   }`}
+                  aria-pressed={formData.university === university.name}
+                  aria-describedby={`${university.id}-description`}
                 >
                   <h3 className="text-lg font-bold text-gray-900 mb-2">{university.name}</h3>
-                  <p className="text-sm text-gray-600">{university.faculties.length}学部</p>
+                  <p id={`${university.id}-description`} className="text-sm text-gray-600">{university.faculties.length}学部</p>
                 </button>
               ))}
             </div>
-          </div>
+          </fieldset>
         )
 
       case 'faculty':
@@ -265,14 +344,7 @@ export default function StepByStepRegisterPage() {
             </div>
             
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
-              {[
-                { value: 1, label: '1年生' },
-                { value: 2, label: '2年生' },
-                { value: 3, label: '3年生' },
-                { value: 4, label: '4年生' },
-                { value: 5, label: '大学院1年' },
-                { value: 6, label: '大学院2年' }
-              ].map(year => (
+              {UI_CONFIG.yearOptions.map(year => (
                 <button
                   key={year.value}
                   onClick={() => handleSelection('year', year.value)}
@@ -320,9 +392,9 @@ export default function StepByStepRegisterPage() {
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckIcon size={40} className="text-green-600" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">登録完了！</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">{MESSAGES.success.registrationComplete}</h2>
               <p className="text-gray-600 mb-8">
-                {formData.name}さん、過去問hubへようこそ！<br />
+                {formData.name}さん、{APP_CONFIG.name}へようこそ！<br />
                 {formData.university} {formData.faculty}の情報を中心にパーソナライズされたコンテンツをお届けします。
               </p>
               
@@ -338,7 +410,7 @@ export default function StepByStepRegisterPage() {
               
               <Link href="/">
                 <AnimatedButton variant="primary" size="lg" className="w-full">
-                  過去問hubを使い始める
+                  {MESSAGES.navigation.startUsing}
                 </AnimatedButton>
               </Link>
             </div>
@@ -363,9 +435,9 @@ export default function StepByStepRegisterPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50">
+    <main id="main-content" className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50">
       {/* 背景装飾 */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-indigo-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
       </div>
@@ -404,7 +476,7 @@ export default function StepByStepRegisterPage() {
                       : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                   }`}
                 >
-                  戻る
+                  {MESSAGES.navigation.back}
                 </button>
                 
                 <AnimatedButton
@@ -415,10 +487,10 @@ export default function StepByStepRegisterPage() {
                   className="flex items-center gap-2"
                 >
                   {(currentStep as Step) === 'name' ? (
-                    isSubmitting ? '登録中...' : '登録完了'
+                    isSubmitting ? MESSAGES.loading.registering : MESSAGES.navigation.complete
                   ) : (
                     <>
-                      次へ
+                      {MESSAGES.navigation.next}
                       <ArrowRightIcon size={16} />
                     </>
                   )}

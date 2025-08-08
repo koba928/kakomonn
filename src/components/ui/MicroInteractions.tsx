@@ -10,15 +10,19 @@ interface AnimatedButtonProps {
   size?: 'sm' | 'md' | 'lg'
   className?: string
   disabled?: boolean
+  'aria-label'?: string
+  'aria-describedby'?: string
 }
 
-export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
+export const AnimatedButton: React.FC<AnimatedButtonProps> = React.memo(({
   children,
   onClick,
   variant = 'primary',
   size = 'md',
   className = '',
-  disabled = false
+  disabled = false,
+  'aria-label': ariaLabel,
+  'aria-describedby': ariaDescribedBy
 }) => {
   const baseStyles = 'relative overflow-hidden transition-all duration-300 ease-out transform'
   const hoverStyles = 'hover:scale-105 hover:shadow-lg active:scale-95'
@@ -48,6 +52,9 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
       `}
       onClick={onClick}
       disabled={disabled}
+      aria-label={ariaLabel}
+      aria-describedby={ariaDescribedBy}
+      type="button"
     >
       <span className="relative z-10 flex items-center gap-2">
         {children}
@@ -55,18 +62,20 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
       <div className="absolute inset-0 bg-white/20 translate-y-full transition-transform duration-300 group-hover:translate-y-0" />
     </button>
   )
-}
+})
 
 interface LikeButtonProps {
   initialLikes?: number
   isLiked?: boolean
   onToggle?: (liked: boolean) => void
+  'aria-label'?: string
 }
 
-export const LikeButton: React.FC<LikeButtonProps> = ({
+export const LikeButton: React.FC<LikeButtonProps> = React.memo(({
   initialLikes = 0,
   isLiked = false,
-  onToggle
+  onToggle,
+  'aria-label': ariaLabel
 }) => {
   const [liked, setLiked] = useState(isLiked)
   const [likes, setLikes] = useState(initialLikes)
@@ -93,17 +102,21 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
         }
         ${isAnimating ? 'scale-110' : 'hover:scale-105'}
       `}
+      aria-label={ariaLabel || `${liked ? '取り消し' : 'いいね'} - ${likes}いいね`}
+      aria-pressed={liked}
+      type="button"
     >
       <HeartIcon 
         size={16} 
         className={`transition-all duration-300 ${
           liked ? 'fill-red-500 text-red-500' : ''
         } ${isAnimating ? 'animate-pulse' : ''}`}
+        aria-hidden="true"
       />
       <span className="text-sm font-medium">{likes}</span>
     </button>
   )
-}
+})
 
 interface RatingProps {
   rating: number
@@ -111,14 +124,16 @@ interface RatingProps {
   onRate?: (rating: number) => void
   readonly?: boolean
   size?: number
+  'aria-label'?: string
 }
 
-export const InteractiveRating: React.FC<RatingProps> = ({
+export const InteractiveRating: React.FC<RatingProps> = React.memo(({
   rating,
   maxRating = 5,
   onRate,
   readonly = false,
-  size = 20
+  size = 20,
+  'aria-label': ariaLabel
 }) => {
   const [hoverRating, setHoverRating] = useState(0)
   const [isHovering, setIsHovering] = useState(false)
@@ -132,6 +147,8 @@ export const InteractiveRating: React.FC<RatingProps> = ({
         setIsHovering(false)
         setHoverRating(0)
       }}
+      role="group"
+      aria-label={ariaLabel || `評価: ${maxRating}点満点中${rating}点`}
     >
       {Array.from({ length: maxRating }, (_, index) => {
         const starValue = index + 1
@@ -155,6 +172,8 @@ export const InteractiveRating: React.FC<RatingProps> = ({
               }
             }}
             disabled={readonly}
+            aria-label={`${starValue}点の評価を付ける`}
+            type="button"
           >
             <StarIcon
               size={size}
@@ -163,26 +182,29 @@ export const InteractiveRating: React.FC<RatingProps> = ({
               className={`transition-colors duration-200 ${
                 !readonly && 'hover:text-yellow-400'
               }`}
+              aria-hidden="true"
             />
           </button>
         )
       })}
     </div>
   )
-}
+})
 
 interface FloatingActionButtonProps {
   onClick?: () => void
   icon: React.ReactNode
   position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'
   className?: string
+  'aria-label': string
 }
 
-export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
+export const FloatingActionButton: React.FC<FloatingActionButtonProps> = React.memo(({
   onClick,
   icon,
   position = 'bottom-right',
-  className = ''
+  className = '',
+  'aria-label': ariaLabel
 }) => {
   const positionStyles = {
     'bottom-right': 'bottom-4 right-4 md:bottom-6 md:right-6',
@@ -206,13 +228,15 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
         ${className}
       `}
       style={{ minHeight: '44px', minWidth: '44px' }}
+      aria-label={ariaLabel}
+      type="button"
     >
-      <span className="w-6 h-6 sm:w-7 sm:h-7">
+      <span className="w-6 h-6 sm:w-7 sm:h-7" aria-hidden="true">
         {icon}
       </span>
     </button>
   )
-}
+})
 
 interface ProgressBarProps {
   progress: number
@@ -222,7 +246,7 @@ interface ProgressBarProps {
   animated?: boolean
 }
 
-export const ProgressBar: React.FC<ProgressBarProps> = ({
+export const ProgressBar: React.FC<ProgressBarProps> = React.memo(({
   progress,
   maxProgress = 100,
   color = 'bg-blue-500',
@@ -243,7 +267,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
       />
     </div>
   )
-}
+})
 
 interface PulseLoadingProps {
   size?: 'sm' | 'md' | 'lg'
@@ -251,7 +275,7 @@ interface PulseLoadingProps {
   className?: string
 }
 
-export const PulseLoading: React.FC<PulseLoadingProps> = ({
+export const PulseLoading: React.FC<PulseLoadingProps> = React.memo(({
   size = 'md',
   color = 'bg-blue-500',
   className = ''
@@ -278,7 +302,7 @@ export const PulseLoading: React.FC<PulseLoadingProps> = ({
       ))}
     </div>
   )
-}
+})
 
 interface TooltipProps {
   content: string
@@ -287,7 +311,7 @@ interface TooltipProps {
   className?: string
 }
 
-export const Tooltip: React.FC<TooltipProps> = ({
+export const Tooltip: React.FC<TooltipProps> = React.memo(({
   content,
   children,
   position = 'top',
@@ -323,4 +347,4 @@ export const Tooltip: React.FC<TooltipProps> = ({
       )}
     </div>
   )
-}
+})

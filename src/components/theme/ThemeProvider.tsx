@@ -1,6 +1,8 @@
 'use client'
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
+import { storage } from '@/utils/storage'
+import { THEME_CONFIG } from '@/constants/app'
 
 type Theme = 'light' | 'dark' | 'system'
 
@@ -25,71 +27,78 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [theme, setTheme] = useState<Theme>('system')
+  const [mounted, setMounted] = useState(false)
+  const [theme, setTheme] = useState<Theme>(THEME_CONFIG.defaultTheme)
   const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>('light')
-  const [isLoaded, setIsLoaded] = useState(false)
 
+  // マウント後にのみテーマを読み込み
   useEffect(() => {
-    // Get theme from localStorage or default to 'system'
-    if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('theme') as Theme
-      if (savedTheme) {
-        setTheme(savedTheme)
-      }
+    setMounted(true)
+    
+    // ローカルストレージからテーマを読み込み
+    const savedTheme = storage.get(THEME_CONFIG.storageKey) as Theme
+    if (savedTheme && THEME_CONFIG.themes.includes(savedTheme)) {
+      setTheme(savedTheme)
     }
-    setIsLoaded(true)
   }, [])
 
+  // テーマが変更されたときの処理
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (!mounted) return
 
-    const updateTheme = () => {
-      let resolvedTheme: 'light' | 'dark'
-      
-      if (theme === 'system') {
+    let resolvedTheme: 'light' | 'dark' = 'light'
+    
+    if (theme === 'system') {
+      if (typeof window !== 'undefined') {
         resolvedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-      } else {
-        resolvedTheme = theme
       }
-      
-      setCurrentTheme(resolvedTheme)
-      
-      // Apply to document
+    } else {
+      resolvedTheme = theme
+    }
+    
+    setCurrentTheme(resolvedTheme)
+    
+    // DOM操作
+    if (typeof document !== 'undefined') {
       if (resolvedTheme === 'dark') {
         document.documentElement.classList.add('dark')
       } else {
         document.documentElement.classList.remove('dark')
       }
-      
-      // Save to localStorage
-      localStorage.setItem('theme', theme)
     }
+    
+    // ローカルストレージに保存
+    storage.set(THEME_CONFIG.storageKey, theme)
+  }, [theme, mounted])
 
-    updateTheme()
+  // システムテーマ変更の監視
+  useEffect(() => {
+    if (!mounted || theme !== 'system' || typeof window === 'undefined') return
 
-    // Listen for system theme changes
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    const handleChange = () => {
-      if (theme === 'system') {
-        updateTheme()
-      }
+    const handleChange = (e: MediaQueryListEvent) => {
+      setCurrentTheme(e.matches ? 'dark' : 'light')
     }
 
     mediaQuery.addEventListener('change', handleChange)
     return () => mediaQuery.removeEventListener('change', handleChange)
-  }, [theme])
+  }, [theme, mounted])
 
-  const value = {
+  const handleSetTheme = (newTheme: Theme) => {
+    setTheme(newTheme)
+  }
+
+  const value: ThemeContextType = {
     theme,
-    setTheme,
+    setTheme: handleSetTheme,
     currentTheme
   }
 
-  // ローディング中はデフォルト値でプロバイダーを提供
-  if (!isLoaded) {
+  // SSR中またはマウント前はデフォルト値でレンダリング
+  if (!mounted) {
     return (
       <ThemeContext.Provider value={{
-        theme: 'system',
+        theme: THEME_CONFIG.defaultTheme,
         setTheme: () => {},
         currentTheme: 'light'
       }}>
@@ -127,7 +136,10 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
   }
 
   const getThemeLabel = () => {
-    return theme === 'system' ? 'システム' : currentTheme === 'dark' ? 'ダーク' : 'ライト'
+    if (theme === 'system') {
+      return THEME_CONFIG.labels.system
+    }
+    return currentTheme === 'dark' ? THEME_CONFIG.labels.dark : THEME_CONFIG.labels.light
   }
 
   return (
