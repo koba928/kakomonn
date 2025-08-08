@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { SearchIcon } from '@/components/icons/IconSystem'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
-import { HomeContent } from '@/components/home/HomeContent'
+import HomeContent from '@/components/home/HomeContent'
 import { APP_CONFIG } from '@/constants/app'
 
 export default function Home() {

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 
 interface ErrorNotificationProps {
   message: string | null
@@ -17,6 +17,11 @@ export function ErrorNotification({
 }: ErrorNotificationProps) {
   const [isVisible, setIsVisible] = useState(false)
 
+  const handleClose = useCallback(() => {
+    setIsVisible(false)
+    setTimeout(onClose, 300) // Wait for animation to complete
+  }, [onClose])
+
   useEffect(() => {
     if (message) {
       setIsVisible(true)
@@ -29,12 +34,8 @@ export function ErrorNotification({
     } else {
       setIsVisible(false)
     }
-  }, [message, autoClose, duration])
-
-  const handleClose = () => {
-    setIsVisible(false)
-    setTimeout(onClose, 300) // Wait for animation to complete
-  }
+    return undefined
+  }, [message, autoClose, duration, handleClose])
 
   if (!message) return null
 
@@ -74,10 +75,19 @@ export function ErrorNotification({
   )
 }
 
-export function ErrorNotificationContainer({ children }: { children: React.ReactNode }) {
+interface ErrorNotificationContainerProps {
+  errors: string | null
+  onDismiss: () => void
+}
+
+export function ErrorNotificationContainer({ 
+  errors, 
+  onDismiss
+}: ErrorNotificationContainerProps) {
   return (
-    <div className="relative">
-      {children}
-    </div>
+    <ErrorNotification 
+      message={errors} 
+      onClose={onDismiss}
+    />
   )
 }

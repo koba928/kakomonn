@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { StarIcon, HeartIcon } from '../icons/IconSystem'
 
 interface AnimatedButtonProps {
@@ -14,7 +14,7 @@ interface AnimatedButtonProps {
   'aria-describedby'?: string
 }
 
-export const AnimatedButton: React.FC<AnimatedButtonProps> = React.memo(({
+export const AnimatedButton: React.FC<AnimatedButtonProps> = React.memo(function AnimatedButton({
   children,
   onClick,
   variant = 'primary',
@@ -23,7 +23,7 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = React.memo(({
   disabled = false,
   'aria-label': ariaLabel,
   'aria-describedby': ariaDescribedBy
-}) => {
+}) {
   const baseStyles = 'relative overflow-hidden transition-all duration-300 ease-out transform'
   const hoverStyles = 'hover:scale-105 hover:shadow-lg active:scale-95'
   
@@ -71,12 +71,12 @@ interface LikeButtonProps {
   'aria-label'?: string
 }
 
-export const LikeButton: React.FC<LikeButtonProps> = React.memo(({
+export const LikeButton: React.FC<LikeButtonProps> = React.memo(function LikeButton({
   initialLikes = 0,
   isLiked = false,
   onToggle,
   'aria-label': ariaLabel
-}) => {
+}) {
   const [liked, setLiked] = useState(isLiked)
   const [likes, setLikes] = useState(initialLikes)
   const [isAnimating, setIsAnimating] = useState(false)
@@ -111,7 +111,7 @@ export const LikeButton: React.FC<LikeButtonProps> = React.memo(({
         className={`transition-all duration-300 ${
           liked ? 'fill-red-500 text-red-500' : ''
         } ${isAnimating ? 'animate-pulse' : ''}`}
-        aria-hidden="true"
+        aria-hidden={true}
       />
       <span className="text-sm font-medium">{likes}</span>
     </button>
@@ -127,14 +127,14 @@ interface RatingProps {
   'aria-label'?: string
 }
 
-export const InteractiveRating: React.FC<RatingProps> = React.memo(({
+export const InteractiveRating: React.FC<RatingProps> = React.memo(function InteractiveRating({
   rating,
   maxRating = 5,
   onRate,
   readonly = false,
   size = 20,
   'aria-label': ariaLabel
-}) => {
+}) {
   const [hoverRating, setHoverRating] = useState(0)
   const [isHovering, setIsHovering] = useState(false)
   
@@ -182,7 +182,7 @@ export const InteractiveRating: React.FC<RatingProps> = React.memo(({
               className={`transition-colors duration-200 ${
                 !readonly && 'hover:text-yellow-400'
               }`}
-              aria-hidden="true"
+              aria-hidden={true}
             />
           </button>
         )
@@ -199,13 +199,13 @@ interface FloatingActionButtonProps {
   'aria-label': string
 }
 
-export const FloatingActionButton: React.FC<FloatingActionButtonProps> = React.memo(({
+export const FloatingActionButton: React.FC<FloatingActionButtonProps> = React.memo(function FloatingActionButton({
   onClick,
   icon,
   position = 'bottom-right',
   className = '',
   'aria-label': ariaLabel
-}) => {
+}) {
   const positionStyles = {
     'bottom-right': 'bottom-4 right-4 md:bottom-6 md:right-6',
     'bottom-left': 'bottom-4 left-4 md:bottom-6 md:left-6',
@@ -246,13 +246,13 @@ interface ProgressBarProps {
   animated?: boolean
 }
 
-export const ProgressBar: React.FC<ProgressBarProps> = React.memo(({
+export const ProgressBar: React.FC<ProgressBarProps> = React.memo(function ProgressBar({
   progress,
   maxProgress = 100,
   color = 'bg-blue-500',
   className = '',
   animated = true
-}) => {
+}) {
   const percentage = Math.min((progress / maxProgress) * 100, 100)
   
   return (
@@ -275,11 +275,11 @@ interface PulseLoadingProps {
   className?: string
 }
 
-export const PulseLoading: React.FC<PulseLoadingProps> = React.memo(({
+export const PulseLoading: React.FC<PulseLoadingProps> = React.memo(function PulseLoading({
   size = 'md',
   color = 'bg-blue-500',
   className = ''
-}) => {
+}) {
   const sizeStyles = {
     sm: 'w-4 h-4',
     md: 'w-8 h-8',
@@ -311,12 +311,12 @@ interface TooltipProps {
   className?: string
 }
 
-export const Tooltip: React.FC<TooltipProps> = React.memo(({
+export const Tooltip: React.FC<TooltipProps> = React.memo(function Tooltip({
   content,
   children,
   position = 'top',
   className = ''
-}) => {
+}) {
   const [isVisible, setIsVisible] = useState(false)
   
   const positionStyles = {
@@ -348,3 +348,13 @@ export const Tooltip: React.FC<TooltipProps> = React.memo(({
     </div>
   )
 })
+
+export default {
+  AnimatedButton,
+  LikeButton,
+  InteractiveRating,
+  FloatingActionButton,
+  ProgressBar,
+  PulseLoading,
+  Tooltip
+}

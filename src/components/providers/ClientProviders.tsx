@@ -17,8 +17,8 @@ function GlobalErrorHandler({ children }: { children: React.ReactNode }) {
     <>
       {children}
       <ErrorNotificationContainer
-        errors={errorHandler.errors}
-        onDismiss={errorHandler.clearError}
+        errors={errorHandler.error}
+        onDismiss={errorHandler.clearErrors}
         maxVisible={3}
       />
     </>

@@ -7,7 +7,7 @@ import { ThemeToggle } from '@/components/theme/ThemeProvider'
 import { FloatingActionButton } from '@/components/ui/MicroInteractions'
 import { useUser } from '@/contexts/UserContext'
 
-export function HomeContent() {
+function HomeContent() {
   const { user, isLoggedIn } = useUser()
   const [mounted, setMounted] = useState(false)
 
@@ -35,6 +35,7 @@ export function HomeContent() {
           icon={<PlusIcon size={24} />}
           onClick={() => window?.location && (window.location.href = '/upload')}
           position="bottom-right"
+          aria-label="投稿する"
         />
       </>
     )
@@ -74,7 +75,11 @@ export function HomeContent() {
         icon={<PlusIcon size={24} />}
         onClick={() => window.location.href = '/upload'}
         position="bottom-right"
+        aria-label="投稿する"
       />
     </>
   )
 }
+
+export { HomeContent }
+export default HomeContent

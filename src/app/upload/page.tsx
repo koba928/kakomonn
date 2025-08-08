@@ -1,15 +1,22 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
-import { CheckIcon, ArrowRightIcon, ArrowLeftIcon } from '@/components/icons/IconSystem'
+import { CheckIcon, ArrowRightIcon } from '@/components/icons/IconSystem'
 import { useUser } from '@/contexts/UserContext'
-import VirtualizedAutocompleteSelect from '@/components/ui/VirtualizedAutocompleteSelect'
-import TeacherSearchModal from '@/components/teacher/TeacherSearchModal'
+import { VirtualizedAutocompleteSelect } from '@/components/ui/VirtualizedAutocompleteSelect'
+import { TeacherSearchModal } from '@/components/teacher/TeacherSearchModal'
 import { universityDataDetailed } from '@/data/universityDataDetailed'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
 import { useFormErrorHandler, useFileUploadErrorHandler } from '@/hooks/useErrorHandler'
-import type { CourseTeacher } from '@/types/course'
+// CourseTeacher type definition
+interface CourseTeacher {
+  id: string
+  name: string
+  kana?: string
+  position?: string
+  isMainInstructor?: boolean
+}
 
 type Step = 
   | 'university' 
@@ -1070,7 +1077,7 @@ export default function UploadPage() {
                     : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                 }`}
               >
-                <ArrowLeftIcon size={16} />
+                <ArrowRightIcon size={16} className="rotate-180" />
                 戻る
               </button>
               
