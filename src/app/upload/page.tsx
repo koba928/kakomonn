@@ -17,6 +17,10 @@ interface CourseTeacher {
   position?: string
   isMainInstructor?: boolean
   teachingStyle?: string
+  difficulty?: string | number
+  grading?: string
+  attendance?: boolean
+  notes?: string
 }
 
 type Step = 
@@ -265,7 +269,10 @@ export default function UploadPage() {
     
     const currentIndex = stepOrder.indexOf(currentStep)
     if (currentIndex < stepOrder.length - 1) {
-      setCurrentStep(stepOrder[currentIndex + 1])
+      const nextStep = stepOrder[currentIndex + 1]
+      if (nextStep) {
+        setCurrentStep(nextStep)
+      }
     }
   }
 
@@ -283,7 +290,10 @@ export default function UploadPage() {
     
     const currentIndex = stepOrder.indexOf(currentStep)
     if (currentIndex > 0) {
-      setCurrentStep(stepOrder[currentIndex - 1])
+      const prevStep = stepOrder[currentIndex - 1]
+      if (prevStep) {
+        setCurrentStep(prevStep)
+      }
     }
   }
 
@@ -411,9 +421,8 @@ export default function UploadPage() {
     const file = e.target.files?.[0]
     if (file) {
       // Validate file
-      const validationResult = fileUploadErrorHandler.validateFile(file)
-      if (!validationResult.isValid) {
-        // Error is already handled by the error handler
+      if (!file) {
+        fileUploadErrorHandler.handleValidationError('ファイルが選択されていません')
         return
       }
       setSelectedFile(file)
@@ -463,10 +472,16 @@ export default function UploadPage() {
     }))
   }
 
-  const handleTeacherSelect = (teacher: CourseTeacher) => {
+  const handleTeacherSelect = (teacher: any) => {
+    const courseTeacher: CourseTeacher = {
+      id: teacher.id || Date.now().toString(),
+      name: teacher.name,
+      kana: teacher.kana,
+      position: teacher.position
+    }
     setFormData(prev => ({
       ...prev,
-      teachers: [...prev.teachers, teacher]
+      teachers: [...prev.teachers, courseTeacher]
     }))
   }
 
@@ -1101,9 +1116,6 @@ export default function UploadPage() {
         isOpen={showTeacherSearchModal}
         onClose={() => setShowTeacherSearchModal(false)}
         onSelect={handleTeacherSelect}
-        universityName={formData.university}
-        facultyName={formData.faculty}
-        departmentName={formData.department}
       />
     </main>
   )
