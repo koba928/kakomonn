@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
 import { AcademicInfoSelector, AcademicInfo } from '@/components/ui/AcademicInfoSelector'
 import { VirtualizedAutocompleteSelect } from '@/components/ui/VirtualizedAutocompleteSelect'
-import { api } from '@/services/api'
+// import { api } from '@/services/api' // 一時的にコメントアウト
 
 // 過去問検索結果の型定義
 interface PastExam {
