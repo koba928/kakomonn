@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useMemo } from 'react'
+import { flexibleMatch } from '@/utils/kanaUtils'
 
 interface Option {
   value: string
@@ -28,11 +29,8 @@ export function VirtualizedAutocompleteSelect({
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredOptions = useMemo(() => {
-    console.log('Options available:', options.length, 'Search query:', searchQuery)
     if (!searchQuery) return options
-    return options.filter(option =>
-      option.label.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    return options.filter(option => flexibleMatch(option.label, searchQuery))
   }, [options, searchQuery])
 
   const selectedOption = options.find(option => option.value === value)

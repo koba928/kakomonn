@@ -58,7 +58,6 @@ export function AcademicInfoSelector({
 
   // Get university options
   const universityOptions = useMemo(() => {
-    console.log('University data:', universityDataDetailed.length, 'universities')
     return universityDataDetailed.map(u => ({
       value: u.name,
       label: u.name
