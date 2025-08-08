@@ -70,6 +70,8 @@ export function useAuth() {
 
   const signUp = async (email: string, password: string, userData: Omit<AuthUser, 'id'>) => {
     try {
+      console.log('signUp開始:', { email, userData })
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -85,10 +87,17 @@ export function useAuth() {
         }
       })
 
-      if (error) throw error
+      console.log('Supabase認証結果:', { data, error })
+
+      if (error) {
+        console.error('Supabase認証エラー:', error)
+        throw error
+      }
 
       // ユーザープロフィールを作成
       if (data.user) {
+        console.log('ユーザープロフィール作成開始:', data.user.id)
+        
         const { error: profileError } = await supabase
           .from('users')
           .insert({
@@ -102,11 +111,17 @@ export function useAuth() {
             pen_name: userData.pen_name
           })
 
-        if (profileError) throw profileError
+        if (profileError) {
+          console.error('プロフィール作成エラー:', profileError)
+          throw profileError
+        }
+        
+        console.log('プロフィール作成成功')
       }
 
       return { data, error: null }
     } catch (error) {
+      console.error('signUp全体エラー:', error)
       return { data: null, error }
     }
   }

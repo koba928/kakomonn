@@ -51,9 +51,9 @@ export default function EmailAuthPage() {
         const userData = {
           email,
           name: emailName,
-          university: '',
-          faculty: '',
-          department: '',
+          university: '未設定',
+          faculty: '未設定',
+          department: '未設定',
           year: 1,
           pen_name: emailName
         }
