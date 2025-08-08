@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
 import { AcademicInfoSelector, AcademicInfo } from '@/components/ui/AcademicInfoSelector'
+import { VirtualizedAutocompleteSelect } from '@/components/ui/VirtualizedAutocompleteSelect'
 
 type Step = 'university' | 'faculty' | 'department' | 'year' | 'penname'
 
