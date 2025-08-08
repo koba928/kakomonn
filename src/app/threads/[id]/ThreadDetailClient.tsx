@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useUser } from '@/contexts/UserContext'
+import { useAuth } from '@/hooks/useAuth'
 
 interface Comment {
   id: string
@@ -18,7 +18,8 @@ interface ThreadDetailClientProps {
 }
 
 export default function ThreadDetailClient({ initialComments, threadId }: ThreadDetailClientProps) {
-  const { user, isLoggedIn } = useUser()
+  const { user, session } = useAuth()
+  const isLoggedIn = !!session
   
   // Use threadId for future API calls
   console.log('Thread ID:', threadId)
