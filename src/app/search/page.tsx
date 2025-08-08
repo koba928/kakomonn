@@ -164,7 +164,6 @@ function SearchPageClient() {
   const [specializedCategory, setSpecializedCategory] = useState<SpecializedCategory | null>(null)
   const [generalStep, setGeneralStep] = useState<GeneralStep>('genre')
   const [generalGenre, setGeneralGenre] = useState<GeneralGenre | null>(null)
-  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([])
   const [subjectSearchQuery, setSubjectSearchQuery] = useState('')
 
   useEffect(() => {
@@ -427,7 +426,6 @@ function SearchPageClient() {
     setSpecializedCategory(null)
     setGeneralStep('genre')
     setGeneralGenre(null)
-    setSelectedSubjects([])
     setSubjectSearchQuery('')
   }
 
