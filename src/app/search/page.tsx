@@ -118,18 +118,6 @@ const mockResults: SearchResult[] = [
 // const mockPastExams: PastExam[] = []
 // const mockLivePosts: LivePost[] = []
 
-const mockTrendingTopics = [
-  { name: 'マクロ経済学', count: 234, category: '経済' },
-  { name: '線形代数', count: 187, category: '数学' },
-  { name: '有機化学', count: 156, category: '化学' },
-  { name: 'データベース', count: 143, category: '情報' },
-  { name: '国際関係論', count: 132, category: '政治' },
-  { name: '心理学概論', count: 118, category: '心理' },
-  { name: '機械学習', count: 109, category: '情報' },
-  { name: '日本史', count: 98, category: '歴史' },
-  { name: '憲法', count: 87, category: '法学' },
-  { name: '統計学', count: 76, category: '統計' }
-]
 
 // Mock professor and course data
 const mockProfessorData: Record<string, Array<{professor: string, courses: Array<{name: string, years: string[]}>, university: string, faculty: string}>> = {
