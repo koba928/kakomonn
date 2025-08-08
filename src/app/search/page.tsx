@@ -72,7 +72,7 @@ interface LivePost {
 }
 */
 
-type MainSection = 'search' | 'courses' | 'exams' | 'live'
+type MainSection = 'search' | 'exams'
 
 const mockResults: SearchResult[] = [
   {
@@ -134,7 +134,7 @@ interface UserInfo {
 
 function SearchPageClient() {
   const searchParams = useSearchParams()
-  const [activeSection, setActiveSection] = useState<MainSection>('search')
+  const [activeSection, setActiveSection] = useState<MainSection>('exams')
   const [query, setQuery] = useState('')
   const [selectedTab, setSelectedTab] = useState<'all' | 'threads' | 'users' | 'courses'>('all')
   const [results, setResults] = useState<SearchResult[]>([])
@@ -241,30 +241,35 @@ function SearchPageClient() {
           </div>
         </div>
 
-        {/* Section Navigation */}
-        <div className="flex justify-center mb-8">
-          <div className="flex bg-white rounded-xl shadow-sm border border-gray-200 p-1">
-            {[
-              { key: 'search', label: '🔍 検索', desc: '統合検索' },
-              { key: 'courses', label: '📚 授業評価', desc: '楽単・評価' },
-              { key: 'exams', label: '📝 過去問', desc: '年度別整理' },
-              { key: 'live', label: '💬 ライブ', desc: 'リアルタイム' }
-            ].map(section => (
-              <button
-                key={section.key}
-                onClick={() => setActiveSection(section.key as MainSection)}
-                className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  activeSection === section.key
-                    ? 'bg-indigo-600 text-white shadow-md'
-                    : 'text-gray-600 hover:text-indigo-600 hover:bg-indigo-50'
-                }`}
-              >
-                <div className="text-center">
-                  <div className="text-base">{section.label}</div>
-                  <div className="text-xs opacity-80">{section.desc}</div>
-                </div>
-              </button>
-            ))}
+        {/* Main Value Proposition */}
+        <div className="text-center mb-8">
+          <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-6 px-8 rounded-2xl shadow-lg mb-6">
+            <h2 className="text-2xl font-bold mb-2">📝 過去問データベース</h2>
+            <p className="text-lg opacity-90">大学の過去問を検索・共有・分析できるプラットフォーム</p>
+          </div>
+          
+          <div className="flex justify-center mb-6">
+            <div className="flex bg-white rounded-xl shadow-sm border border-gray-200 p-1">
+              {[
+                { key: 'exams', label: '📝 過去問検索', desc: 'メイン機能' },
+                { key: 'search', label: '🔍 統合検索', desc: 'その他の検索' }
+              ].map(section => (
+                <button
+                  key={section.key}
+                  onClick={() => setActiveSection(section.key as MainSection)}
+                  className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    activeSection === section.key
+                      ? 'bg-indigo-600 text-white shadow-md'
+                      : 'text-gray-600 hover:text-indigo-600 hover:bg-indigo-50'
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className="text-base">{section.label}</div>
+                    <div className="text-xs opacity-80">{section.desc}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -290,10 +295,8 @@ function SearchPageClient() {
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch(query)}
                 placeholder={
-                  activeSection === 'search' ? "過去問、授業、教授を検索..." :
-                  activeSection === 'courses' ? "授業名や教授名で評価を検索..." :
-                  activeSection === 'exams' ? "科目名や年度で過去問を検索..." :
-                  "質問やトピックを検索..."
+                  activeSection === 'exams' ? "科目名、大学名、年度で過去問を検索..." :
+                  "過去問、授業、教授を検索..."
                 }
                 className="w-full px-4 py-4 pl-12 text-lg border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white/80 backdrop-blur-sm"
               />
@@ -307,13 +310,23 @@ function SearchPageClient() {
             {/* Sample searches based on active section */}
             <div className="mt-3">
               <div className="text-sm text-gray-500 mb-2">
-                {activeSection === 'search' && '人気の検索: '}
-                {activeSection === 'courses' && '人気の授業: '}
-                {activeSection === 'exams' && '最近の過去問: '}
-                {activeSection === 'live' && '注目のトピック: '}
+                {activeSection === 'exams' ? '人気の過去問: ' : '人気の検索: '}
               </div>
               <div className="flex flex-wrap gap-2 justify-center">
-                {activeSection === 'search' && [
+                {activeSection === 'exams' ? [
+                  '線形代数 2024', '有機化学 期末', 'マクロ経済学', 'データ構造'
+                ].map(term => (
+                  <button
+                    key={term}
+                    onClick={() => {
+                      setQuery(term)
+                      handleSearch(term)
+                    }}
+                    className="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full text-sm transition-colors"
+                  >
+                    {term}
+                  </button>
+                )) : [
                   '線形代数', 'マクロ経済学', '有機化学', 'プログラミング基礎'
                 ].map(term => (
                   <button
@@ -323,42 +336,6 @@ function SearchPageClient() {
                       handleSearch(term)
                     }}
                     className="px-3 py-1 bg-gray-100 hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 rounded-full text-sm transition-colors"
-                  >
-                    {term}
-                  </button>
-                ))}
-                
-                {activeSection === 'courses' && [
-                  '体育実技', '教養英語', '統計学', '心理学概論'
-                ].map(term => (
-                  <button
-                    key={term}
-                    onClick={() => setQuery(term)}
-                    className="px-3 py-1 bg-green-100 hover:bg-green-200 text-green-700 rounded-full text-sm transition-colors"
-                  >
-                    {term}
-                  </button>
-                ))}
-                
-                {activeSection === 'exams' && [
-                  '2024年度', '期末試験', '中間試験', '数学'
-                ].map(term => (
-                  <button
-                    key={term}
-                    onClick={() => setQuery(term)}
-                    className="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full text-sm transition-colors"
-                  >
-                    {term}
-                  </button>
-                ))}
-                
-                {activeSection === 'live' && [
-                  '試験情報', '課題提出', '休講情報', '履修相談'
-                ].map(term => (
-                  <button
-                    key={term}
-                    onClick={() => setQuery(term)}
-                    className="px-3 py-1 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-full text-sm transition-colors"
                   >
                     {term}
                   </button>
@@ -545,106 +522,28 @@ function SearchPageClient() {
                 
                 {/* Quick action buttons */}
                 <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                  <div className="text-sm text-gray-500">他のセクションも試してみよう:</div>
+                  <div className="text-sm text-gray-500">メイン機能を試してみよう:</div>
                   <div className="flex gap-2">
                     <button
-                      onClick={() => setActiveSection('courses')}
-                      className="px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors text-sm font-medium"
-                    >
-                      📚 楽単を探す
-                    </button>
-                    <button
                       onClick={() => setActiveSection('exams')}
-                      className="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium"
+                      className="px-6 py-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium border-2 border-blue-200"
                     >
-                      📝 過去問を見る
+                      📝 過去問データベースを見る
                     </button>
                     <button
-                      onClick={() => setActiveSection('live')}
-                      className="px-4 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors text-sm font-medium"
+                      onClick={() => {
+                        setQuery('線形代数 2024')
+                        handleSearch('線形代数 2024')
+                      }}
+                      className="px-6 py-3 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors text-sm font-medium"
                     >
-                      💬 ライブを見る
+                      🔍 サンプル検索を試す
                     </button>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Course Ratings Section */}
-            {activeSection === 'courses' && (
-              <div className="space-y-6">
-                <div className="text-center py-12">
-                  <div className="text-indigo-600 text-6xl mb-6">📚</div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-4">授業評価</h2>
-                  <p className="text-gray-600 mb-8">楽単情報・授業の難易度・教授の評価をチェック</p>
-                  
-                  {/* Course Rating Features */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-8 rounded-2xl border border-green-100">
-                      <div className="text-green-600 text-4xl mb-4">🎯</div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-3">楽単検索</h3>
-                      <p className="text-gray-600 mb-4">出席だけで単位が取れる授業や、レポートのみで評価される科目を探そう</p>
-                      <div className="bg-white p-4 rounded-lg">
-                        <div className="text-sm text-gray-600 mb-2">人気の楽単:</div>
-                        <div className="flex flex-wrap gap-2">
-                          <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">体育実技</span>
-                          <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">教養英語</span>
-                          <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">情報リテラシー</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-gradient-to-br from-purple-50 to-violet-50 p-8 rounded-2xl border border-purple-100">
-                      <div className="text-purple-600 text-4xl mb-4">⭐</div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-3">教授評価</h3>
-                      <p className="text-gray-600 mb-4">授業の分かりやすさ、採点の厳しさ、出席の重要度などをチェック</p>
-                      <div className="bg-white p-4 rounded-lg">
-                        <div className="text-sm text-gray-600 mb-2">評価項目:</div>
-                        <div className="space-y-1">
-                          <div className="flex items-center text-sm">
-                            <span className="w-16">分かりやすさ</span>
-                            <div className="flex text-yellow-400 ml-2">
-                              ⭐⭐⭐⭐⭐
-                            </div>
-                          </div>
-                          <div className="flex items-center text-sm">
-                            <span className="w-16">単位取得</span>
-                            <div className="flex text-yellow-400 ml-2">
-                              ⭐⭐⭐⭐☆
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-8 space-y-4">
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-yellow-600">⚠️</span>
-                        <span className="text-sm text-yellow-800 font-medium">このセクションは開発中です</span>
-                      </div>
-                      <p className="text-xs text-yellow-700 mt-1">近日中に楽単検索と教授評価機能をリリース予定！</p>
-                    </div>
-                    
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                      <button 
-                        onClick={() => setActiveSection('search')}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2 rounded-lg transition-colors"
-                      >
-                        🔍 検索ページに戻る
-                      </button>
-                      <button 
-                        onClick={() => setActiveSection('live')}
-                        className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded-lg transition-colors"
-                      >
-                        💬 ライブフィードを見る
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Past Exams Section */}
             {activeSection === 'exams' && (
@@ -727,13 +626,16 @@ function SearchPageClient() {
                         onClick={() => setActiveSection('search')}
                         className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2 rounded-lg transition-colors"
                       >
-                        🔍 検索ページに戻る
+                        🔍 統合検索に戻る
                       </button>
                       <button 
-                        onClick={() => setActiveSection('live')}
-                        className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded-lg transition-colors"
+                        onClick={() => {
+                          setQuery('線形代数 2024')
+                          handleSearch('線形代数 2024')
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition-colors"
                       >
-                        💬 ライブフィードを見る
+                        📝 サンプル過去問を見る
                       </button>
                     </div>
                   </div>
@@ -741,104 +643,6 @@ function SearchPageClient() {
               </div>
             )}
 
-            {/* Live Feed Section */}
-            {activeSection === 'live' && (
-              <div className="space-y-6">
-                <div className="text-center py-12">
-                  <div className="text-indigo-600 text-6xl mb-6">💬</div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-4">ライブフィード</h2>
-                  <p className="text-gray-600 mb-8">リアルタイムで情報交換・緊急情報・最新の話題</p>
-                  
-                  {/* Live Feed Features */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                    <div className="bg-gradient-to-br from-red-50 to-pink-50 p-6 rounded-xl border border-red-100">
-                      <div className="text-red-600 text-3xl mb-4">🚨</div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-2">緊急情報</h3>
-                      <p className="text-gray-600 text-sm mb-4">試験・授業の急な変更やお知らせ</p>
-                      <div className="bg-white p-4 rounded-lg">
-                        <div className="space-y-2">
-                          <div className="flex items-start space-x-2">
-                            <span className="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></span>
-                            <div className="text-left">
-                              <div className="text-sm font-medium text-gray-900">マクロ経済学</div>
-                              <div className="text-xs text-gray-600">明日の試験、教室変更！</div>
-                              <div className="text-xs text-gray-400">2分前</div>
-                            </div>
-                          </div>
-                          <div className="flex items-start space-x-2">
-                            <span className="w-2 h-2 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></span>
-                            <div className="text-left">
-                              <div className="text-sm font-medium text-gray-900">統計学演習</div>
-                              <div className="text-xs text-gray-600">レポート締切延長</div>
-                              <div className="text-xs text-gray-400">15分前</div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-6 rounded-xl border border-blue-100">
-                      <div className="text-blue-600 text-3xl mb-4">💭</div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-2">リアルタイム質問</h3>
-                      <p className="text-gray-600 text-sm mb-4">今すぐ答えが欲しい質問</p>
-                      <div className="bg-white p-4 rounded-lg">
-                        <div className="space-y-2">
-                          <div className="text-left">
-                            <div className="text-sm font-medium text-gray-900">「線形代数のレポート、みんなどうしてる？」</div>
-                            <div className="flex items-center justify-between mt-1">
-                              <span className="text-xs text-gray-600">東工大・情報理工</span>
-                              <span className="text-xs text-blue-600">💬 3件の返信</span>
-                            </div>
-                          </div>
-                          <div className="text-left">
-                            <div className="text-sm font-medium text-gray-900">「明日の有機化学、何持ってく？」</div>
-                            <div className="flex items-center justify-between mt-1">
-                              <span className="text-xs text-gray-600">早稲田・理工</span>
-                              <span className="text-xs text-blue-600">💬 1件の返信</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-8 space-y-4">
-                    <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-6 rounded-xl">
-                      <div className="flex items-center justify-center space-x-3">
-                        <span className="animate-pulse text-2xl">🔴</span>
-                        <span className="text-lg font-medium">LIVE</span>
-                        <span className="text-sm opacity-90">234人がオンライン中</span>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-yellow-600">⚠️</span>
-                          <span className="text-sm text-yellow-800 font-medium">このセクションは開発中です</span>
-                        </div>
-                        <p className="text-xs text-yellow-700 mt-1">リアルタイムチャット機能を開発中！</p>
-                      </div>
-                      
-                      <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                        <button 
-                          onClick={() => setActiveSection('search')}
-                          className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2 rounded-lg transition-colors"
-                        >
-                          🔍 検索ページに戻る
-                        </button>
-                        <button 
-                          onClick={() => setActiveSection('courses')}
-                          className="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-lg transition-colors"
-                        >
-                          📚 授業評価を見る
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Sidebar */}
