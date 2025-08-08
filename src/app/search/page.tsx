@@ -8,28 +8,28 @@ import { AcademicInfoSelector, AcademicInfo } from '@/components/ui/AcademicInfo
 import { VirtualizedAutocompleteSelect } from '@/components/ui/VirtualizedAutocompleteSelect'
 // import { api } from '@/services/api' // 一時的にコメントアウト
 
-// 過去問検索結果の型定義
-interface PastExam {
-  id: string
-  title: string
-  course_name: string
-  professor: string
-  university: string
-  faculty: string
-  department: string
-  year: number
-  semester: string
-  exam_type: string
-  file_url: string
-  file_name: string
-  uploaded_by: string
-  download_count: number
-  difficulty: number
-  helpful_count: number
-  tags: string[]
-  created_at: string
-  updated_at: string
-}
+// 過去問検索結果の型定義（検索機能実装時に使用）
+// interface PastExam {
+//   id: string
+//   title: string
+//   course_name: string
+//   professor: string
+//   university: string
+//   faculty: string
+//   department: string
+//   year: number
+//   semester: string
+//   exam_type: string
+//   file_url: string
+//   file_name: string
+//   uploaded_by: string
+//   download_count: number
+//   difficulty: number
+//   helpful_count: number
+//   tags: string[]
+//   created_at: string
+//   updated_at: string
+// }
 
 // 検索フィルターの型定義
 interface SearchFilters {
@@ -64,23 +64,23 @@ interface Course {
   description?: string
 }
 
-interface PastExam {
-  id: string
-  courseName: string
-  professor: string
-  year: number
-  semester: 'spring' | 'fall' | 'summer'
-  examType: 'midterm' | 'final' | 'quiz' | 'assignment'
-  university: string
-  faculty: string
-  department: string
-  uploadedBy: string
-  uploadedAt: string
-  downloadCount: number
-  difficulty: number
-  helpful: number
-  tags: string[]
-}
+// interface PastExam {
+//   id: string
+//   courseName: string
+//   professor: string
+//   year: number
+//   semester: 'spring' | 'fall' | 'summer'
+//   examType: 'midterm' | 'final' | 'quiz' | 'assignment'
+//   university: string
+//   faculty: string
+//   department: string
+//   uploadedBy: string
+//   uploadedAt: string
+//   downloadCount: number
+//   difficulty: number
+//   helpful: number
+//   tags: string[]
+// }
 
 interface LivePost {
   id: string
