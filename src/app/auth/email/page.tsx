@@ -16,14 +16,19 @@ export default function EmailAuthPage() {
   const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log('handleSubmit開始')
     e.preventDefault()
     setError('')
     
+    console.log('フォームバリデーション開始:', { isLogin, email, password, confirmPassword })
+    
     if (!isLogin && password !== confirmPassword) {
+      console.log('パスワード不一致エラー')
       setError('パスワードが一致しません')
       return
     }
     
+    console.log('フォームバリデーション通過')
     setIsLoading(true)
     
     // デバッグログ
@@ -211,15 +216,18 @@ export default function EmailAuthPage() {
             </div>
           )}
 
-          <AnimatedButton
-            variant="primary"
-            size="lg"
-            className="w-full"
+          <button
+            type="submit"
+            className={`w-full px-4 py-3 rounded-lg font-medium transition-colors ${
+              !isFormValid() || isLoading
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-indigo-600 text-white hover:bg-indigo-700'
+            }`}
             disabled={!isFormValid() || isLoading}
-            aria-label={isLogin ? 'ログイン' : 'アカウント作成'}
+            onClick={() => console.log('ボタンクリック:', { isFormValid: isFormValid(), isLoading })}
           >
             {isLoading ? (isLogin ? 'ログイン中...' : '作成中...') : (isLogin ? 'ログイン' : 'アカウント作成')}
-          </AnimatedButton>
+          </button>
         </form>
 
         {/* フッター */}
