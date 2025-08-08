@@ -26,15 +26,26 @@ export default function EmailAuthPage() {
     
     setIsLoading(true)
     
+    // デバッグログ
+    console.log('認証開始:', { isLogin, email })
+    console.log('環境変数確認:', {
+      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      hasAnonKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    })
+    
     try {
       if (isLogin) {
+        console.log('ログイン処理開始')
         const { error } = await signIn(email, password)
         if (error) {
+          console.error('ログインエラー:', error)
           setError(error.message)
         } else {
+          console.log('ログイン成功')
           window.location.href = '/search'
         }
       } else {
+        console.log('新規登録処理開始')
         // 新規登録の場合は大学情報も必要
         const emailName = email.split('@')[0] || 'user'
         const userData = {
@@ -46,14 +57,18 @@ export default function EmailAuthPage() {
           year: 1,
           pen_name: emailName
         }
+        console.log('ユーザーデータ:', userData)
         const { error } = await signUp(email, password, userData)
         if (error) {
+          console.error('新規登録エラー:', error)
           setError(error.message)
         } else {
+          console.log('新規登録成功')
           window.location.href = '/auth/university-info'
         }
       }
     } catch (err: any) {
+      console.error('認証エラー:', err)
       setError(err.message || '認証に失敗しました')
     } finally {
       setIsLoading(false)
