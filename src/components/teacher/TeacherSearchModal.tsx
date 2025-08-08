@@ -32,6 +32,7 @@ export function TeacherSearchModal({ isOpen, onClose, onSelect }: TeacherSearchM
       return () => clearTimeout(timeoutId)
     } else {
       setTeachers([])
+      return undefined
     }
   }, [searchQuery])
 
