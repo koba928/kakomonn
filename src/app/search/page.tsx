@@ -155,8 +155,6 @@ function SearchPageClient() {
   const searchParams = useSearchParams()
   const [activeSection, setActiveSection] = useState<MainSection | null>(null)
   const [query, setQuery] = useState('')
-  const [selectedTab, setSelectedTab] = useState<'all' | 'threads' | 'users' | 'courses'>('all')
-  const [results, setResults] = useState<SearchResult[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
   const [showUniversityModal, setShowUniversityModal] = useState(false)
@@ -226,43 +224,15 @@ function SearchPageClient() {
 
   const handleSearch = async (searchQuery: string) => {
     if (!searchQuery.trim()) {
-      setResults([])
       return
     }
 
     setIsLoading(true)
     
-    // Simulate API call
+    // Simulate API call - just for loading state
     setTimeout(() => {
-      let filtered = mockResults.filter(result => 
-        result.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        result.content?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        result.course?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-
-      // Prioritize results from user's university if logged in
-      if (userInfo) {
-        filtered = filtered.sort((a, b) => {
-          const aMatchesUniversity = a.university === userInfo.university
-          const bMatchesUniversity = b.university === userInfo.university
-          const aMatchesFaculty = a.faculty === userInfo.faculty
-          const bMatchesFaculty = b.faculty === userInfo.faculty
-
-          // Same university results first
-          if (aMatchesUniversity && !bMatchesUniversity) return -1
-          if (!aMatchesUniversity && bMatchesUniversity) return 1
-          
-          // Within same university, prioritize same faculty
-          if (aMatchesUniversity && bMatchesUniversity) {
-            if (aMatchesFaculty && !bMatchesFaculty) return -1
-            if (!aMatchesFaculty && bMatchesFaculty) return 1
-          }
-
-          return 0
-        })
-      }
-
-      setResults(filtered)
+      // In a real app, this would navigate to search results page
+      console.log('Searching for:', searchQuery)
       setIsLoading(false)
     }, 500)
   }
@@ -363,15 +333,6 @@ function SearchPageClient() {
     return stepMap[currentUniversityStep]
   }
 
-  const getTabResults = () => {
-    if (selectedTab === 'all') return results
-    return results.filter(result => {
-      if (selectedTab === 'threads') return result.type === 'thread'
-      if (selectedTab === 'users') return result.type === 'user'
-      if (selectedTab === 'courses') return result.type === 'course'
-      return true
-    })
-  }
 
   const getSubjectsByCategory = () => {
     const subjectData = {
