@@ -18,6 +18,59 @@ interface SearchResult {
   likeCount?: number
 }
 
+interface Course {
+  id: string
+  name: string
+  professor: string
+  university: string
+  faculty: string
+  department: string
+  credits: number
+  difficulty: number // 1-5
+  workload: number // 1-5
+  overall: number // 1-5
+  reviewCount: number
+  isEasy: boolean
+  tags: string[]
+  description?: string
+}
+
+interface PastExam {
+  id: string
+  courseName: string
+  professor: string
+  year: number
+  semester: 'spring' | 'fall' | 'summer'
+  examType: 'midterm' | 'final' | 'quiz' | 'assignment'
+  university: string
+  faculty: string
+  department: string
+  uploadedBy: string
+  uploadedAt: string
+  downloadCount: number
+  difficulty: number
+  helpful: number
+  tags: string[]
+}
+
+interface LivePost {
+  id: string
+  content: string
+  author: string
+  university: string
+  faculty: string
+  department: string
+  course?: string
+  urgency: 'low' | 'medium' | 'high'
+  type: 'test_info' | 'attendance' | 'homework' | 'general'
+  createdAt: string
+  likes: number
+  replies: number
+  isAnonymous: boolean
+}
+
+type MainSection = 'search' | 'courses' | 'exams' | 'live'
+
 const mockResults: SearchResult[] = [
   {
     id: '1',
@@ -48,6 +101,111 @@ const mockResults: SearchResult[] = [
   }
 ]
 
+const mockCourses: Course[] = [
+  {
+    id: '1',
+    name: 'マクロ経済学',
+    professor: '田中教授',
+    university: '東京大学',
+    faculty: '経済学部',
+    department: '経済学科',
+    credits: 2,
+    difficulty: 3,
+    workload: 4,
+    overall: 4,
+    reviewCount: 45,
+    isEasy: false,
+    tags: ['楽単', '出席重要', 'レポート'],
+    description: 'IS-LMモデルを中心とした基礎的なマクロ経済理論を学ぶ'
+  },
+  {
+    id: '2',
+    name: '線形代数',
+    professor: '佐藤教授',
+    university: '東京工業大学',
+    faculty: '工学院',
+    department: '数理・計算科学系',
+    credits: 3,
+    difficulty: 5,
+    workload: 5,
+    overall: 3,
+    reviewCount: 23,
+    isEasy: false,
+    tags: ['難しい', '期末重要', '演習必須'],
+    description: '行列の基礎から固有値・固有ベクトルまで'
+  }
+]
+
+const mockPastExams: PastExam[] = [
+  {
+    id: '1',
+    courseName: 'マクロ経済学',
+    professor: '田中教授',
+    year: 2024,
+    semester: 'spring',
+    examType: 'final',
+    university: '東京大学',
+    faculty: '経済学部',
+    department: '経済学科',
+    uploadedBy: '経済太郎',
+    uploadedAt: '2024-01-20',
+    downloadCount: 89,
+    difficulty: 3,
+    helpful: 12,
+    tags: ['IS-LM', '計算問題', '論述']
+  },
+  {
+    id: '2',
+    courseName: '線形代数',
+    professor: '佐藤教授',
+    year: 2023,
+    semester: 'fall',
+    examType: 'midterm',
+    university: '東京工業大学',
+    faculty: '工学院',
+    department: '数理・計算科学系',
+    uploadedBy: '工学花子',
+    uploadedAt: '2023-11-15',
+    downloadCount: 156,
+    difficulty: 4,
+    helpful: 23,
+    tags: ['固有値', '行列式', '証明問題']
+  }
+]
+
+const mockLivePosts: LivePost[] = [
+  {
+    id: '1',
+    content: 'マクロ経済学、明日小テストあるって聞いたけど本当？IS-LMのとこ出るのかな...',
+    author: '経済3年',
+    university: '東京大学',
+    faculty: '経済学部',
+    department: '経済学科',
+    course: 'マクロ経済学',
+    urgency: 'high',
+    type: 'test_info',
+    createdAt: '2024-01-22T14:30:00Z',
+    likes: 5,
+    replies: 8,
+    isAnonymous: false
+  },
+  {
+    id: '2',
+    content: '今日の線形代数、出席とったよー！遅刻の人は気をつけて',
+    author: '匿名さん',
+    university: '東京工業大学',
+    faculty: '工学院',
+    department: '数理・計算科学系',
+    course: '線形代数',
+    urgency: 'medium',
+    type: 'attendance',
+    createdAt: '2024-01-22T10:15:00Z',
+    likes: 12,
+    replies: 3,
+    isAnonymous: true
+  }
+]
+
 const mockTrendingTopics = [
   { name: 'マクロ経済学', count: 234, category: '経済' },
   { name: '線形代数', count: 187, category: '数学' },
@@ -58,10 +216,7 @@ const mockTrendingTopics = [
   { name: '機械学習', count: 109, category: '情報' },
   { name: '日本史', count: 98, category: '歴史' },
   { name: '憲法', count: 87, category: '法学' },
-  { name: '統計学', count: 76, category: '統計' },
-  { name: '微積分', count: 65, category: '数学' },
-  { name: '刑法', count: 54, category: '法学' },
-  { name: '物理化学', count: 43, category: '化学' }
+  { name: '統計学', count: 76, category: '統計' }
 ]
 
 interface UserInfo {
