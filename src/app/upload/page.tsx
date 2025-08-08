@@ -514,12 +514,15 @@ export default function UploadPage() {
         return
       }
 
+      setIsSubmitting(true)
+
       try {
         console.log('アップロード開始:', formData)
         
         // ファイルが選択されているか確認
         if (!formData.file) {
           alert('ファイルを選択してください')
+          setIsSubmitting(false)
           return
         }
 
@@ -527,6 +530,7 @@ export default function UploadPage() {
         const maxSize = 10 * 1024 * 1024 // 10MB
         if (formData.file.size > maxSize) {
           alert('ファイルサイズは10MB以下にしてください')
+          setIsSubmitting(false)
           return
         }
 
@@ -534,6 +538,7 @@ export default function UploadPage() {
         const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg']
         if (!allowedTypes.includes(formData.file.type)) {
           alert('PDF、JPEG、PNG形式のファイルのみアップロード可能です')
+          setIsSubmitting(false)
           return
         }
 
@@ -552,6 +557,7 @@ export default function UploadPage() {
       if (uploadError) {
         console.error('ファイルアップロードエラー:', uploadError)
         alert('ファイルのアップロードに失敗しました')
+        setIsSubmitting(false)
         return
       }
 
@@ -599,6 +605,7 @@ export default function UploadPage() {
       if (examError) {
         console.error('過去問データ保存エラー:', examError)
         alert('過去問情報の保存に失敗しました')
+        setIsSubmitting(false)
         return
       }
 
@@ -610,6 +617,8 @@ export default function UploadPage() {
     } catch (error) {
       console.error('アップロード全体エラー:', error)
       alert('アップロード中にエラーが発生しました')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
