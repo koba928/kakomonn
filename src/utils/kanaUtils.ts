@@ -69,7 +69,7 @@ export function matchesRomaji(text: string, query: string): boolean {
   for (let i = 0; i < hiraganaText.length; i++) {
     // 2文字の組み合わせをチェック（拗音など）
     if (i < hiraganaText.length - 1) {
-      const twoChars = hiraganaText.substr(i, 2)
+      const twoChars = hiraganaText.substring(i, i + 2)
       if (romajiMap[twoChars]) {
         romajiText += romajiMap[twoChars][0]
         i++ // 2文字処理したので1つスキップ
@@ -79,9 +79,9 @@ export function matchesRomaji(text: string, query: string): boolean {
     
     // 1文字をチェック
     const oneChar = hiraganaText[i]
-    if (romajiMap[oneChar]) {
+    if (oneChar && romajiMap[oneChar]) {
       romajiText += romajiMap[oneChar][0]
-    } else {
+    } else if (oneChar) {
       romajiText += oneChar // ローマ字変換できない場合はそのまま
     }
   }
