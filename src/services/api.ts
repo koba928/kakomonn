@@ -16,6 +16,31 @@ export const api = {
         .eq('id', id)
         .single()
       
+      if (error) {
+        if (error.code === 'PGRST116') { // No rows found
+          return null
+        }
+        throw error
+      }
+      return data
+    },
+
+    async create(user: {
+      id: string
+      email: string
+      name: string
+      university: string
+      faculty: string
+      department: string
+      year: number
+      pen_name: string
+    }): Promise<User> {
+      const { data, error } = await supabase
+        .from('users')
+        .insert(user)
+        .select()
+        .single()
+      
       if (error) throw error
       return data
     },
@@ -25,6 +50,26 @@ export const api = {
         .from('users')
         .update(updates)
         .eq('id', id)
+        .select()
+        .single()
+      
+      if (error) throw error
+      return data
+    },
+
+    async upsert(user: {
+      id: string
+      email: string
+      name: string
+      university: string
+      faculty: string
+      department: string
+      year: number
+      pen_name: string
+    }): Promise<User> {
+      const { data, error } = await supabase
+        .from('users')
+        .upsert(user)
         .select()
         .single()
       

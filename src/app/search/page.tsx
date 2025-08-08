@@ -6,7 +6,8 @@ import { useSearchParams } from 'next/navigation'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
 import { AcademicInfoSelector, AcademicInfo } from '@/components/ui/AcademicInfoSelector'
 import { VirtualizedAutocompleteSelect } from '@/components/ui/VirtualizedAutocompleteSelect'
-// import { api } from '@/services/api' // 一時的にコメントアウト
+import { api } from '@/services/api'
+import { useAuth } from '@/hooks/useAuth'
 
 // 過去問検索結果の型定義（検索機能実装時に使用）
 // interface PastExam {
@@ -148,6 +149,7 @@ interface UserInfo {
 
 function SearchPageClient() {
   const searchParams = useSearchParams()
+  const { user, isLoggedIn } = useAuth()
   const [activeSection, setActiveSection] = useState<MainSection | null>(null)
   const [query, setQuery] = useState('')
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
@@ -161,6 +163,7 @@ function SearchPageClient() {
   const [year, setYear] = useState('')
   const [penName, setPenName] = useState('')
   const [isCompletingSetup, setIsCompletingSetup] = useState(false)
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true)
   
   // New state for step-by-step flow
   const [specializedStep, setSpecializedStep] = useState<SpecializedStep>('category')
@@ -203,6 +206,58 @@ function SearchPageClient() {
     //   setIsSearching(false)
     // }
   }, [])
+
+  // ログインユーザーのプロファイル情報を読み込む
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      if (!isLoggedIn || !user) {
+        setIsLoadingProfile(false)
+        return
+      }
+
+      try {
+        const profile = await api.users.getById(user.id)
+        if (profile) {
+          // 既存のプロファイル情報がある場合は自動的に設定
+          setAcademicInfo({
+            university: profile.university,
+            faculty: profile.faculty,
+            department: profile.department
+          })
+          setYear(profile.year.toString() + '年生')
+          setPenName(profile.pen_name)
+          
+          // ユーザー情報を設定して、モーダルを表示しない
+          setUserInfo({
+            university: profile.university,
+            faculty: profile.faculty,
+            department: profile.department,
+            year: profile.year.toString() + '年生',
+            penName: profile.pen_name,
+            isLoggedIn: true,
+            completedAt: new Date().toISOString()
+          })
+          
+          // LocalStorageにも保存
+          localStorage.setItem('kakomonn_user', JSON.stringify({
+            university: profile.university,
+            faculty: profile.faculty,
+            department: profile.department,
+            year: profile.year.toString() + '年生',
+            penName: profile.pen_name,
+            isLoggedIn: true,
+            completedAt: new Date().toISOString()
+          }))
+        }
+      } catch (error) {
+        console.error('Failed to load user profile:', error)
+      } finally {
+        setIsLoadingProfile(false)
+      }
+    }
+
+    loadUserProfile()
+  }, [isLoggedIn, user])
 
   useEffect(() => {
     const q = searchParams.get('q')
@@ -288,28 +343,64 @@ function SearchPageClient() {
   const handleUniversityComplete = async () => {
     setIsCompletingSetup(true)
 
-    const tempUniversityInfo = {
-      university: academicInfo.university,
-      faculty: academicInfo.faculty,
-      department: academicInfo.department,
-      year: year
-    }
+    try {
+      // ログインユーザーの場合はデータベースに保存
+      if (isLoggedIn && user) {
+        const yearNumber = parseInt(year.replace('年生', ''))
+        const profileData = {
+          id: user.id,
+          email: user.email || '',
+          name: user.user_metadata?.name || user.email?.split('@')[0] || '',
+          university: academicInfo.university,
+          faculty: academicInfo.faculty,
+          department: academicInfo.department,
+          year: yearNumber,
+          pen_name: penName || 'ゲストユーザー'
+        }
 
-    const guestUserInfo = {
-      ...academicInfo,
-      year: year || '未設定',
-      penName: penName || 'ゲストユーザー',
-      isLoggedIn: false,
-      completedAt: new Date().toISOString()
-    }
+        await api.users.upsert(profileData)
+        
+        // 成功したらユーザー情報を設定
+        const userInfo = {
+          ...academicInfo,
+          year: year,
+          penName: penName || 'ゲストユーザー',
+          isLoggedIn: true,
+          completedAt: new Date().toISOString()
+        }
+        
+        localStorage.setItem('kakomonn_user', JSON.stringify(userInfo))
+        setUserInfo(userInfo)
+      } else {
+        // ゲストユーザーの場合はローカルストレージに保存
+        const tempUniversityInfo = {
+          university: academicInfo.university,
+          faculty: academicInfo.faculty,
+          department: academicInfo.department,
+          year: year
+        }
 
-    localStorage.setItem('kakomonn_guest_university', JSON.stringify(tempUniversityInfo))
-    
-    setTimeout(() => {
-      setUserInfo(guestUserInfo)
-      setShowUniversityModal(false)
+        const guestUserInfo = {
+          ...academicInfo,
+          year: year || '未設定',
+          penName: penName || 'ゲストユーザー',
+          isLoggedIn: false,
+          completedAt: new Date().toISOString()
+        }
+
+        localStorage.setItem('kakomonn_guest_university', JSON.stringify(tempUniversityInfo))
+        setUserInfo(guestUserInfo)
+      }
+      
+      setTimeout(() => {
+        setShowUniversityModal(false)
+        setIsCompletingSetup(false)
+      }, 1500)
+    } catch (error) {
+      console.error('Failed to save user profile:', error)
+      alert('プロファイルの保存に失敗しました。もう一度お試しください。')
       setIsCompletingSetup(false)
-    }, 1500)
+    }
   }
 
   const canProceedUniversity = () => {
@@ -383,7 +474,7 @@ function SearchPageClient() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
       {/* University Selection Modal */}
-      {showUniversityModal && (
+      {showUniversityModal && !isLoadingProfile && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
             {/* ヘッダー */}
