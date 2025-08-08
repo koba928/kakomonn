@@ -31,18 +31,18 @@ import { VirtualizedAutocompleteSelect } from '@/components/ui/VirtualizedAutoco
 //   updated_at: string
 // }
 
-// 検索フィルターの型定義
-interface SearchFilters {
-  university?: string
-  faculty?: string
-  department?: string
-  course?: string
-  professor?: string
-  year?: number
-  semester?: string
-  examType?: string
-  tags?: string[]
-}
+// 検索フィルターの型定義（検索機能実装時に使用）
+// interface SearchFilters {
+//   university?: string
+//   faculty?: string
+//   department?: string
+//   course?: string
+//   professor?: string
+//   year?: number
+//   semester?: string
+//   examType?: string
+//   tags?: string[]
+// }
 
 
 // Future interfaces for new sections
