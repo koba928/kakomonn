@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { AnimatedButton } from '@/components/ui/MicroInteractions'
 import { useAuthContext } from '@/components/providers/AuthProvider'
 
 export default function EmailAuthPage() {
