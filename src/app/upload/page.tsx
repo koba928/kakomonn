@@ -8,7 +8,7 @@ import { VirtualizedAutocompleteSelect } from '@/components/ui/VirtualizedAutoco
 import { TeacherSearchModal } from '@/components/teacher/TeacherSearchModal'
 import { universityDataDetailed } from '@/data/universityDataDetailed'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
-import { useFormErrorHandler, useFileUploadErrorHandler } from '@/hooks/useErrorHandler'
+import { useFormErrorHandler } from '@/hooks/useErrorHandler'
 import { supabase } from '@/lib/supabase'
 // CourseTeacher type definition
 interface CourseTeacher {
@@ -89,7 +89,6 @@ export default function UploadPage() {
   const { user } = useAuthContext()
   const isLoggedIn = !!user
   const formErrorHandler = useFormErrorHandler()
-  const fileUploadErrorHandler = useFileUploadErrorHandler()
   
   const [currentStep, setCurrentStep] = useState<Step>('university')
   const [showTeacherSearchModal, setShowTeacherSearchModal] = useState(false)
