@@ -82,21 +82,21 @@ interface Course {
 //   tags: string[]
 // }
 
-interface LivePost {
-  id: string
-  content: string
-  author: string
-  university: string
-  faculty: string
-  department: string
-  course?: string
-  urgency: 'low' | 'medium' | 'high'
-  type: 'test_info' | 'attendance' | 'homework' | 'general'
-  createdAt: string
-  likes: number
-  replies: number
-  isAnonymous: boolean
-}
+// interface LivePost {
+//   id: string
+//   content: string
+//   author: string
+//   university: string
+//   faculty: string
+//   department: string
+//   course?: string
+//   urgency: 'low' | 'medium' | 'high'
+//   type: 'test_info' | 'attendance' | 'homework' | 'general'
+//   createdAt: string
+//   likes: number
+//   replies: number
+//   isAnonymous: boolean
+// }
 */
 
 type MainSection = 'specialized' | 'general' | 'professor'
