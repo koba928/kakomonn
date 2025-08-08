@@ -174,39 +174,35 @@ function SearchPageClient() {
   const [selectedProfessor, setSelectedProfessor] = useState<string | null>(null)
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null)
   
-  // 検索機能の状態管理
-  const [searchResults, setSearchResults] = useState<PastExam[]>([])
-  const [searchFilters] = useState<SearchFilters>({})
-  const [isSearching, setIsSearching] = useState(false)
+  // 検索機能の状態管理（一時的にコメントアウト）
+  // const [searchResults, setSearchResults] = useState<PastExam[]>([])
+  // const [searchFilters] = useState<SearchFilters>({})
+  // const [isSearching, setIsSearching] = useState(false)
 
   const handleSearch = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) {
-      setSearchResults([])
       return
     }
 
-    try {
-      setIsSearching(true)
-      console.log('検索開始:', searchQuery)
-      
-      // 検索フィルターを構築
-      const filters: SearchFilters = {
-        ...searchFilters,
-        course: searchQuery
-      }
-      
-      // APIを使用して過去問を検索
-      const results = await api.pastExams.getAll(filters)
-      setSearchResults(results)
-      
-      console.log('検索結果:', results)
-    } catch (error) {
-      console.error('検索エラー:', error)
-      setSearchResults([])
-    } finally {
-      setIsSearching(false)
-    }
-  }, [searchFilters])
+    // 一時的にコンソールログのみ
+    console.log('検索開始:', searchQuery)
+    
+    // TODO: 検索機能を実装
+    // try {
+    //   setIsSearching(true)
+    //   const filters: SearchFilters = {
+    //     ...searchFilters,
+    //     course: searchQuery
+    //   }
+    //   const results = await api.pastExams.getAll(filters)
+    //   setSearchResults(results)
+    // } catch (error) {
+    //   console.error('検索エラー:', error)
+    //   setSearchResults([])
+    // } finally {
+    //   setIsSearching(false)
+    // }
+  }, [])
 
   useEffect(() => {
     const q = searchParams.get('q')
