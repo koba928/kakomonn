@@ -231,6 +231,7 @@ interface UserInfo {
 
 function SearchPageClient() {
   const searchParams = useSearchParams()
+  const [activeSection, setActiveSection] = useState<MainSection>('search')
   const [query, setQuery] = useState('')
   const [selectedTab, setSelectedTab] = useState<'all' | 'threads' | 'users' | 'courses'>('all')
   const [results, setResults] = useState<SearchResult[]>([])
