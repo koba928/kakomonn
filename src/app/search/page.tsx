@@ -1,25 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
 import { AcademicInfoSelector, AcademicInfo } from '@/components/ui/AcademicInfoSelector'
 import { VirtualizedAutocompleteSelect } from '@/components/ui/VirtualizedAutocompleteSelect'
 
-interface SearchResult {
-  id: string
-  type: 'thread' | 'user' | 'course'
-  title: string
-  content?: string
-  author?: string
-  course?: string
-  university?: string
-  faculty?: string
-  createdAt?: string
-  commentCount?: number
-  likeCount?: number
-}
 
 // Future interfaces for new sections
 /*
@@ -192,7 +179,7 @@ function SearchPageClient() {
     }
   }, [])
 
-  const handleSearch = async (searchQuery: string) => {
+  const handleSearch = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) {
       return
     }
@@ -205,7 +192,7 @@ function SearchPageClient() {
       console.log('Searching for:', searchQuery)
       setIsLoading(false)
     }, 500)
-  }
+  }, [])
 
   const handleAcademicInfoChange = (newInfo: AcademicInfo) => {
     setAcademicInfo(newInfo)
