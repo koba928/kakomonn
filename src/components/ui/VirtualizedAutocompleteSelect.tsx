@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react'
 import { flexibleMatch } from '@/utils/kanaUtils'
+import { matchUniversityName } from '@/data/universityReadings'
 
 interface Option {
   value: string
@@ -30,7 +31,13 @@ export function VirtualizedAutocompleteSelect({
 
   const filteredOptions = useMemo(() => {
     if (!searchQuery) return options
-    return options.filter(option => flexibleMatch(option.label, searchQuery))
+    return options.filter(option => {
+      // 通常の柔軟マッチング
+      if (flexibleMatch(option.label, searchQuery)) return true
+      // 大学名専用の読み仮名マッチング
+      if (matchUniversityName(option.label, searchQuery)) return true
+      return false
+    })
   }, [options, searchQuery])
 
   const selectedOption = options.find(option => option.value === value)
