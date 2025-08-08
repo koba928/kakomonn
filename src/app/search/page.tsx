@@ -289,7 +289,12 @@ function SearchPageClient() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch(query)}
-                placeholder="過去問、授業、教授を検索..."
+                placeholder={
+                  activeSection === 'search' ? "過去問、授業、教授を検索..." :
+                  activeSection === 'courses' ? "授業名や教授名で評価を検索..." :
+                  activeSection === 'exams' ? "科目名や年度で過去問を検索..." :
+                  "質問やトピックを検索..."
+                }
                 className="w-full px-4 py-4 pl-12 text-lg border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white/80 backdrop-blur-sm"
               />
               <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
@@ -298,6 +303,69 @@ function SearchPageClient() {
                 </svg>
               </div>
             </div>
+            
+            {/* Sample searches based on active section */}
+            <div className="mt-3">
+              <div className="text-sm text-gray-500 mb-2">
+                {activeSection === 'search' && '人気の検索: '}
+                {activeSection === 'courses' && '人気の授業: '}
+                {activeSection === 'exams' && '最近の過去問: '}
+                {activeSection === 'live' && '注目のトピック: '}
+              </div>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {activeSection === 'search' && [
+                  '線形代数', 'マクロ経済学', '有機化学', 'プログラミング基礎'
+                ].map(term => (
+                  <button
+                    key={term}
+                    onClick={() => {
+                      setQuery(term)
+                      handleSearch(term)
+                    }}
+                    className="px-3 py-1 bg-gray-100 hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 rounded-full text-sm transition-colors"
+                  >
+                    {term}
+                  </button>
+                ))}
+                
+                {activeSection === 'courses' && [
+                  '体育実技', '教養英語', '統計学', '心理学概論'
+                ].map(term => (
+                  <button
+                    key={term}
+                    onClick={() => setQuery(term)}
+                    className="px-3 py-1 bg-green-100 hover:bg-green-200 text-green-700 rounded-full text-sm transition-colors"
+                  >
+                    {term}
+                  </button>
+                ))}
+                
+                {activeSection === 'exams' && [
+                  '2024年度', '期末試験', '中間試験', '数学'
+                ].map(term => (
+                  <button
+                    key={term}
+                    onClick={() => setQuery(term)}
+                    className="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full text-sm transition-colors"
+                  >
+                    {term}
+                  </button>
+                ))}
+                
+                {activeSection === 'live' && [
+                  '試験情報', '課題提出', '休講情報', '履修相談'
+                ].map(term => (
+                  <button
+                    key={term}
+                    onClick={() => setQuery(term)}
+                    className="px-3 py-1 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-full text-sm transition-colors"
+                  >
+                    {term}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
             <div className="flex justify-center mt-4">
               <button
                 onClick={() => handleSearch(query)}
@@ -430,21 +498,73 @@ function SearchPageClient() {
               <div className="text-center py-12">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">何をお探しですか？</h2>
                 <p className="text-gray-600 mb-8">過去問、授業情報、教授について検索できます</p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-                  <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                    <div className="text-indigo-600 text-3xl mb-4">📝</div>
-                    <h3 className="font-semibold text-gray-900 mb-2">過去問・試験情報</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto mb-8">
+                  <button 
+                    onClick={() => {
+                      setQuery('線形代数')
+                      handleSearch('線形代数')
+                    }}
+                    className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md hover:border-indigo-300 transition-all group cursor-pointer"
+                  >
+                    <div className="text-indigo-600 text-3xl mb-4 group-hover:scale-110 transition-transform">📝</div>
+                    <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-indigo-600">過去問・試験情報</h3>
                     <p className="text-sm text-gray-600">過去の試験問題や傾向を検索</p>
-                  </div>
-                  <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                    <div className="text-purple-600 text-3xl mb-4">📚</div>
-                    <h3 className="font-semibold text-gray-900 mb-2">授業・講義情報</h3>
+                    <div className="mt-2 text-xs text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                      クリックして試してみる →
+                    </div>
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setQuery('マクロ経済学')
+                      handleSearch('マクロ経済学')
+                    }}
+                    className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md hover:border-purple-300 transition-all group cursor-pointer"
+                  >
+                    <div className="text-purple-600 text-3xl mb-4 group-hover:scale-110 transition-transform">📚</div>
+                    <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-purple-600">授業・講義情報</h3>
                     <p className="text-sm text-gray-600">授業の内容や評価を検索</p>
-                  </div>
-                  <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                    <div className="text-green-600 text-3xl mb-4">👨‍🏫</div>
-                    <h3 className="font-semibold text-gray-900 mb-2">教授・講師情報</h3>
+                    <div className="mt-2 text-xs text-purple-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                      クリックして試してみる →
+                    </div>
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setQuery('田中教授')
+                      handleSearch('田中教授')
+                    }}
+                    className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md hover:border-green-300 transition-all group cursor-pointer"
+                  >
+                    <div className="text-green-600 text-3xl mb-4 group-hover:scale-110 transition-transform">👨‍🏫</div>
+                    <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-green-600">教授・講師情報</h3>
                     <p className="text-sm text-gray-600">教授の授業スタイルや評価を検索</p>
+                    <div className="mt-2 text-xs text-green-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                      クリックして試してみる →
+                    </div>
+                  </button>
+                </div>
+                
+                {/* Quick action buttons */}
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  <div className="text-sm text-gray-500">他のセクションも試してみよう:</div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setActiveSection('courses')}
+                      className="px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors text-sm font-medium"
+                    >
+                      📚 楽単を探す
+                    </button>
+                    <button
+                      onClick={() => setActiveSection('exams')}
+                      className="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium"
+                    >
+                      📝 過去問を見る
+                    </button>
+                    <button
+                      onClick={() => setActiveSection('live')}
+                      className="px-4 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors text-sm font-medium"
+                    >
+                      💬 ライブを見る
+                    </button>
                   </div>
                 </div>
               </div>
@@ -498,10 +618,29 @@ function SearchPageClient() {
                     </div>
                   </div>
                   
-                  <div className="mt-8">
-                    <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-8 py-3 rounded-lg transition-colors">
-                      授業評価を見る（準備中）
-                    </button>
+                  <div className="mt-8 space-y-4">
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-yellow-600">⚠️</span>
+                        <span className="text-sm text-yellow-800 font-medium">このセクションは開発中です</span>
+                      </div>
+                      <p className="text-xs text-yellow-700 mt-1">近日中に楽単検索と教授評価機能をリリース予定！</p>
+                    </div>
+                    
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                      <button 
+                        onClick={() => setActiveSection('search')}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2 rounded-lg transition-colors"
+                      >
+                        🔍 検索ページに戻る
+                      </button>
+                      <button 
+                        onClick={() => setActiveSection('live')}
+                        className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded-lg transition-colors"
+                      >
+                        💬 ライブフィードを見る
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -574,10 +713,29 @@ function SearchPageClient() {
                     </div>
                   </div>
                   
-                  <div className="mt-8">
-                    <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-8 py-3 rounded-lg transition-colors">
-                      過去問を検索する（準備中）
-                    </button>
+                  <div className="mt-8 space-y-4">
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-yellow-600">⚠️</span>
+                        <span className="text-sm text-yellow-800 font-medium">このセクションは開発中です</span>
+                      </div>
+                      <p className="text-xs text-yellow-700 mt-1">過去問データベースと分析機能を準備中です！</p>
+                    </div>
+                    
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                      <button 
+                        onClick={() => setActiveSection('search')}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2 rounded-lg transition-colors"
+                      >
+                        🔍 検索ページに戻る
+                      </button>
+                      <button 
+                        onClick={() => setActiveSection('live')}
+                        className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded-lg transition-colors"
+                      >
+                        💬 ライブフィードを見る
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -653,9 +811,30 @@ function SearchPageClient() {
                       </div>
                     </div>
                     
-                    <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-8 py-3 rounded-lg transition-colors">
-                      ライブフィードに参加（準備中）
-                    </button>
+                    <div className="space-y-4">
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-yellow-600">⚠️</span>
+                          <span className="text-sm text-yellow-800 font-medium">このセクションは開発中です</span>
+                        </div>
+                        <p className="text-xs text-yellow-700 mt-1">リアルタイムチャット機能を開発中！</p>
+                      </div>
+                      
+                      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                        <button 
+                          onClick={() => setActiveSection('search')}
+                          className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2 rounded-lg transition-colors"
+                        >
+                          🔍 検索ページに戻る
+                        </button>
+                        <button 
+                          onClick={() => setActiveSection('courses')}
+                          className="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-lg transition-colors"
+                        >
+                          📚 授業評価を見る
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
