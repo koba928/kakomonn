@@ -16,6 +16,7 @@ interface CourseTeacher {
   kana?: string
   position?: string
   isMainInstructor?: boolean
+  teachingStyle?: string
 }
 
 type Step = 
@@ -147,20 +148,20 @@ export default function UploadPage() {
   }, [user, isLoggedIn])
 
   // 大学選択に基づいて利用可能な学部を取得
-  const availableFaculties = useMemo(() => {
-    if (!formData.university) return []
-    const university = universityDataDetailed.find(u => u.name === formData.university)
-    return university?.faculties || []
-  }, [formData.university])
+  // const availableFaculties = useMemo(() => {
+  //   if (!formData.university) return []
+  //   const university = universityDataDetailed.find(u => u.name === formData.university)
+  //   return university?.faculties || []
+  // }, [formData.university])
 
   // 学部選択に基づいて利用可能な学科を取得
-  const availableDepartments = useMemo(() => {
-    if (!formData.university || !formData.faculty) return []
-    const university = universityDataDetailed.find(u => u.name === formData.university)
-    if (!university) return []
-    const faculty = university.faculties.find(f => f.name === formData.faculty)
-    return faculty?.departments || []
-  }, [formData.university, formData.faculty])
+  // const availableDepartments = useMemo(() => {
+  //   if (!formData.university || !formData.faculty) return []
+  //   const university = universityDataDetailed.find(u => u.name === formData.university)
+  //   if (!university) return []
+  //   const faculty = university.faculties.find(f => f.name === formData.faculty)
+  //   return faculty?.departments || []
+  // }, [formData.university, formData.faculty])
 
   // 科目分類に基づいてターゲット層を生成
   const availableTargetAudiences = useMemo((): TargetAudience[] => {

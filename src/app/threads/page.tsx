@@ -138,7 +138,7 @@ const mockThreads: Thread[] = [
 export default function ThreadsPage() {
   const [selectedUniversity, setSelectedUniversity] = useState('')
   const [selectedFaculty, setSelectedFaculty] = useState('')
-  const [selectedDepartment, setSelectedDepartment] = useState('')
+  // const [selectedDepartment, setSelectedDepartment] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedTab, setSelectedTab] = useState<'for-you' | 'following' | 'trending'>('for-you')
   const [showFilters, setShowFilters] = useState(false)
@@ -151,13 +151,13 @@ export default function ThreadsPage() {
   }, [selectedUniversity])
 
   // 学部選択に基づいて利用可能な学科を取得
-  const availableDepartments = useMemo(() => {
-    if (!selectedUniversity || !selectedFaculty) return []
-    const university = universityDataDetailed.find(u => u.name === selectedUniversity)
-    if (!university) return []
-    const faculty = university.faculties.find(f => f.name === selectedFaculty)
-    return faculty?.departments || []
-  }, [selectedUniversity, selectedFaculty])
+  // const availableDepartments = useMemo(() => {
+  //   if (!selectedUniversity || !selectedFaculty) return []
+  //   const university = universityDataDetailed.find(u => u.name === selectedUniversity)
+  //   if (!university) return []
+  //   const faculty = university.faculties.find(f => f.name === selectedFaculty)
+  //   return faculty?.departments || []
+  // }, [selectedUniversity, selectedFaculty])
 
   const filteredThreads = mockThreads.filter(thread => {
     const matchesUniversity = !selectedUniversity || thread.university === selectedUniversity
@@ -321,7 +321,7 @@ export default function ThreadsPage() {
 
         {/* Timeline */}
         <div>
-          {filteredThreads.map((thread, index) => (
+          {filteredThreads.map((thread) => (
             <div key={thread.id} className="bg-white border-b border-gray-200 hover:bg-gray-50 transition-colors">
               <Link href={`/threads/${thread.id}`}>
                 <div className="p-4 cursor-pointer">

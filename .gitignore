@@ -31,3 +31,5 @@ yarn-error.log*
 # TypeScript
 *.tsbuildinfo
 next-env.d.tsnode_modules_backup/
+node_modules_backup/
+*.backup
