@@ -83,35 +83,6 @@ type GeneralStep = 'genre' | 'subject'
 type GeneralGenre = 'language' | 'liberal' | 'other'
 type ProfessorStep = 'search' | 'courses' | 'years'
 
-const mockResults: SearchResult[] = [
-  {
-    id: '1',
-    type: 'thread',
-    title: 'マクロ経済学 2024年期末試験について',
-    content: '来週のマクロ経済学の期末試験、過去問と傾向が似てるかな？IS-LMモデルは確実に出そうだけど...',
-    author: '経済3年',
-    course: 'マクロ経済学',
-    university: '東京大学',
-    faculty: '経済学部',
-    createdAt: '2024-01-15',
-    commentCount: 12,
-    likeCount: 8
-  },
-  {
-    id: '2',
-    type: 'user',
-    title: '田中教授',
-    university: '早稲田大学',
-    faculty: '商学部'
-  },
-  {
-    id: '3',
-    type: 'course',
-    title: 'データ構造とアルゴリズム',
-    university: '東京工業大学',
-    faculty: '情報理工学院'
-  }
-]
 
 // Mock data for future implementation
 // const mockCourses: Course[] = []
@@ -187,8 +158,7 @@ function SearchPageClient() {
       setQuery(q)
       handleSearch(q)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams])
+  }, [searchParams, handleSearch])
 
   useEffect(() => {
     // Load user information from localStorage
