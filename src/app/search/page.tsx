@@ -346,7 +346,7 @@ function SearchPageClient() {
   }
 
   const getUniversitySpecificSubjects = () => {
-    const universitySubjects = {
+    const universitySubjects: Record<string, { specialized: Array<{subject: string, icon: string, count: string}> }> = {
       '東京大学': {
         specialized: [
           { subject: '線形代数学', icon: '📐', count: '68' },
@@ -385,7 +385,7 @@ function SearchPageClient() {
       }
     }
 
-    return universitySubjects[userInfo?.university] || {
+    return universitySubjects[userInfo?.university || ''] || {
       specialized: [
         { subject: '線形代数', icon: '📊', count: '45' },
         { subject: 'マクロ経済学', icon: '💹', count: '32' },
