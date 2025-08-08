@@ -9,6 +9,7 @@ import { TeacherSearchModal } from '@/components/teacher/TeacherSearchModal'
 import { universityDataDetailed } from '@/data/universityDataDetailed'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
 import { useFormErrorHandler, useFileUploadErrorHandler } from '@/hooks/useErrorHandler'
+import { supabase } from '@/lib/supabase'
 // CourseTeacher type definition
 interface CourseTeacher {
   id: string
@@ -117,7 +118,9 @@ export default function UploadPage() {
     description: '',
     
     // 教員情報
-    teachers: [] as CourseTeacher[]
+    teachers: [] as CourseTeacher[],
+    file: null as File | null, // ファイルを追加
+    tags: [] as string[] // タグを追加
   })
   
   const [teacherInput, setTeacherInput] = useState({
@@ -423,10 +426,30 @@ export default function UploadPage() {
     if (file) {
       // Validate file
       if (!file) {
-        fileUploadErrorHandler.handleValidationError('ファイルが選択されていません')
+        alert('ファイルが選択されていません')
         return
       }
-      setSelectedFile(file)
+      
+      // ファイルサイズチェック（10MB制限）
+      const maxSize = 10 * 1024 * 1024 // 10MB
+      if (file.size > maxSize) {
+        alert('ファイルサイズは10MB以下にしてください')
+        return
+      }
+
+      // ファイル形式チェック
+      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg']
+      if (!allowedTypes.includes(file.type)) {
+        alert('PDF、JPEG、PNG形式のファイルのみアップロード可能です')
+        return
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        file: file
+      }))
+      
+      console.log('ファイル選択:', { name: file.name, size: file.size, type: file.type })
     }
   }
 
@@ -487,30 +510,107 @@ export default function UploadPage() {
   }
 
   const handleSubmit = async () => {
-    try {
-      setIsSubmitting(true)
+          if (!isLoggedIn) {
+        alert('ログインが必要です')
+        return
+      }
+
+      try {
+        console.log('アップロード開始:', formData)
+        
+        // ファイルが選択されているか確認
+        if (!formData.file) {
+          alert('ファイルを選択してください')
+          return
+        }
+
+        // ファイルサイズチェック（10MB制限）
+        const maxSize = 10 * 1024 * 1024 // 10MB
+        if (formData.file.size > maxSize) {
+          alert('ファイルサイズは10MB以下にしてください')
+          return
+        }
+
+        // ファイル形式チェック
+        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg']
+        if (!allowedTypes.includes(formData.file.type)) {
+          alert('PDF、JPEG、PNG形式のファイルのみアップロード可能です')
+          return
+        }
+
+      // ファイル名を生成（ユニークな名前）
+      const fileExtension = formData.file.name.split('.').pop()
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExtension}`
+      const filePath = `${user?.id}/${fileName}`
+
+      console.log('ファイルアップロード開始:', { fileName, filePath })
+
+      // Supabase Storageにファイルをアップロード
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('past-exams')
+        .upload(filePath, formData.file)
+
+      if (uploadError) {
+        console.error('ファイルアップロードエラー:', uploadError)
+        alert('ファイルのアップロードに失敗しました')
+        return
+      }
+
+      console.log('ファイルアップロード成功:', uploadData)
+
+      // ファイルの公開URLを取得
+      const { data: urlData } = supabase.storage
+        .from('past-exams')
+        .getPublicUrl(filePath)
+
+      const fileUrl = urlData.publicUrl
+
+      // データベースに過去問情報を保存
+      const pastExamData = {
+        title: formData.courseName || '無題',
+        course_name: formData.courseName || '',
+        professor: formData.teachers.map(t => t.name).join(', '), // 教員名をカンマ区切りで保存
+        university: formData.university || '',
+        faculty: formData.faculty || '',
+        department: formData.department || '',
+        year: formData.year || new Date().getFullYear(),
+        semester: formData.term || 'spring',
+        exam_type: formData.examType || 'final',
+        file_url: fileUrl,
+        file_name: formData.file.name,
+        uploaded_by: user.id,
+        difficulty: formData.teachers.length > 0 
+          ? formData.teachers.map(t => Number(t.difficulty) || 3).reduce((sum, val) => sum + val, 0) / formData.teachers.length 
+          : 3, // 教員の難易度の平均を保存
+        tags: formData.tags || [],
+        target_audiences: formData.targetAudiences.map(id => ({
+          id: id,
+          name: availableTargetAudiences.find(t => t.id === id)?.name || '不明'
+        }))
+      }
+
+      console.log('過去問データ保存開始:', pastExamData)
+
+      const { data: examData, error: examError } = await supabase
+        .from('past_exams')
+        .insert(pastExamData)
+        .select()
+        .single()
+
+      if (examError) {
+        console.error('過去問データ保存エラー:', examError)
+        alert('過去問情報の保存に失敗しました')
+        return
+      }
+
+      console.log('過去問データ保存成功:', examData)
       
-      // Create form data for upload
-      const uploadData = new FormData()
-      uploadData.append('file', selectedFile!)
-      uploadData.append('data', JSON.stringify({
-        ...formData,
-        uploadedAt: new Date().toISOString(),
-        uploaderId: user?.id || 'anonymous'
-      }))
-      
-      // Simulate upload
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      // Success
+      // 成功メッセージを表示
       setCurrentStep('complete')
       
     } catch (error) {
-      formErrorHandler.handleSubmissionError(
-        error instanceof Error ? error : '投稿中にエラーが発生しました'
-      )
-    } finally {
-      setIsSubmitting(false)
+      console.error('アップロード全体エラー:', error)
+      alert('アップロード中にエラーが発生しました')
     }
   }
 
