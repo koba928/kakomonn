@@ -83,14 +83,25 @@ export function useAuth() {
             department: userData.department,
             year: userData.year,
             pen_name: userData.pen_name
-          }
+          },
+          emailRedirectTo: `${window.location.origin}/auth/callback`
         }
       })
 
-      console.log('Supabase認証結果:', { data, error })
+      console.log('Supabase認証結果:', { 
+        data: data ? { 
+          user: data.user ? { id: data.user.id, email: data.user.email } : null,
+          session: data.session ? 'session-exists' : null
+        } : null, 
+        error: error ? { message: error.message, status: error.status } : null 
+      })
 
       if (error) {
-        console.error('Supabase認証エラー:', error)
+        console.error('Supabase認証エラー詳細:', {
+          message: error.message,
+          status: error.status,
+          name: error.name
+        })
         throw error
       }
 

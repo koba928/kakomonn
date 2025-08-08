@@ -58,10 +58,13 @@ export default function EmailAuthPage() {
           pen_name: emailName
         }
         console.log('ユーザーデータ:', userData)
-        const { error } = await signUp(email, password, userData)
-        if (error) {
-          console.error('新規登録エラー:', error)
-          setError(error.message)
+        console.log('signUp関数呼び出し前')
+        const result = await signUp(email, password, userData)
+        console.log('signUp関数呼び出し後:', result)
+        
+        if (result.error) {
+          console.error('新規登録エラー:', result.error)
+          setError(result.error.message || '新規登録に失敗しました')
         } else {
           console.log('新規登録成功')
           window.location.href = '/auth/university-info'
