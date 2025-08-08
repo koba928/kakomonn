@@ -1,385 +1,280 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
-import { useUser } from '@/contexts/UserContext'
+import { useState, useEffect } from 'react'
+import { AnimatedButton } from '@/components/ui/MicroInteractions'
+import { AcademicInfoSelector, AcademicInfo } from '@/components/ui/AcademicInfoSelector'
 
-interface UserStats {
-  postsCount: number
-  commentsCount: number
-  likesCount: number
-  bookmarksCount: number
-  downloadsCount: number
-}
-
-interface UserPost {
-  id: string
-  title: string
-  content: string
-  course: string
+interface UserInfo {
   university: string
   faculty: string
-  createdAt: string
-  commentCount: number
-  likeCount: number
-  downloadCount?: number
+  department: string
+  year: string
+  penName: string
+  isLoggedIn: boolean
+  completedAt: string
 }
-
-const mockUserStats: UserStats = {
-  postsCount: 12,
-  commentsCount: 45,
-  likesCount: 234,
-  bookmarksCount: 18,
-  downloadsCount: 89
-}
-
-const mockUserPosts: UserPost[] = [
-  {
-    id: '1',
-    title: 'マクロ経済学 2024年期末試験について',
-    content: '来週のマクロ経済学の期末試験、過去問と傾向が似てるかな？IS-LMモデルは確実に出そうだけど...',
-    course: 'マクロ経済学',
-    university: '東京大学',
-    faculty: '経済学部',
-    createdAt: '2024-01-15',
-    commentCount: 12,
-    likeCount: 34,
-    downloadCount: 8
-  },
-  {
-    id: '2',
-    title: '微積分学I 田中教授の過去問共有',
-    content: '田中教授の微積分、毎年似たような問題が出てます。2023年の過去問をアップしたので参考にどうぞ！',
-    course: '微積分学I',
-    university: '東京大学',
-    faculty: '工学部',
-    createdAt: '2024-01-14',
-    commentCount: 8,
-    likeCount: 56,
-    downloadCount: 23
-  },
-  {
-    id: '3',
-    title: '線形代数 固有値の求め方まとめ',
-    content: '線形代数の固有値・固有ベクトルの計算方法をまとめました。特に3×3行列の効率的な解法を紹介します。',
-    course: '線形代数II',
-    university: '東京大学',
-    faculty: '理学部',
-    createdAt: '2024-01-10',
-    commentCount: 15,
-    likeCount: 78,
-    downloadCount: 45
-  }
-]
 
 export default function ProfilePage() {
-  const { user, isLoggedIn } = useUser()
-  const [selectedTab, setSelectedTab] = useState<'posts' | 'comments' | 'likes' | 'bookmarks'>('posts')
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editedInfo, setEditedInfo] = useState<UserInfo | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
-  if (!isLoggedIn || !user) {
+  useEffect(() => {
+    // Load user information from localStorage
+    const savedUserInfo = localStorage.getItem('kakomonn_user')
+    if (savedUserInfo) {
+      try {
+        const parsed = JSON.parse(savedUserInfo)
+        setUserInfo(parsed)
+        setEditedInfo(parsed)
+      } catch (error) {
+        console.error('Failed to parse user info:', error)
+      }
+    }
+  }, [])
+
+  const handleAcademicInfoChange = (newInfo: AcademicInfo) => {
+    if (editedInfo) {
+      setEditedInfo({
+        ...editedInfo,
+        university: newInfo.university,
+        faculty: newInfo.faculty,
+        department: newInfo.department
+      })
+    }
+  }
+
+  const handleSaveChanges = async () => {
+    if (!editedInfo) return
+
+    setIsLoading(true)
+
+    // デモ用：変更をlocalStorageに保存
+    setTimeout(() => {
+      localStorage.setItem('kakomonn_user', JSON.stringify(editedInfo))
+      setUserInfo(editedInfo)
+      setIsEditing(false)
+      setIsLoading(false)
+    }, 1000)
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('kakomonn_user')
+    window.location.href = '/'
+  }
+
+  const handleCancelEdit = () => {
+    setEditedInfo(userInfo)
+    setIsEditing(false)
+  }
+
+  // Redirect to home if not logged in
+  if (!userInfo && typeof window !== 'undefined') {
+    window.location.href = '/'
+    return null
+  }
+
+  if (!userInfo) {
     return (
-      <main className="min-h-screen bg-gray-50">
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-white text-center py-16">
-            <div className="max-w-sm mx-auto px-4">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                ログインが必要です
-              </h3>
-              <p className="text-gray-600 mb-6">
-                プロフィールを表示するにはログインしてください
-              </p>
-              <Link 
-                href="/register/step-by-step"
-                className="inline-flex items-center bg-indigo-600 text-white px-6 py-2 rounded-full font-medium hover:bg-indigo-700 transition-colors"
-              >
-                ログイン・新規登録
-              </Link>
-            </div>
-          </div>
-        </div>
-      </main>
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      </div>
     )
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      {/* Twitter-style header */}
-      <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200">
-        <div className="max-w-2xl mx-auto px-4">
-          <div className="flex items-center h-14">
-            <Link href="/threads" className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-gray-100 transition-colors mr-8">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+    <main className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <Link 
+            href="/search" 
+            className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"
+          >
+            KakoMoNN
+          </Link>
+          <div className="flex items-center space-x-4">
+            <Link 
+              href="/search"
+              className="text-sm text-gray-500 hover:text-gray-700"
+            >
+              ← 検索に戻る
             </Link>
-            <div className="flex-1">
-              <h1 className="text-xl font-bold text-gray-900">{user.name}</h1>
-              <p className="text-sm text-gray-500">{mockUserStats.postsCount}件の投稿</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-2xl mx-auto">
-        {/* Profile header */}
-        <div className="bg-white">
-          {/* Cover photo area */}
-          <div className="h-48 bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400"></div>
-          
-          {/* Profile info */}
-          <div className="px-4 pb-4">
-            <div className="flex justify-between items-start -mt-16">
-              <div className="w-32 h-32 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 border-4 border-white flex items-center justify-center">
-                <span className="text-white font-bold text-4xl">
-                  {user.name.charAt(0)}
-                </span>
-              </div>
-              <button className="mt-16 px-4 py-2 border border-gray-300 rounded-full font-medium hover:bg-gray-50 transition-colors">
-                プロフィール編集
-              </button>
-            </div>
-            
-            <div className="mt-4">
-              <h2 className="text-2xl font-bold text-gray-900">{user.name}</h2>
-              <p className="text-gray-500 mb-3">@{user.name.toLowerCase().replace(/\s+/g, '')}</p>
-              
-              <div className="mb-4">
-                <div className="flex items-center text-gray-600 mb-2">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0a2 2 0 002-2v-4m-2 4a2 2 0 01-2 2M5 3v18m14-8h-2" />
-                  </svg>
-                  <span>{user.university} {user.faculty}</span>
-                </div>
-                <div className="flex items-center text-gray-600 mb-2">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                  <span>{user.department} {user.year}年生</span>
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 0a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2v-8a2 2 0 00-2-2z" />
-                  </svg>
-                  <span>参加日: {new Date(user.createdAt).toLocaleDateString('ja-JP')}</span>
-                </div>
-              </div>
-              
-              {/* Stats */}
-              <div className="flex space-x-6">
-                <div className="text-center">
-                  <div className="font-bold text-gray-900">{mockUserStats.postsCount}</div>
-                  <div className="text-sm text-gray-500">投稿</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-bold text-gray-900">{mockUserStats.commentsCount}</div>
-                  <div className="text-sm text-gray-500">コメント</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-bold text-gray-900">{mockUserStats.likesCount}</div>
-                  <div className="text-sm text-gray-500">いいね</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-bold text-gray-900">{mockUserStats.downloadsCount}</div>
-                  <div className="text-sm text-gray-500">DL</div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="bg-white border-b border-gray-200 sticky top-14 z-40">
-          <div className="flex">
-            <button
-              onClick={() => setSelectedTab('posts')}
-              className={`flex-1 text-center py-4 text-sm font-medium transition-colors relative ${
-                selectedTab === 'posts' 
-                  ? 'text-gray-900' 
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              投稿
-              {selectedTab === 'posts' && (
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-indigo-500 rounded-full" />
-              )}
-            </button>
-            <button
-              onClick={() => setSelectedTab('comments')}
-              className={`flex-1 text-center py-4 text-sm font-medium transition-colors relative ${
-                selectedTab === 'comments' 
-                  ? 'text-gray-900' 
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              コメント
-              {selectedTab === 'comments' && (
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-indigo-500 rounded-full" />
-              )}
-            </button>
-            <button
-              onClick={() => setSelectedTab('likes')}
-              className={`flex-1 text-center py-4 text-sm font-medium transition-colors relative ${
-                selectedTab === 'likes' 
-                  ? 'text-gray-900' 
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              いいね
-              {selectedTab === 'likes' && (
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-indigo-500 rounded-full" />
-              )}
-            </button>
-            <button
-              onClick={() => setSelectedTab('bookmarks')}
-              className={`flex-1 text-center py-4 text-sm font-medium transition-colors relative ${
-                selectedTab === 'bookmarks' 
-                  ? 'text-gray-900' 
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              保存済み
-              {selectedTab === 'bookmarks' && (
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-indigo-500 rounded-full" />
-              )}
-            </button>
-          </div>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h1 className="text-2xl font-bold text-gray-900">プロフィール設定</h1>
+                {!isEditing && (
+                  <AnimatedButton
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setIsEditing(true)}
+                    aria-label="プロフィールを編集"
+                  >
+                    ✏️ 編集
+                  </AnimatedButton>
+                )}
+              </div>
 
-        {/* Content */}
-        <div>
-          {selectedTab === 'posts' && (
-            <div>
-              {mockUserPosts.map((post) => (
-                <div key={post.id} className="bg-white border-b border-gray-200 hover:bg-gray-50 transition-colors">
-                  <Link href={`/threads/${post.id}`}>
-                    <div className="p-4 cursor-pointer">
-                      <div className="flex space-x-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center">
-                          <span className="text-white font-bold">
-                            {user.name.charAt(0)}
-                          </span>
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2">
-                            <span className="font-bold text-gray-900">{user.name}</span>
-                            <span className="text-gray-500">·</span>
-                            <span className="text-gray-500 text-sm">{post.createdAt}</span>
-                          </div>
-                          
-                          {/* Tags */}
-                          <div className="flex flex-wrap gap-1 mt-1 mb-2">
-                            <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs">
-                              {post.university}
-                            </span>
-                            <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-xs">
-                              {post.faculty}
-                            </span>
-                            <span className="bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full text-xs">
-                              {post.course}
-                            </span>
-                          </div>
-                          
-                          <h3 className="font-bold text-gray-900 mb-2">
-                            {post.title}
-                          </h3>
-                          
-                          <div className="text-gray-700 mb-3 whitespace-pre-line">
-                            {post.content.length > 150 
-                              ? `${post.content.substring(0, 150)}...` 
-                              : post.content
-                            }
-                          </div>
-                          
-                          {/* Stats */}
-                          <div className="flex items-center space-x-6 text-sm text-gray-500">
-                            <div className="flex items-center space-x-1">
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                              </svg>
-                              <span>{post.commentCount}</span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                              </svg>
-                              <span>{post.likeCount}</span>
-                            </div>
-                            {post.downloadCount && (
-                              <div className="flex items-center space-x-1">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m-7 4h14a2 2 0 002-2V9a2 2 0 00-2-2M5 3v4M3 5h4" />
-                                </svg>
-                                <span>{post.downloadCount}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
+              {isEditing ? (
+                <div className="space-y-8">
+                  {/* Academic Information */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">大学情報</h3>
+                    <AcademicInfoSelector
+                      value={{
+                        university: editedInfo?.university || '',
+                        faculty: editedInfo?.faculty || '',
+                        department: editedInfo?.department || ''
+                      }}
+                      onChange={handleAcademicInfoChange}
+                    />
+                  </div>
+
+                  {/* Year Selection */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      学年 <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={editedInfo?.year || ''}
+                      onChange={(e) => editedInfo && setEditedInfo({ ...editedInfo, year: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    >
+                      <option value="">選択してください</option>
+                      <option value="1年生">1年生</option>
+                      <option value="2年生">2年生</option>
+                      <option value="3年生">3年生</option>
+                      <option value="4年生">4年生</option>
+                      <option value="大学院生">大学院生</option>
+                      <option value="その他">その他</option>
+                    </select>
+                  </div>
+
+                  {/* Pen Name */}
+                  <div>
+                    <label htmlFor="penname" className="block text-sm font-medium text-gray-700 mb-2">
+                      ペンネーム（任意）
+                    </label>
+                    <input
+                      id="penname"
+                      type="text"
+                      value={editedInfo?.penName || ''}
+                      onChange={(e) => editedInfo && setEditedInfo({ ...editedInfo, penName: e.target.value })}
+                      placeholder="例: 工学太郎、理系さん"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      maxLength={20}
+                    />
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex space-x-4">
+                    <AnimatedButton
+                      variant="primary"
+                      size="lg"
+                      onClick={handleSaveChanges}
+                      disabled={isLoading}
+                      className="flex-1"
+                      aria-label="変更を保存"
+                    >
+                      {isLoading ? '保存中...' : '変更を保存'}
+                    </AnimatedButton>
+                    <AnimatedButton
+                      variant="secondary"
+                      size="lg"
+                      onClick={handleCancelEdit}
+                      disabled={isLoading}
+                      className="flex-1"
+                      aria-label="キャンセル"
+                    >
+                      キャンセル
+                    </AnimatedButton>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Current Information Display */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">表示名</label>
+                      <p className="text-lg text-gray-900">{userInfo.penName || '匿名ユーザー'}</p>
                     </div>
-                  </Link>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">学年</label>
+                      <p className="text-lg text-gray-900">{userInfo.year}</p>
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">大学</label>
+                      <p className="text-lg text-gray-900">{userInfo.university}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">学部</label>
+                      <p className="text-lg text-gray-900">{userInfo.faculty}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">学科</label>
+                      <p className="text-lg text-gray-900">{userInfo.department}</p>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-gray-200">
+                    <div className="flex items-center justify-between text-sm text-gray-500">
+                      <span>アカウント作成日: {new Date(userInfo.completedAt).toLocaleDateString('ja-JP')}</span>
+                      <span>ID: {userInfo.completedAt.slice(-8)}</span>
+                    </div>
+                  </div>
                 </div>
-              ))}
+              )}
             </div>
-          )}
-          
-          {selectedTab === 'comments' && (
-            <div className="bg-white text-center py-16">
-              <div className="max-w-sm mx-auto px-4">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  コメント履歴
-                </h3>
-                <p className="text-gray-600">
-                  あなたが投稿したコメントがここに表示されます
-                </p>
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Account Actions */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="font-semibold text-gray-900 mb-4">アカウント操作</h3>
+              <div className="space-y-3">
+                <Link href="/search">
+                  <AnimatedButton variant="secondary" size="sm" className="w-full">
+                    🔍 検索ページ
+                  </AnimatedButton>
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="w-full px-4 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors"
+                >
+                  🚪 ログアウト
+                </button>
               </div>
             </div>
-          )}
-          
-          {selectedTab === 'likes' && (
-            <div className="bg-white text-center py-16">
-              <div className="max-w-sm mx-auto px-4">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  いいねした投稿
-                </h3>
-                <p className="text-gray-600">
-                  いいねした投稿がここに表示されます
-                </p>
-              </div>
+
+            {/* Tips */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="text-sm font-medium text-blue-800 mb-2">💡 プロフィールのメリット</h4>
+              <ul className="text-xs text-blue-700 space-y-1">
+                <li>• あなたの大学の情報が優先表示されます</li>
+                <li>• 同じ大学・学部の投稿が見つけやすくなります</li>
+                <li>• 関連度の高いトピックが表示されます</li>
+                <li>• より快適な検索体験を提供します</li>
+              </ul>
             </div>
-          )}
-          
-          {selectedTab === 'bookmarks' && (
-            <div className="bg-white text-center py-16">
-              <div className="max-w-sm mx-auto px-4">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  保存した投稿
-                </h3>
-                <p className="text-gray-600">
-                  ブックマークした投稿がここに表示されます
-                </p>
-              </div>
+
+            {/* Demo Info */}
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <h4 className="text-sm font-medium text-yellow-800 mb-2">🚧 デモモード</h4>
+              <p className="text-xs text-yellow-700">
+                現在はデモ版です。情報はブラウザ内にのみ保存されます。
+                実際のサービスでは安全なサーバーで管理されます。
+              </p>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </main>

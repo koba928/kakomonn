@@ -64,12 +64,23 @@ const mockTrendingTopics = [
   { name: '物理化学', count: 43, category: '化学' }
 ]
 
+interface UserInfo {
+  university: string
+  faculty: string
+  department: string
+  year: string
+  penName: string
+  isLoggedIn: boolean
+  completedAt: string
+}
+
 function SearchPageClient() {
   const searchParams = useSearchParams()
   const [query, setQuery] = useState('')
   const [selectedTab, setSelectedTab] = useState<'all' | 'threads' | 'users' | 'courses'>('all')
   const [results, setResults] = useState<SearchResult[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
 
   useEffect(() => {
     const q = searchParams.get('q')
@@ -78,6 +89,19 @@ function SearchPageClient() {
       handleSearch(q)
     }
   }, [searchParams])
+
+  useEffect(() => {
+    // Load user information from localStorage
+    const savedUserInfo = localStorage.getItem('kakomonn_user')
+    if (savedUserInfo) {
+      try {
+        const parsed = JSON.parse(savedUserInfo)
+        setUserInfo(parsed)
+      } catch (error) {
+        console.error('Failed to parse user info:', error)
+      }
+    }
+  }, [])
 
   const handleSearch = async (searchQuery: string) => {
     if (!searchQuery.trim()) {
@@ -89,11 +113,34 @@ function SearchPageClient() {
     
     // Simulate API call
     setTimeout(() => {
-      const filtered = mockResults.filter(result => 
+      let filtered = mockResults.filter(result => 
         result.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         result.content?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         result.course?.toLowerCase().includes(searchQuery.toLowerCase())
       )
+
+      // Prioritize results from user's university if logged in
+      if (userInfo) {
+        filtered = filtered.sort((a, b) => {
+          const aMatchesUniversity = a.university === userInfo.university
+          const bMatchesUniversity = b.university === userInfo.university
+          const aMatchesFaculty = a.faculty === userInfo.faculty
+          const bMatchesFaculty = b.faculty === userInfo.faculty
+
+          // Same university results first
+          if (aMatchesUniversity && !bMatchesUniversity) return -1
+          if (!aMatchesUniversity && bMatchesUniversity) return 1
+          
+          // Within same university, prioritize same faculty
+          if (aMatchesUniversity && bMatchesUniversity) {
+            if (aMatchesFaculty && !bMatchesFaculty) return -1
+            if (!aMatchesFaculty && bMatchesFaculty) return 1
+          }
+
+          return 0
+        })
+      }
+
       setResults(filtered)
       setIsLoading(false)
     }, 500)
@@ -120,10 +167,31 @@ function SearchPageClient() {
           >
             KakoMoNN
           </Link>
-          <div className="text-sm text-gray-500">
-            {query && `"${query}" の検索結果`}
+          <div className="flex items-center space-x-4">
+            {userInfo && (
+              <Link href="/profile">
+                <div className="text-sm text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full hover:bg-indigo-100 transition-colors cursor-pointer">
+                  👤 {userInfo.penName || '匿名ユーザー'} ({userInfo.university})
+                </div>
+              </Link>
+            )}
+            <div className="text-sm text-gray-500">
+              {query && `"${query}" の検索結果`}
+            </div>
           </div>
         </div>
+
+        {/* Personalized Welcome Message */}
+        {userInfo && !query && (
+          <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-8">
+            <h3 className="text-lg font-semibold text-indigo-900 mb-2">
+              こんにちは、{userInfo.penName || '匿名ユーザー'}さん！
+            </h3>
+            <p className="text-indigo-700 text-sm">
+              {userInfo.university} {userInfo.faculty} {userInfo.department} {userInfo.year}の情報を優先的に表示します。
+            </p>
+          </div>
+        )}
 
         {/* Search Bar */}
         <div className="mb-8">
@@ -203,11 +271,38 @@ function SearchPageClient() {
                                 {result.type === 'thread' ? 'スレッド' :
                                  result.type === 'user' ? 'ユーザー' : '授業'}
                               </span>
+                              
+                              {/* University match indicator */}
+                              {userInfo && result.university === userInfo.university && (
+                                <span className="px-2 py-1 text-xs rounded-full bg-indigo-100 text-indigo-700 font-medium">
+                                  🏫 同じ大学
+                                </span>
+                              )}
+                              
+                              {/* Faculty match indicator */}
+                              {userInfo && result.university === userInfo.university && result.faculty === userInfo.faculty && (
+                                <span className="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-700 font-medium">
+                                  📚 同じ学部
+                                </span>
+                              )}
+
                               {result.university && (
-                                <span className="text-sm text-gray-500">{result.university}</span>
+                                <span className={`text-sm ${
+                                  userInfo && result.university === userInfo.university 
+                                    ? 'text-indigo-600 font-medium' 
+                                    : 'text-gray-500'
+                                }`}>
+                                  {result.university}
+                                </span>
                               )}
                               {result.faculty && (
-                                <span className="text-sm text-gray-500">• {result.faculty}</span>
+                                <span className={`text-sm ${
+                                  userInfo && result.faculty === userInfo.faculty 
+                                    ? 'text-purple-600 font-medium' 
+                                    : 'text-gray-500'
+                                }`}>
+                                  • {result.faculty}
+                                </span>
                               )}
                             </div>
                             <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -270,8 +365,39 @@ function SearchPageClient() {
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
+            {/* User Profile Section */}
+            {userInfo && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+                <h3 className="font-semibold text-gray-900 mb-4">プロフィール</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">表示名:</span>
+                    <span className="font-medium">{userInfo.penName || '匿名ユーザー'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">大学:</span>
+                    <span className="font-medium">{userInfo.university}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">学部:</span>
+                    <span className="font-medium">{userInfo.faculty}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">学科:</span>
+                    <span className="font-medium">{userInfo.department}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">学年:</span>
+                    <span className="font-medium">{userInfo.year}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">人気のトピック</h3>
+              <h3 className="font-semibold text-gray-900 mb-4">
+                {userInfo ? `${userInfo.university}で人気のトピック` : '人気のトピック'}
+              </h3>
               <div className="space-y-3">
                 {mockTrendingTopics.map((topic, index) => (
                   <div key={index} className="flex items-center justify-between">

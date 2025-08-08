@@ -38,14 +38,29 @@ export default function Home() {
               {APP_CONFIG.fullDescription}
             </p>
 
-            {/* メインアクション - 過去問を探すボタンのみ */}
-            <nav className="flex justify-center animate-slide-in mb-4" aria-label="メインナビゲーション">
-              <Link href="/search">
-                <AnimatedButton variant="primary" size="lg" aria-label="過去問を検索する">
-                  <SearchIcon size={24} aria-hidden={true} />
-                  過去問を探す
-                </AnimatedButton>
-              </Link>
+            {/* メインアクション - 利用方法選択 */}
+            <nav className="space-y-4 animate-slide-in mb-8" aria-label="メインナビゲーション">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <Link href="/auth/method-select">
+                  <AnimatedButton variant="primary" size="lg" aria-label="ログインして始める">
+                    <span aria-hidden="true">👤</span>
+                    ログインして始める
+                  </AnimatedButton>
+                </Link>
+                
+                <div className="text-gray-400 text-sm">または</div>
+                
+                <Link href="/search">
+                  <AnimatedButton variant="secondary" size="lg" aria-label="ログインせずに使う">
+                    <SearchIcon size={24} aria-hidden={true} />
+                    ログインせずに使う
+                  </AnimatedButton>
+                </Link>
+              </div>
+              
+              <div className="text-center text-sm text-gray-600">
+                <p>ログインすると、あなたの大学に最適化された情報を表示します</p>
+              </div>
             </nav>
             
             {/* 使い方ガイド */}
@@ -65,11 +80,6 @@ export default function Home() {
                   <span>右下で新規投稿</span>
                 </li>
               </ul>
-              <div className="mt-4">
-                <Link href="/register" className="text-indigo-600 hover:text-indigo-800 text-sm font-medium" aria-label="ユーザー登録ページへ移動">
-                  ユーザー登録をして、パーソナライズされた情報を受け取る →
-                </Link>
-              </div>
             </section>
           </header>
         </section>
