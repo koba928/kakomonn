@@ -9,41 +9,41 @@ import { VirtualizedAutocompleteSelect } from '@/components/ui/VirtualizedAutoco
 import { api } from '@/services/api'
 import { useAuth } from '@/hooks/useAuth'
 
-// 過去問検索結果の型定義（検索機能実装時に使用）
-// interface PastExam {
-//   id: string
-//   title: string
-//   course_name: string
-//   professor: string
-//   university: string
-//   faculty: string
-//   department: string
-//   year: number
-//   semester: string
-//   exam_type: string
-//   file_url: string
-//   file_name: string
-//   uploaded_by: string
-//   download_count: number
-//   difficulty: number
-//   helpful_count: number
-//   tags: string[]
-//   created_at: string
-//   updated_at: string
-// }
+// 過去問検索結果の型定義
+interface PastExam {
+  id: string
+  title: string
+  course_name: string
+  professor: string
+  university: string
+  faculty: string
+  department: string
+  year: number
+  semester: string
+  exam_type: string
+  file_url: string
+  file_name: string
+  uploaded_by: string
+  download_count: number
+  difficulty: number
+  helpful_count: number
+  tags: string[]
+  created_at: string
+  updated_at: string
+}
 
-// 検索フィルターの型定義（検索機能実装時に使用）
-// interface SearchFilters {
-//   university?: string
-//   faculty?: string
-//   department?: string
-//   course?: string
-//   professor?: string
-//   year?: number
-//   semester?: string
-//   examType?: string
-//   tags?: string[]
-// }
+// 検索フィルターの型定義
+interface SearchFilters {
+  university?: string
+  faculty?: string
+  department?: string
+  course?: string
+  professor?: string
+  year?: number
+  semester?: string
+  examType?: string
+  tags?: string[]
+}
 
 
 // Future interfaces for new sections
@@ -177,35 +177,39 @@ function SearchPageClient() {
   const [selectedProfessor, setSelectedProfessor] = useState<string | null>(null)
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null)
   
-  // 検索機能の状態管理（一時的にコメントアウト）
-  // const [searchResults, setSearchResults] = useState<PastExam[]>([])
-  // const [searchFilters] = useState<SearchFilters>({})
-  // const [isSearching, setIsSearching] = useState(false)
+  // 検索機能の状態管理
+  const [searchResults, setSearchResults] = useState<PastExam[]>([])
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>({})
+  const [isSearching, setIsSearching] = useState(false)
 
   const handleSearch = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) {
+      setSearchResults([])
       return
     }
 
-    // 一時的にコンソールログのみ
-    console.log('検索開始:', searchQuery)
-    
-    // TODO: 検索機能を実装
-    // try {
-    //   setIsSearching(true)
-    //   const filters: SearchFilters = {
-    //     ...searchFilters,
-    //     course: searchQuery
-    //   }
-    //   const results = await api.pastExams.getAll(filters)
-    //   setSearchResults(results)
-    // } catch (error) {
-    //   console.error('検索エラー:', error)
-    //   setSearchResults([])
-    // } finally {
-    //   setIsSearching(false)
-    // }
-  }, [])
+    try {
+      setIsSearching(true)
+      console.log('検索開始:', searchQuery)
+      
+      // 検索フィルターを構築
+      const filters: SearchFilters = {
+        ...searchFilters,
+        course: searchQuery
+      }
+      
+      // APIを使用して過去問を検索
+      const results = await api.pastExams.getAll(filters)
+      setSearchResults(results)
+      
+      console.log('検索結果:', results)
+    } catch (error) {
+      console.error('検索エラー:', error)
+      setSearchResults([])
+    } finally {
+      setIsSearching(false)
+    }
+  }, [searchFilters])
 
   // ログインユーザーのプロファイル情報を読み込む
   useEffect(() => {
@@ -470,6 +474,63 @@ function SearchPageClient() {
     setGeneralStep('subject')
   }
 
+  // 検索結果を表示するコンポーネント
+  const renderSearchResults = () => {
+    if (isSearching) {
+      return (
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          <span className="ml-2 text-gray-600">検索中...</span>
+        </div>
+      )
+    }
+
+    if (searchResults.length === 0) {
+      return (
+        <div className="text-center py-8">
+          <p className="text-gray-500">検索結果が見つかりませんでした</p>
+        </div>
+      )
+    }
+
+    return (
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-gray-900">検索結果 ({searchResults.length}件)</h3>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {searchResults.map((exam) => (
+            <div key={exam.id} className="bg-white rounded-lg shadow-md p-4 border border-gray-200 hover:shadow-lg transition-shadow">
+              <div className="flex items-start justify-between mb-2">
+                <h4 className="font-medium text-gray-900 truncate">{exam.title}</h4>
+                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                  {exam.year}年
+                </span>
+              </div>
+              <p className="text-sm text-gray-600 mb-2">{exam.course_name}</p>
+              <p className="text-xs text-gray-500 mb-3">{exam.professor}</p>
+              <div className="flex items-center justify-between text-xs text-gray-500">
+                <span>{exam.university} {exam.faculty}</span>
+                <div className="flex items-center space-x-2">
+                  <span>📥 {exam.download_count}</span>
+                  <span>⭐ {exam.difficulty}/5</span>
+                </div>
+              </div>
+              <div className="mt-3">
+                <a
+                  href={exam.file_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-3 py-1 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-md hover:bg-indigo-100 transition-colors"
+                >
+                  ダウンロード
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
@@ -699,7 +760,7 @@ function SearchPageClient() {
                       className="group p-6 sm:p-8 bg-gradient-to-br from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl hover:from-yellow-100 hover:to-orange-100 hover:shadow-md transition-all duration-200"
                     >
                       <div className="text-center">
-                        <div className="text-4xl sm:text-5xl mb-4 group-hover:scale-110 transition-transform">👨‍🏫</div>
+                        <div className="text-4xl sm:text-5xl mb-4">👨‍🏫</div>
                         <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">教授名で検索</h4>
                         <p className="text-sm sm:text-base text-gray-600">教授名から授業を特定</p>
                         <p className="text-xs sm:text-sm text-orange-600 mt-2 font-medium">おすすめ・最速</p>
@@ -711,7 +772,7 @@ function SearchPageClient() {
                       className="group p-6 sm:p-8 bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl hover:from-indigo-100 hover:to-purple-100 hover:shadow-md transition-all duration-200"
                     >
                       <div className="text-center">
-                        <div className="text-4xl sm:text-5xl mb-4 group-hover:scale-110 transition-transform">🎓</div>
+                        <div className="text-4xl sm:text-5xl mb-4">🎓</div>
                         <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">学部専門科目</h4>
                         <p className="text-sm sm:text-base text-gray-600">メジャーの専門的な科目</p>
                         <p className="text-xs sm:text-sm text-indigo-600 mt-2 font-medium">学科専門 / その他</p>
@@ -723,7 +784,7 @@ function SearchPageClient() {
                       className="group p-6 sm:p-8 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl hover:from-green-100 hover:to-emerald-100 hover:shadow-md transition-all duration-200"
                     >
                       <div className="text-center">
-                        <div className="text-4xl sm:text-5xl mb-4 group-hover:scale-110 transition-transform">🌍</div>
+                        <div className="text-4xl sm:text-5xl mb-4">🌍</div>
                         <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">全学共通科目</h4>
                         <p className="text-sm sm:text-base text-gray-600">教養・言語・基礎科目</p>
                         <p className="text-xs sm:text-sm text-green-600 mt-2 font-medium">言語 / 教養 / その他</p>
@@ -756,7 +817,7 @@ function SearchPageClient() {
                       className="group p-6 sm:p-8 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl hover:from-blue-100 hover:to-indigo-100 hover:shadow-md transition-all duration-200"
                     >
                       <div className="text-center">
-                        <div className="text-4xl sm:text-5xl mb-3 sm:mb-4 group-hover:scale-110 transition-transform">🏛️</div>
+                        <div className="text-4xl sm:text-5xl mb-3 sm:mb-4 ">🏛️</div>
                         <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">学科専門</h4>
                         <p className="text-sm sm:text-base text-gray-600">学科に直接関連する専門科目</p>
                       </div>
@@ -767,7 +828,7 @@ function SearchPageClient() {
                       className="group p-6 sm:p-8 bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-xl hover:from-purple-100 hover:to-pink-100 hover:shadow-md transition-all duration-200"
                     >
                       <div className="text-center">
-                        <div className="text-4xl sm:text-5xl mb-3 sm:mb-4 group-hover:scale-110 transition-transform">📚</div>
+                        <div className="text-4xl sm:text-5xl mb-3 sm:mb-4 ">📚</div>
                         <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">その他</h4>
                         <p className="text-sm sm:text-base text-gray-600">関連する専門分野の科目</p>
                       </div>
@@ -799,7 +860,7 @@ function SearchPageClient() {
                       className="group p-6 bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 rounded-xl hover:from-blue-100 hover:to-cyan-100 hover:shadow-md transition-all duration-200"
                     >
                       <div className="text-center">
-                        <div className="text-3xl sm:text-4xl mb-3 group-hover:scale-110 transition-transform">💬</div>
+                        <div className="text-3xl sm:text-4xl mb-3 ">💬</div>
                         <h4 className="text-lg font-bold text-gray-900 mb-2">言語科目</h4>
                         <p className="text-sm text-gray-600">外国語・コミュニケーション</p>
                       </div>
@@ -810,7 +871,7 @@ function SearchPageClient() {
                       className="group p-6 bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-200 rounded-xl hover:from-purple-100 hover:to-violet-100 hover:shadow-md transition-all duration-200"
                     >
                       <div className="text-center">
-                        <div className="text-3xl sm:text-4xl mb-3 group-hover:scale-110 transition-transform">🧠</div>
+                        <div className="text-3xl sm:text-4xl mb-3 ">🧠</div>
                         <h4 className="text-lg font-bold text-gray-900 mb-2">教養科目</h4>
                         <p className="text-sm text-gray-600">人文・社会・自然科学</p>
                       </div>
@@ -821,7 +882,7 @@ function SearchPageClient() {
                       className="group p-6 bg-gradient-to-br from-orange-50 to-red-50 border border-orange-200 rounded-xl hover:from-orange-100 hover:to-red-100 hover:shadow-md transition-all duration-200"
                     >
                       <div className="text-center">
-                        <div className="text-3xl sm:text-4xl mb-3 group-hover:scale-110 transition-transform">🏃</div>
+                        <div className="text-3xl sm:text-4xl mb-3 ">🏃</div>
                         <h4 className="text-lg font-bold text-gray-900 mb-2">その他</h4>
                         <p className="text-sm text-gray-600">実技・基礎・実験科目</p>
                       </div>
@@ -960,7 +1021,7 @@ function SearchPageClient() {
                           className="group p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl hover:from-blue-100 hover:to-indigo-100 hover:shadow-md transition-all duration-200 text-left"
                         >
                           <div className="text-center">
-                            <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">📖</div>
+                            <div className="text-3xl mb-3 ">📖</div>
                             <h4 className="text-lg font-bold text-gray-900 mb-2">{course.name}</h4>
                             <p className="text-sm text-gray-600">{course.years.length}年分の過去問</p>
                             <p className="text-xs text-blue-600 mt-2 font-medium">
@@ -1012,7 +1073,7 @@ function SearchPageClient() {
                           className="group p-4 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl hover:from-green-100 hover:to-emerald-100 hover:shadow-md transition-all duration-200"
                         >
                           <div className="text-center">
-                            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">📅</div>
+                            <div className="text-2xl mb-2 ">📅</div>
                             <h4 className="text-lg font-bold text-gray-900 mb-1">{year}年</h4>
                             <p className="text-xs text-green-600">過去問を見る</p>
                           </div>
@@ -1026,6 +1087,12 @@ function SearchPageClient() {
           </div>
         </div>
 
+        {/* 検索結果の表示 */}
+        {query && (
+          <div className="container mx-auto px-4 py-8 max-w-6xl">
+            {renderSearchResults()}
+          </div>
+        )}
 
       </div>
     </div>
