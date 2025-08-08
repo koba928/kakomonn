@@ -179,7 +179,7 @@ function SearchPageClient() {
   
   // 検索機能の状態管理
   const [searchResults, setSearchResults] = useState<PastExam[]>([])
-  const [searchFilters, setSearchFilters] = useState<SearchFilters>({})
+  const [searchFilters] = useState<SearchFilters>({})
   const [isSearching, setIsSearching] = useState(false)
 
   const handleSearch = useCallback(async (searchQuery: string) => {
