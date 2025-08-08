@@ -75,12 +75,13 @@ interface LivePost {
 }
 */
 
-type MainSection = 'specialized' | 'general'
+type MainSection = 'specialized' | 'general' | 'professor'
 type UniversityStep = 'university' | 'faculty' | 'department' | 'year' | 'penname'
 type SpecializedStep = 'category' | 'subject'
 type SpecializedCategory = 'department' | 'other'
 type GeneralStep = 'genre' | 'subject'
 type GeneralGenre = 'language' | 'liberal' | 'other'
+type ProfessorStep = 'search' | 'courses' | 'years'
 
 const mockResults: SearchResult[] = [
   {
@@ -130,6 +131,28 @@ const mockTrendingTopics = [
   { name: '統計学', count: 76, category: '統計' }
 ]
 
+// Mock professor and course data
+const mockProfessorData: Record<string, Array<{professor: string, courses: Array<{name: string, years: string[]}>, university: string, faculty: string}>> = {
+  '東京大学_経済学部': [
+    { professor: '田中経済', courses: [{ name: 'マクロ経済学I', years: ['2024', '2023', '2022'] }, { name: 'ミクロ経済学', years: ['2024', '2023'] }], university: '東京大学', faculty: '経済学部' },
+    { professor: '佐藤統計', courses: [{ name: '計量経済学', years: ['2024', '2023', '2022', '2021'] }, { name: '統計学', years: ['2024', '2023'] }], university: '東京大学', faculty: '経済学部' },
+    { professor: '山田金融', courses: [{ name: '金融論', years: ['2024', '2023'] }], university: '東京大学', faculty: '経済学部' },
+  ],
+  '東京大学_工学部': [
+    { professor: '鈴木工学', courses: [{ name: '線形代数学', years: ['2024', '2023', '2022'] }, { name: '解析学I', years: ['2024', '2023'] }], university: '東京大学', faculty: '工学部' },
+    { professor: '高橋情報', courses: [{ name: 'データ構造とアルゴリズム', years: ['2024', '2023', '2022', '2021'] }], university: '東京大学', faculty: '工学部' },
+  ],
+  '早稲田大学_商学部': [
+    { professor: '中村商学', courses: [{ name: '商学概論', years: ['2024', '2023', '2022'] }, { name: '経営学原理', years: ['2024', '2023'] }], university: '早稲田大学', faculty: '商学部' },
+    { professor: '小林マーケ', courses: [{ name: 'マーケティング論', years: ['2024', '2023', '2022'] }], university: '早稲田大学', faculty: '商学部' },
+  ]
+}
+
+const getAllProfessorsForUser = (university: string, faculty: string) => {
+  const key = `${university}_${faculty}`
+  return mockProfessorData[key] || []
+}
+
 interface UserInfo {
   university: string
   faculty: string
@@ -165,6 +188,12 @@ function SearchPageClient() {
   const [generalStep, setGeneralStep] = useState<GeneralStep>('genre')
   const [generalGenre, setGeneralGenre] = useState<GeneralGenre | null>(null)
   const [subjectSearchQuery, setSubjectSearchQuery] = useState('')
+  
+  // Professor search flow state
+  const [professorStep, setProfessorStep] = useState<ProfessorStep>('search')
+  const [professorQuery, setProfessorQuery] = useState('')
+  const [selectedProfessor, setSelectedProfessor] = useState<string | null>(null)
+  const [selectedCourse, setSelectedCourse] = useState<string | null>(null)
 
   useEffect(() => {
     const q = searchParams.get('q')
@@ -427,6 +456,10 @@ function SearchPageClient() {
     setGeneralStep('genre')
     setGeneralGenre(null)
     setSubjectSearchQuery('')
+    setProfessorStep('search')
+    setProfessorQuery('')
+    setSelectedProfessor(null)
+    setSelectedCourse(null)
   }
 
   const handleSectionSelect = (section: MainSection) => {
@@ -434,9 +467,14 @@ function SearchPageClient() {
     if (section === 'specialized') {
       setSpecializedStep('category')
       setSpecializedCategory(null)
-    } else {
+    } else if (section === 'general') {
       setGeneralStep('genre')
       setGeneralGenre(null)
+    } else if (section === 'professor') {
+      setProfessorStep('search')
+      setProfessorQuery('')
+      setSelectedProfessor(null)
+      setSelectedCourse(null)
     }
   }
 
@@ -671,8 +709,20 @@ function SearchPageClient() {
               {/* Step 1: Main Section Selection */}
               {!activeSection && (
                 <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8">
-                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-6 text-center">まず、カテゴリを選択してください</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-6 text-center">まず、検索方法を選択してください</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                    <button
+                      onClick={() => handleSectionSelect('professor')}
+                      className="group p-6 sm:p-8 bg-gradient-to-br from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl hover:from-yellow-100 hover:to-orange-100 hover:shadow-md transition-all duration-200"
+                    >
+                      <div className="text-center">
+                        <div className="text-4xl sm:text-5xl mb-4 group-hover:scale-110 transition-transform">👨‍🏫</div>
+                        <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">教授名で検索</h4>
+                        <p className="text-sm sm:text-base text-gray-600">教授名から授業を特定</p>
+                        <p className="text-xs sm:text-sm text-orange-600 mt-2 font-medium">おすすめ・最速</p>
+                      </div>
+                    </button>
+                    
                     <button
                       onClick={() => handleSectionSelect('specialized')}
                       className="group p-6 sm:p-8 bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl hover:from-indigo-100 hover:to-purple-100 hover:shadow-md transition-all duration-200"
@@ -793,6 +843,199 @@ function SearchPageClient() {
                         <p className="text-sm text-gray-600">実技・基礎・実験科目</p>
                       </div>
                     </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Professor Search Flow */}
+              {activeSection === 'professor' && professorStep === 'search' && (
+                <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <span className="text-sm text-orange-600 font-medium">教授名検索</span>
+                      <h3 className="text-lg sm:text-xl font-bold text-gray-900">教授名を入力してください</h3>
+                      {userInfo && (
+                        <p className="text-sm text-gray-600 mt-1">{userInfo.university} {userInfo.faculty} の教授を検索</p>
+                      )}
+                    </div>
+                    <button
+                      onClick={resetFlow}
+                      className="text-gray-400 hover:text-gray-600 transition-colors p-2"
+                    >
+                      <span className="hidden sm:inline">← 戻る</span>
+                      <span className="sm:hidden">←</span>
+                    </button>
+                  </div>
+                  
+                  {/* Professor Search Input */}
+                  <div className="mb-6">
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={professorQuery}
+                        onChange={(e) => setProfessorQuery(e.target.value)}
+                        placeholder="教授名を入力... (例: 田中、佐藤)"
+                        className="w-full px-4 py-4 pl-12 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      />
+                      <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                        <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Professor Results */}
+                  {professorQuery && userInfo && (
+                    <div className="space-y-3 max-h-96 overflow-y-auto">
+                      {getAllProfessorsForUser(userInfo.university, userInfo.faculty)
+                        .filter(prof => prof.professor.toLowerCase().includes(professorQuery.toLowerCase()))
+                        .map((prof, index) => (
+                          <button
+                            key={index}
+                            onClick={() => {
+                              setSelectedProfessor(prof.professor)
+                              setProfessorStep('courses')
+                            }}
+                            className="w-full p-4 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 hover:shadow-md transition-all text-left"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <div className="text-2xl">👨‍🏫</div>
+                              <div>
+                                <h4 className="font-bold text-gray-900">{prof.professor} 教授</h4>
+                                <p className="text-sm text-gray-600">
+                                  {prof.courses.length}つの授業 • {prof.courses.reduce((total, course) => total + course.years.length, 0)}年分の過去問
+                                </p>
+                                <p className="text-xs text-orange-600 mt-1">
+                                  {prof.courses.map(c => c.name).join(', ')}
+                                </p>
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                      
+                      {/* No results */}
+                      {getAllProfessorsForUser(userInfo.university, userInfo.faculty)
+                        .filter(prof => prof.professor.toLowerCase().includes(professorQuery.toLowerCase())).length === 0 && (
+                        <div className="text-center py-8">
+                          <p className="text-gray-500 mb-2">「{professorQuery}」に該当する教授が見つかりませんでした</p>
+                          <p className="text-sm text-gray-400">別の名前で検索してみてください</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Help Text */}
+                  {!professorQuery && (
+                    <div className="text-center py-8">
+                      <div className="text-4xl mb-4">🔍</div>
+                      <h4 className="text-lg font-bold text-gray-900 mb-2">教授名を入力してください</h4>
+                      <p className="text-gray-600 mb-4">姓だけでも検索できます</p>
+                      {userInfo && (
+                        <div className="bg-gray-50 rounded-lg p-4 max-w-md mx-auto">
+                          <p className="text-sm text-gray-700">
+                            <strong>{userInfo.university} {userInfo.faculty}</strong>の教授を検索します
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Course Selection for Selected Professor */}
+              {activeSection === 'professor' && professorStep === 'courses' && selectedProfessor && userInfo && (
+                <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <div className="flex items-center space-x-2 mb-2">
+                        <span className="text-sm text-orange-600 font-medium">教授名検索</span>
+                        <span className="text-sm text-gray-400">&gt;</span>
+                        <span className="text-sm text-blue-600 font-medium">{selectedProfessor} 教授</span>
+                      </div>
+                      <h3 className="text-lg sm:text-xl font-bold text-gray-900">授業を選択してください</h3>
+                    </div>
+                    <button
+                      onClick={() => setProfessorStep('search')}
+                      className="text-gray-400 hover:text-gray-600 transition-colors p-2"
+                    >
+                      <span className="hidden sm:inline">← 戻る</span>
+                      <span className="sm:hidden">←</span>
+                    </button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {getAllProfessorsForUser(userInfo.university, userInfo.faculty)
+                      .find(prof => prof.professor === selectedProfessor)
+                      ?.courses.map((course, index) => (
+                        <button
+                          key={index}
+                          onClick={() => {
+                            setSelectedCourse(course.name)
+                            setProfessorStep('years')
+                          }}
+                          className="group p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl hover:from-blue-100 hover:to-indigo-100 hover:shadow-md transition-all duration-200 text-left"
+                        >
+                          <div className="text-center">
+                            <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">📖</div>
+                            <h4 className="text-lg font-bold text-gray-900 mb-2">{course.name}</h4>
+                            <p className="text-sm text-gray-600">{course.years.length}年分の過去問</p>
+                            <p className="text-xs text-blue-600 mt-2 font-medium">
+                              {course.years.join('年, ')}年
+                            </p>
+                          </div>
+                        </button>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Year Selection for Selected Course */}
+              {activeSection === 'professor' && professorStep === 'years' && selectedProfessor && selectedCourse && userInfo && (
+                <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <div className="flex items-center space-x-2 mb-2">
+                        <span className="text-sm text-orange-600 font-medium">教授名検索</span>
+                        <span className="text-sm text-gray-400">&gt;</span>
+                        <span className="text-sm text-blue-600 font-medium">{selectedProfessor}</span>
+                        <span className="text-sm text-gray-400">&gt;</span>
+                        <span className="text-sm text-green-600 font-medium">{selectedCourse}</span>
+                      </div>
+                      <h3 className="text-lg sm:text-xl font-bold text-gray-900">年度を選択してください</h3>
+                    </div>
+                    <button
+                      onClick={() => setProfessorStep('courses')}
+                      className="text-gray-400 hover:text-gray-600 transition-colors p-2"
+                    >
+                      <span className="hidden sm:inline">← 戻る</span>
+                      <span className="sm:hidden">←</span>
+                    </button>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {(() => {
+                      const selectedProfData = getAllProfessorsForUser(userInfo.university, userInfo.faculty)
+                        .find(prof => prof.professor === selectedProfessor)
+                      const selectedCourseData = selectedProfData?.courses.find(course => course.name === selectedCourse)
+                      
+                      return selectedCourseData?.years.map((year, index) => (
+                        <button
+                          key={index}
+                          onClick={() => {
+                            setQuery(`${selectedCourse} ${selectedProfessor} ${year}年`)
+                            handleSearch(`${selectedCourse} ${selectedProfessor} ${year}年`)
+                          }}
+                          className="group p-4 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl hover:from-green-100 hover:to-emerald-100 hover:shadow-md transition-all duration-200"
+                        >
+                          <div className="text-center">
+                            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">📅</div>
+                            <h4 className="text-lg font-bold text-gray-900 mb-1">{year}年</h4>
+                            <p className="text-xs text-green-600">過去問を見る</p>
+                          </div>
+                        </button>
+                      )) || []
+                    })()}
                   </div>
                 </div>
               )}
