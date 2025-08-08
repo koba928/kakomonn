@@ -1086,9 +1086,9 @@ export default function UploadPage() {
             <div className="flex justify-between items-center mt-8">
               <button
                 onClick={goToPrevStep}
-                disabled={currentStep === 'university' || (user && isLoggedIn && currentStep === 'courseCategory')}
+                disabled={currentStep === 'university' || (!!user && !!isLoggedIn && currentStep === 'courseCategory')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                  currentStep === 'university' || (user && isLoggedIn && currentStep === 'courseCategory')
+                  currentStep === 'university' || (!!user && !!isLoggedIn && currentStep === 'courseCategory')
                     ? 'text-gray-400 cursor-not-allowed'
                     : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                 }`}
