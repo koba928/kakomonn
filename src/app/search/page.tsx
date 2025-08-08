@@ -236,8 +236,35 @@ function SearchPageClient() {
               </Link>
             )}
             <div className="text-sm text-gray-500">
-              {query && `"${query}" の検索結果`}
+              {query && activeSection === 'search' && `"${query}" の検索結果`}
             </div>
+          </div>
+        </div>
+
+        {/* Section Navigation */}
+        <div className="flex justify-center mb-8">
+          <div className="flex bg-white rounded-xl shadow-sm border border-gray-200 p-1">
+            {[
+              { key: 'search', label: '🔍 検索', desc: '統合検索' },
+              { key: 'courses', label: '📚 授業評価', desc: '楽単・評価' },
+              { key: 'exams', label: '📝 過去問', desc: '年度別整理' },
+              { key: 'live', label: '💬 ライブ', desc: 'リアルタイム' }
+            ].map(section => (
+              <button
+                key={section.key}
+                onClick={() => setActiveSection(section.key as MainSection)}
+                className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  activeSection === section.key
+                    ? 'bg-indigo-600 text-white shadow-md'
+                    : 'text-gray-600 hover:text-indigo-600 hover:bg-indigo-50'
+                }`}
+              >
+                <div className="text-center">
+                  <div className="text-base">{section.label}</div>
+                  <div className="text-xs opacity-80">{section.desc}</div>
+                </div>
+              </button>
+            ))}
           </div>
         </div>
 
@@ -286,7 +313,8 @@ function SearchPageClient() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-3">
-            {query && (
+            {/* Search Section */}
+            {activeSection === 'search' && query && (
               <>
                 {/* Tabs */}
                 <div className="flex space-x-1 bg-gray-100 rounded-lg p-1 mb-6">
@@ -398,7 +426,7 @@ function SearchPageClient() {
               </>
             )}
 
-            {!query && (
+            {activeSection === 'search' && !query && (
               <div className="text-center py-12">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">何をお探しですか？</h2>
                 <p className="text-gray-600 mb-8">過去問、授業情報、教授について検索できます</p>
@@ -417,6 +445,217 @@ function SearchPageClient() {
                     <div className="text-green-600 text-3xl mb-4">👨‍🏫</div>
                     <h3 className="font-semibold text-gray-900 mb-2">教授・講師情報</h3>
                     <p className="text-sm text-gray-600">教授の授業スタイルや評価を検索</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Course Ratings Section */}
+            {activeSection === 'courses' && (
+              <div className="space-y-6">
+                <div className="text-center py-12">
+                  <div className="text-indigo-600 text-6xl mb-6">📚</div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-4">授業評価</h2>
+                  <p className="text-gray-600 mb-8">楽単情報・授業の難易度・教授の評価をチェック</p>
+                  
+                  {/* Course Rating Features */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-8 rounded-2xl border border-green-100">
+                      <div className="text-green-600 text-4xl mb-4">🎯</div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">楽単検索</h3>
+                      <p className="text-gray-600 mb-4">出席だけで単位が取れる授業や、レポートのみで評価される科目を探そう</p>
+                      <div className="bg-white p-4 rounded-lg">
+                        <div className="text-sm text-gray-600 mb-2">人気の楽単:</div>
+                        <div className="flex flex-wrap gap-2">
+                          <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">体育実技</span>
+                          <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">教養英語</span>
+                          <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">情報リテラシー</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-purple-50 to-violet-50 p-8 rounded-2xl border border-purple-100">
+                      <div className="text-purple-600 text-4xl mb-4">⭐</div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">教授評価</h3>
+                      <p className="text-gray-600 mb-4">授業の分かりやすさ、採点の厳しさ、出席の重要度などをチェック</p>
+                      <div className="bg-white p-4 rounded-lg">
+                        <div className="text-sm text-gray-600 mb-2">評価項目:</div>
+                        <div className="space-y-1">
+                          <div className="flex items-center text-sm">
+                            <span className="w-16">分かりやすさ</span>
+                            <div className="flex text-yellow-400 ml-2">
+                              ⭐⭐⭐⭐⭐
+                            </div>
+                          </div>
+                          <div className="flex items-center text-sm">
+                            <span className="w-16">単位取得</span>
+                            <div className="flex text-yellow-400 ml-2">
+                              ⭐⭐⭐⭐☆
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-8">
+                    <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-8 py-3 rounded-lg transition-colors">
+                      授業評価を見る（準備中）
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Past Exams Section */}
+            {activeSection === 'exams' && (
+              <div className="space-y-6">
+                <div className="text-center py-12">
+                  <div className="text-indigo-600 text-6xl mb-6">📝</div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-4">過去問データベース</h2>
+                  <p className="text-gray-600 mb-8">年度別・学期別に整理された過去問をチェック</p>
+                  
+                  {/* Past Exam Features */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100">
+                      <div className="text-blue-600 text-3xl mb-4">📅</div>
+                      <h3 className="text-lg font-bold text-gray-900 mb-2">年度別検索</h3>
+                      <p className="text-gray-600 text-sm mb-4">2020年〜2024年の過去問を年度別に検索</p>
+                      <div className="bg-white p-3 rounded-lg">
+                        <div className="flex justify-between text-sm text-gray-600">
+                          <span>2024年</span>
+                          <span className="text-blue-600 font-medium">234件</span>
+                        </div>
+                        <div className="flex justify-between text-sm text-gray-600">
+                          <span>2023年</span>
+                          <span className="text-blue-600 font-medium">189件</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-orange-50 to-red-50 p-6 rounded-xl border border-orange-100">
+                      <div className="text-orange-600 text-3xl mb-4">📊</div>
+                      <h3 className="text-lg font-bold text-gray-900 mb-2">出題傾向</h3>
+                      <p className="text-gray-600 text-sm mb-4">過去3年間の出題傾向を分析</p>
+                      <div className="bg-white p-3 rounded-lg">
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-sm">
+                            <span>計算問題</span>
+                            <div className="w-12 bg-gray-200 rounded-full h-2">
+                              <div className="bg-orange-500 h-2 rounded-full" style={{width: '80%'}}></div>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between text-sm">
+                            <span>論述問題</span>
+                            <div className="w-12 bg-gray-200 rounded-full h-2">
+                              <div className="bg-orange-500 h-2 rounded-full" style={{width: '60%'}}></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border border-green-100">
+                      <div className="text-green-600 text-3xl mb-4">✅</div>
+                      <h3 className="text-lg font-bold text-gray-900 mb-2">解答・解説</h3>
+                      <p className="text-gray-600 text-sm mb-4">詳細な解答と先輩からのアドバイス</p>
+                      <div className="bg-white p-3 rounded-lg">
+                        <div className="text-sm text-gray-600">
+                          <div className="flex items-center mb-1">
+                            <span className="text-green-600">✓</span>
+                            <span className="ml-2">解答付き: 156件</span>
+                          </div>
+                          <div className="flex items-center">
+                            <span className="text-blue-600">💡</span>
+                            <span className="ml-2">解説付き: 89件</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-8">
+                    <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-8 py-3 rounded-lg transition-colors">
+                      過去問を検索する（準備中）
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Live Feed Section */}
+            {activeSection === 'live' && (
+              <div className="space-y-6">
+                <div className="text-center py-12">
+                  <div className="text-indigo-600 text-6xl mb-6">💬</div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-4">ライブフィード</h2>
+                  <p className="text-gray-600 mb-8">リアルタイムで情報交換・緊急情報・最新の話題</p>
+                  
+                  {/* Live Feed Features */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                    <div className="bg-gradient-to-br from-red-50 to-pink-50 p-6 rounded-xl border border-red-100">
+                      <div className="text-red-600 text-3xl mb-4">🚨</div>
+                      <h3 className="text-lg font-bold text-gray-900 mb-2">緊急情報</h3>
+                      <p className="text-gray-600 text-sm mb-4">試験・授業の急な変更やお知らせ</p>
+                      <div className="bg-white p-4 rounded-lg">
+                        <div className="space-y-2">
+                          <div className="flex items-start space-x-2">
+                            <span className="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></span>
+                            <div className="text-left">
+                              <div className="text-sm font-medium text-gray-900">マクロ経済学</div>
+                              <div className="text-xs text-gray-600">明日の試験、教室変更！</div>
+                              <div className="text-xs text-gray-400">2分前</div>
+                            </div>
+                          </div>
+                          <div className="flex items-start space-x-2">
+                            <span className="w-2 h-2 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></span>
+                            <div className="text-left">
+                              <div className="text-sm font-medium text-gray-900">統計学演習</div>
+                              <div className="text-xs text-gray-600">レポート締切延長</div>
+                              <div className="text-xs text-gray-400">15分前</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-6 rounded-xl border border-blue-100">
+                      <div className="text-blue-600 text-3xl mb-4">💭</div>
+                      <h3 className="text-lg font-bold text-gray-900 mb-2">リアルタイム質問</h3>
+                      <p className="text-gray-600 text-sm mb-4">今すぐ答えが欲しい質問</p>
+                      <div className="bg-white p-4 rounded-lg">
+                        <div className="space-y-2">
+                          <div className="text-left">
+                            <div className="text-sm font-medium text-gray-900">「線形代数のレポート、みんなどうしてる？」</div>
+                            <div className="flex items-center justify-between mt-1">
+                              <span className="text-xs text-gray-600">東工大・情報理工</span>
+                              <span className="text-xs text-blue-600">💬 3件の返信</span>
+                            </div>
+                          </div>
+                          <div className="text-left">
+                            <div className="text-sm font-medium text-gray-900">「明日の有機化学、何持ってく？」</div>
+                            <div className="flex items-center justify-between mt-1">
+                              <span className="text-xs text-gray-600">早稲田・理工</span>
+                              <span className="text-xs text-blue-600">💬 1件の返信</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-8 space-y-4">
+                    <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-6 rounded-xl">
+                      <div className="flex items-center justify-center space-x-3">
+                        <span className="animate-pulse text-2xl">🔴</span>
+                        <span className="text-lg font-medium">LIVE</span>
+                        <span className="text-sm opacity-90">234人がオンライン中</span>
+                      </div>
+                    </div>
+                    
+                    <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-8 py-3 rounded-lg transition-colors">
+                      ライブフィードに参加（準備中）
+                    </button>
                   </div>
                 </div>
               </div>
