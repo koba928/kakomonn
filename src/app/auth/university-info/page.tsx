@@ -108,64 +108,51 @@ export default function UniversityInfoPage() {
     return stepMap[currentStep]
   }
 
-  const renderYearSelection = () => (
-    <div className="space-y-6">
-      {/* ステップインジケーター */}
-      <div className="flex justify-center mb-6">
-        <div className="flex space-x-2">
-          {Array.from({ length: 5 }, (_, i) => (
-            <div
-              key={i}
-              className={`w-2 h-2 rounded-full transition-colors ${
-                i + 1 <= getStepNumber() ? 'bg-indigo-600' : 'bg-gray-300'
-              }`}
-            />
-          ))}
+  const renderYearSelection = () => {
+    const yearOptions = [
+      { value: '1年生', label: '1年生' },
+      { value: '2年生', label: '2年生' },
+      { value: '3年生', label: '3年生' },
+      { value: '4年生', label: '4年生' },
+      { value: '大学院生', label: '大学院生' },
+      { value: 'その他', label: 'その他' }
+    ]
+    
+    return (
+      <div className="space-y-6">
+        {/* ステップインジケーター */}
+        <div className="flex justify-center mb-6">
+          <div className="flex space-x-2">
+            {Array.from({ length: 5 }, (_, i) => (
+              <div
+                key={i}
+                className={`w-2 h-2 rounded-full transition-colors ${
+                  i + 1 <= getStepNumber() ? 'bg-indigo-600' : 'bg-gray-300'
+                }`}
+              />
+            ))}
+          </div>
         </div>
-      </div>
 
-      <div className="text-center">
-        {academicInfo.university && academicInfo.faculty && academicInfo.department && (
-          <span className="text-sm text-indigo-600 font-medium">
-            {academicInfo.university} • {academicInfo.faculty} • {academicInfo.department}
-          </span>
-        )}
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">学年を選択してください</h2>
-        <p className="text-gray-600">現在の学年を教えてください</p>
-      </div>
+        <div className="text-center">
+          {academicInfo.university && academicInfo.faculty && academicInfo.department && (
+            <span className="text-sm text-indigo-600 font-medium">
+              {academicInfo.university} • {academicInfo.faculty} • {academicInfo.department}
+            </span>
+          )}
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">学年を選択してください</h2>
+          <p className="text-gray-600">現在の学年を教えてください</p>
+        </div>
 
-      <div className="space-y-3">
-        {['1年生', '2年生', '3年生', '4年生', '大学院生', 'その他'].map((yearOption) => (
-          <button
-            key={yearOption}
-            onClick={() => setYear(yearOption)}
-            className={`w-full p-4 rounded-xl border-2 transition-all duration-200 text-left ${
-              year === yearOption
-                ? 'border-indigo-500 bg-indigo-50 shadow-md'
-                : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <span className="font-medium text-gray-900">{yearOption}</span>
-              <div className={`w-5 h-5 rounded-full border-2 transition-colors ${
-                year === yearOption
-                  ? 'border-indigo-500 bg-indigo-500'
-                  : 'border-gray-300'
-              }`}>
-                {year === yearOption && (
-                  <div className="w-full h-full rounded-full bg-indigo-500 flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                )}
-              </div>
-            </div>
-          </button>
-        ))}
+        <VirtualizedAutocompleteSelect
+          options={yearOptions}
+          value={year}
+          onChange={setYear}
+          placeholder="学年を選択してください"
+        />
       </div>
-    </div>
-  )
+    )
+  }
 
   const renderPenNameInput = () => (
     <div className="space-y-6">
@@ -267,12 +254,24 @@ export default function UniversityInfoPage() {
               size="lg"
               onClick={handleNext}
               disabled={!canProceed() || isLoading}
-              className="flex-1"
+              className={currentStep === 'university' ? 'w-full' : 'flex-1'}
               aria-label={currentStep === 'penname' ? '完了' : '次の手順に進む'}
             >
               {isLoading ? '完了中...' : currentStep === 'penname' ? '完了' : '次へ'}
             </AnimatedButton>
           </div>
+
+          {/* 認証方法を変更するリンク（最初のステップのみ表示） */}
+          {currentStep === 'university' && (
+            <div className="text-center">
+              <Link 
+                href="/auth/method-select"
+                className="text-sm text-gray-500 hover:text-gray-700"
+              >
+                ← 認証方法を変更
+              </Link>
+            </div>
+          )}
 
           {/* 進捗情報 */}
           <div className="text-center text-sm text-gray-500">
