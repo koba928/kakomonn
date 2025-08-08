@@ -192,6 +192,7 @@ export function useAuth() {
     user,
     session,
     loading,
+    isLoggedIn: !!session,
     signUp,
     signIn,
     signOut,

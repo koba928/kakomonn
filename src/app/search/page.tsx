@@ -350,7 +350,7 @@ function SearchPageClient() {
         const profileData = {
           id: user.id,
           email: user.email || '',
-          name: user.user_metadata?.name || user.email?.split('@')[0] || '',
+          name: user.name || user.email.split('@')[0] || '',
           university: academicInfo.university,
           faculty: academicInfo.faculty,
           department: academicInfo.department,
