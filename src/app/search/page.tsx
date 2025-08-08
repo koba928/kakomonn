@@ -383,62 +383,6 @@ function SearchPageClient() {
     setGeneralStep('subject')
   }
 
-  // 検索結果を表示するコンポーネント
-  const renderSearchResults = () => {
-    if (isSearching) {
-      return (
-        <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-          <span className="ml-2 text-gray-600">検索中...</span>
-        </div>
-      )
-    }
-
-    if (searchResults.length === 0) {
-      return (
-        <div className="text-center py-8">
-          <p className="text-gray-500">検索結果が見つかりませんでした</p>
-        </div>
-      )
-    }
-
-    return (
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900">検索結果 ({searchResults.length}件)</h3>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {searchResults.map((exam) => (
-            <div key={exam.id} className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
-              <div className="flex items-start justify-between mb-2">
-                <h4 className="font-medium text-gray-900 truncate">{exam.title}</h4>
-                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                  {exam.year}年
-                </span>
-              </div>
-              <p className="text-sm text-gray-600 mb-2">{exam.course_name}</p>
-              <p className="text-xs text-gray-500 mb-3">{exam.professor}</p>
-              <div className="flex items-center justify-between text-xs text-gray-500">
-                <span>{exam.university} {exam.faculty}</span>
-                <div className="flex items-center space-x-2">
-                  <span>📥 {exam.download_count}</span>
-                  <span>⭐ {exam.difficulty}/5</span>
-                </div>
-              </div>
-              <div className="mt-3">
-                <a
-                  href={exam.file_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center px-3 py-1 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-md hover:bg-indigo-100 transition-colors"
-                >
-                  ダウンロード
-                </a>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
