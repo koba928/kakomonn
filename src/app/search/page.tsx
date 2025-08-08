@@ -140,6 +140,13 @@ function SearchPageClient() {
   const [results, setResults] = useState<SearchResult[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
+  const [showUniversityModal, setShowUniversityModal] = useState(false)
+  const [tempUniversityInfo, setTempUniversityInfo] = useState({
+    university: '',
+    faculty: '',
+    department: '',
+    year: ''
+  })
 
   useEffect(() => {
     const q = searchParams.get('q')
@@ -153,13 +160,32 @@ function SearchPageClient() {
   useEffect(() => {
     // Load user information from localStorage
     const savedUserInfo = localStorage.getItem('kakomonn_user')
+    const guestUniversityInfo = localStorage.getItem('kakomonn_guest_university')
+    
     if (savedUserInfo) {
       try {
         const parsed = JSON.parse(savedUserInfo)
         setUserInfo(parsed)
       } catch (error) {
         console.error('Failed to parse user info:', error)
+        setShowUniversityModal(true)
       }
+    } else if (guestUniversityInfo) {
+      try {
+        const parsed = JSON.parse(guestUniversityInfo)
+        setUserInfo({
+          ...parsed,
+          penName: 'ゲストユーザー',
+          isLoggedIn: false,
+          completedAt: new Date().toISOString()
+        })
+      } catch (error) {
+        console.error('Failed to parse guest university info:', error)
+        setShowUniversityModal(true)
+      }
+    } else {
+      // No user info found, show university selection modal
+      setShowUniversityModal(true)
     }
   }, [])
 
@@ -206,6 +232,27 @@ function SearchPageClient() {
     }, 500)
   }
 
+  const handleUniversitySubmit = () => {
+    if (!tempUniversityInfo.university || !tempUniversityInfo.faculty) {
+      alert('大学名と学部名を選択してください')
+      return
+    }
+
+    const guestUserInfo = {
+      university: tempUniversityInfo.university,
+      faculty: tempUniversityInfo.faculty,
+      department: tempUniversityInfo.department || '未設定',
+      year: tempUniversityInfo.year || '未設定',
+      penName: 'ゲストユーザー',
+      isLoggedIn: false,
+      completedAt: new Date().toISOString()
+    }
+
+    localStorage.setItem('kakomonn_guest_university', JSON.stringify(tempUniversityInfo))
+    setUserInfo(guestUserInfo)
+    setShowUniversityModal(false)
+  }
+
   const getTabResults = () => {
     if (selectedTab === 'all') return results
     return results.filter(result => {
@@ -216,8 +263,172 @@ function SearchPageClient() {
     })
   }
 
+  const getUniversitySpecificSubjects = () => {
+    const universitySubjects = {
+      '東京大学': {
+        specialized: [
+          { subject: '線形代数学', icon: '📐', count: '68' },
+          { subject: '解析学', icon: '📊', count: '45' },
+          { subject: '物理学', icon: '🔬', count: '52' },
+          { subject: '化学', icon: '🧪', count: '38' },
+          { subject: '生物学', icon: '🧬', count: '29' },
+          { subject: '経済原論', icon: '💹', count: '34' },
+          { subject: '憲法', icon: '⚖️', count: '41' },
+          { subject: '哲学', icon: '🤔', count: '25' }
+        ]
+      },
+      '早稲田大学': {
+        specialized: [
+          { subject: 'マクロ経済学', icon: '📈', count: '55' },
+          { subject: 'ミクロ経済学', icon: '📉', count: '48' },
+          { subject: '商学概論', icon: '💼', count: '42' },
+          { subject: '経営学原理', icon: '📋', count: '39' },
+          { subject: '統計学', icon: '📊', count: '33' },
+          { subject: '国際関係論', icon: '🌍', count: '28' },
+          { subject: '社会学', icon: '👥', count: '24' },
+          { subject: '心理学', icon: '🧠', count: '31' }
+        ]
+      },
+      '東京工業大学': {
+        specialized: [
+          { subject: '線形代数', icon: '🔢', count: '72' },
+          { subject: '微積分学', icon: '📐', count: '65' },
+          { subject: 'プログラミング', icon: '💻', count: '58' },
+          { subject: 'データ構造', icon: '🗂️', count: '44' },
+          { subject: '物理学実験', icon: '⚗️', count: '37' },
+          { subject: '化学実験', icon: '🧪', count: '32' },
+          { subject: '機械工学', icon: '⚙️', count: '29' },
+          { subject: '電子工学', icon: '🔌', count: '26' }
+        ]
+      }
+    }
+
+    return universitySubjects[userInfo?.university] || {
+      specialized: [
+        { subject: '線形代数', icon: '📊', count: '45' },
+        { subject: 'マクロ経済学', icon: '💹', count: '32' },
+        { subject: '有機化学', icon: '🧪', count: '28' },
+        { subject: 'データ構造', icon: '💻', count: '38' },
+        { subject: '統計学', icon: '📈', count: '24' },
+        { subject: '国際関係論', icon: '🌍', count: '19' },
+        { subject: '機械学習', icon: '🤖', count: '41' },
+        { subject: '会計学', icon: '📊', count: '26' }
+      ]
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+      {/* University Selection Modal */}
+      {showUniversityModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="text-center mb-6">
+              <div className="text-4xl mb-4">🏫</div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">大学情報を選択</h2>
+              <p className="text-gray-600 text-sm">
+                最適化された過去問を表示するため、<br />
+                大学情報を教えてください
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">大学名 *</label>
+                <select
+                  value={tempUniversityInfo.university}
+                  onChange={(e) => setTempUniversityInfo({...tempUniversityInfo, university: e.target.value, faculty: ''})}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                >
+                  <option value="">大学を選択してください</option>
+                  <option value="東京大学">東京大学</option>
+                  <option value="早稲田大学">早稲田大学</option>
+                  <option value="慶應義塾大学">慶應義塾大学</option>
+                  <option value="東京工業大学">東京工業大学</option>
+                  <option value="一橋大学">一橋大学</option>
+                  <option value="京都大学">京都大学</option>
+                  <option value="大阪大学">大阪大学</option>
+                  <option value="名古屋大学">名古屋大学</option>
+                  <option value="九州大学">九州大学</option>
+                  <option value="北海道大学">北海道大学</option>
+                  <option value="その他">その他</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">学部 *</label>
+                <select
+                  value={tempUniversityInfo.faculty}
+                  onChange={(e) => setTempUniversityInfo({...tempUniversityInfo, faculty: e.target.value})}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  disabled={!tempUniversityInfo.university}
+                >
+                  <option value="">学部を選択してください</option>
+                  <option value="文学部">文学部</option>
+                  <option value="法学部">法学部</option>
+                  <option value="経済学部">経済学部</option>
+                  <option value="商学部">商学部</option>
+                  <option value="理学部">理学部</option>
+                  <option value="工学部">工学部</option>
+                  <option value="医学部">医学部</option>
+                  <option value="農学部">農学部</option>
+                  <option value="教育学部">教育学部</option>
+                  <option value="情報学部">情報学部</option>
+                  <option value="国際関係学部">国際関係学部</option>
+                  <option value="その他">その他</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">学科（任意）</label>
+                <input
+                  type="text"
+                  value={tempUniversityInfo.department}
+                  onChange={(e) => setTempUniversityInfo({...tempUniversityInfo, department: e.target.value})}
+                  placeholder="例: 情報工学科"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">学年（任意）</label>
+                <select
+                  value={tempUniversityInfo.year}
+                  onChange={(e) => setTempUniversityInfo({...tempUniversityInfo, year: e.target.value})}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                >
+                  <option value="">学年を選択してください</option>
+                  <option value="1年生">1年生</option>
+                  <option value="2年生">2年生</option>
+                  <option value="3年生">3年生</option>
+                  <option value="4年生">4年生</option>
+                  <option value="大学院生">大学院生</option>
+                  <option value="その他">その他</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="mt-6 flex space-x-3">
+              <button
+                onClick={handleUniversitySubmit}
+                disabled={!tempUniversityInfo.university || !tempUniversityInfo.faculty}
+                className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 text-white font-medium py-3 px-4 rounded-lg transition-colors"
+              >
+                過去問を見る
+              </button>
+            </div>
+
+            <div className="mt-4 text-center">
+              <p className="text-xs text-gray-500">
+                この情報は過去問の最適化のみに使用され、<br />
+                いつでも変更可能です
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -231,7 +442,7 @@ function SearchPageClient() {
             {userInfo && (
               <Link href="/profile">
                 <div className="text-sm text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full hover:bg-indigo-100 transition-colors cursor-pointer">
-                  👤 {userInfo.penName || '匿名ユーザー'} ({userInfo.university})
+                  👤 {userInfo.penName || 'ゲストユーザー'} ({userInfo.university})
                 </div>
               </Link>
             )}
@@ -483,16 +694,7 @@ function SearchPageClient() {
                     </p>
                     
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                      {[
-                        { subject: '線形代数', icon: '📊', count: '45' },
-                        { subject: 'マクロ経済学', icon: '💹', count: '32' },
-                        { subject: '有機化学', icon: '🧪', count: '28' },
-                        { subject: 'データ構造', icon: '💻', count: '38' },
-                        { subject: '統計学', icon: '📈', count: '24' },
-                        { subject: '国際関係論', icon: '🌍', count: '19' },
-                        { subject: '機械学習', icon: '🤖', count: '41' },
-                        { subject: '会計学', icon: '💼', count: '26' }
-                      ].map((item, index) => (
+                      {getUniversitySpecificSubjects().specialized.map((item, index) => (
                         <button
                           key={index}
                           onClick={() => {
