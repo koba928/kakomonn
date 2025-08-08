@@ -349,7 +349,7 @@ export const Tooltip: React.FC<TooltipProps> = React.memo(function Tooltip({
   )
 })
 
-export default {
+const MicroInteractions = {
   AnimatedButton,
   LikeButton,
   InteractiveRating,
@@ -358,3 +358,5 @@ export default {
   PulseLoading,
   Tooltip
 }
+
+export default MicroInteractions

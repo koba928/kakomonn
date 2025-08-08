@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm install)",
+      "Bash(mkdir:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git config:*)",
+      "Bash(git push:*)",
+      "WebFetch(domain:kakomonn-com.vercel.app)",
+      "Bash(git remote set-url:*)",
+      "WebFetch(domain:vercel.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(npm run build:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(npm install:*)",
+      "Bash(timeout 30 npx next lint --fix)",
+      "Bash(timeout 30 npm run lint)",
+      "WebFetch(domain:manabi.benesse.ne.jp)",
+      "Bash(npx next:*)",
+      "Bash(npx tsc:*)",
+      "Bash(git fetch:*)",
+      "Bash(gh api:*)",
+      "Bash(curl:*)",
+      "Bash(echo)",
+      "WebFetch(domain:www.osaka-u.ac.jp)",
+      "Bash(pkill:*)",
+      "Bash(chmod:*)",
+      "Bash(grep:*)",
+      "Bash(kill:*)"
+    ],
+    "deny": []
+  }
+}

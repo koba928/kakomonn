@@ -5,10 +5,11 @@ import Link from 'next/link'
 import { UserIcon, PlusIcon } from '@/components/icons/IconSystem'
 import { ThemeToggle } from '@/components/theme/ThemeProvider'
 import { FloatingActionButton } from '@/components/ui/MicroInteractions'
-import { useUser } from '@/contexts/UserContext'
+import { useAuthContext } from '@/components/providers/AuthProvider'
 
 function HomeContent() {
-  const { user, isLoggedIn } = useUser()
+  const { user } = useAuthContext()
+  const isLoggedIn = !!user
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {

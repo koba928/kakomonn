@@ -3,31 +3,61 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
+import { useAuthContext } from '@/components/providers/AuthProvider'
 
 export default function EmailAuthPage() {
+  const { signIn, signUp } = useAuthContext()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isLogin, setIsLogin] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError('')
     
     if (!isLogin && password !== confirmPassword) {
-      alert('パスワードが一致しません')
+      setError('パスワードが一致しません')
       return
     }
     
     setIsLoading(true)
     
-    // デモ用：メール認証をシミュレート
-    setTimeout(() => {
+    try {
+      if (isLogin) {
+        const { error } = await signIn(email, password)
+        if (error) {
+          setError(error.message)
+        } else {
+          window.location.href = '/search'
+        }
+      } else {
+        // 新規登録の場合は大学情報も必要
+        const emailName = email.split('@')[0] || 'user'
+        const userData = {
+          email,
+          name: emailName,
+          university: '',
+          faculty: '',
+          department: '',
+          year: 1,
+          pen_name: emailName
+        }
+        const { error } = await signUp(email, password, userData)
+        if (error) {
+          setError(error.message)
+        } else {
+          window.location.href = '/auth/university-info'
+        }
+      }
+    } catch (err: any) {
+      setError(err.message || '認証に失敗しました')
+    } finally {
       setIsLoading(false)
-      // 大学情報入力ページに遷移
-      window.location.href = '/auth/university-info'
-    }, 1500)
+    }
   }
 
   const isFormValid = () => {
@@ -80,6 +110,13 @@ export default function EmailAuthPage() {
             新規登録
           </button>
         </div>
+
+        {/* エラーメッセージ */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+            {error}
+          </div>
+        )}
 
         {/* 認証フォーム */}
         <form onSubmit={handleSubmit} className="space-y-4">

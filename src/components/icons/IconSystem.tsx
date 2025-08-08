@@ -570,7 +570,7 @@ export const ClockIcon: React.FC<IconProps> = React.memo(function ClockIcon({
   )
 })
 
-export default {
+const IconSystem = {
   SearchIcon,
   UploadIcon,
   ThreadIcon,
@@ -591,3 +591,5 @@ export default {
   AcademicCapIcon,
   ClockIcon
 }
+
+export default IconSystem

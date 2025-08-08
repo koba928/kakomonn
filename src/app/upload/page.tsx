@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { CheckIcon, ArrowRightIcon } from '@/components/icons/IconSystem'
-import { useUser } from '@/contexts/UserContext'
+import { useAuthContext } from '@/components/providers/AuthProvider'
 import { VirtualizedAutocompleteSelect } from '@/components/ui/VirtualizedAutocompleteSelect'
 import { TeacherSearchModal } from '@/components/teacher/TeacherSearchModal'
 import { universityDataDetailed } from '@/data/universityDataDetailed'
@@ -85,7 +85,8 @@ const TEACHER_POSITIONS = [
 ]
 
 export default function UploadPage() {
-  const { user, isLoggedIn } = useUser()
+  const { user } = useAuthContext()
+  const isLoggedIn = !!user
   const formErrorHandler = useFormErrorHandler()
   const fileUploadErrorHandler = useFileUploadErrorHandler()
   

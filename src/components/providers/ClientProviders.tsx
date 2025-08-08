@@ -1,7 +1,7 @@
 'use client'
 
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
-import { UserProvider } from '@/contexts/UserContext'
+import { AuthProvider } from './AuthProvider'
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
 import { ErrorNotificationContainer } from '@/components/ui/ErrorNotification'
 import { useErrorHandler } from '@/hooks/useErrorHandler'
@@ -27,13 +27,13 @@ function GlobalErrorHandler({ children }: { children: React.ReactNode }) {
 export function ClientProviders({ children }: ClientProvidersProps) {
   return (
     <ErrorBoundary>
-      <UserProvider>
+      <AuthProvider>
         <ThemeProvider>
           <GlobalErrorHandler>
             {children}
           </GlobalErrorHandler>
         </ThemeProvider>
-      </UserProvider>
+      </AuthProvider>
     </ErrorBoundary>
   )
 }
