@@ -6,6 +6,43 @@ import { useSearchParams } from 'next/navigation'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
 import { AcademicInfoSelector, AcademicInfo } from '@/components/ui/AcademicInfoSelector'
 import { VirtualizedAutocompleteSelect } from '@/components/ui/VirtualizedAutocompleteSelect'
+import { api } from '@/services/api'
+
+// 過去問検索結果の型定義
+interface PastExam {
+  id: string
+  title: string
+  course_name: string
+  professor: string
+  university: string
+  faculty: string
+  department: string
+  year: number
+  semester: string
+  exam_type: string
+  file_url: string
+  file_name: string
+  uploaded_by: string
+  download_count: number
+  difficulty: number
+  helpful_count: number
+  tags: string[]
+  created_at: string
+  updated_at: string
+}
+
+// 検索フィルターの型定義
+interface SearchFilters {
+  university?: string
+  faculty?: string
+  department?: string
+  course?: string
+  professor?: string
+  year?: number
+  semester?: string
+  examType?: string
+  tags?: string[]
+}
 
 
 // Future interfaces for new sections
@@ -136,15 +173,40 @@ function SearchPageClient() {
   const [professorQuery, setProfessorQuery] = useState('')
   const [selectedProfessor, setSelectedProfessor] = useState<string | null>(null)
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null)
+  
+  // 検索機能の状態管理
+  const [searchResults, setSearchResults] = useState<PastExam[]>([])
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>({})
+  const [isSearching, setIsSearching] = useState(false)
 
   const handleSearch = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) {
+      setSearchResults([])
       return
     }
 
-    // In a real app, this would navigate to search results page
-    console.log('Searching for:', searchQuery)
-  }, [])
+    try {
+      setIsSearching(true)
+      console.log('検索開始:', searchQuery)
+      
+      // 検索フィルターを構築
+      const filters: SearchFilters = {
+        ...searchFilters,
+        course: searchQuery
+      }
+      
+      // APIを使用して過去問を検索
+      const results = await api.pastExams.getAll(filters)
+      setSearchResults(results)
+      
+      console.log('検索結果:', results)
+    } catch (error) {
+      console.error('検索エラー:', error)
+      setSearchResults([])
+    } finally {
+      setIsSearching(false)
+    }
+  }, [searchFilters])
 
   useEffect(() => {
     const q = searchParams.get('q')
@@ -319,6 +381,63 @@ function SearchPageClient() {
   const handleGeneralGenreSelect = (genre: GeneralGenre) => {
     setGeneralGenre(genre)
     setGeneralStep('subject')
+  }
+
+  // 検索結果を表示するコンポーネント
+  const renderSearchResults = () => {
+    if (isSearching) {
+      return (
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          <span className="ml-2 text-gray-600">検索中...</span>
+        </div>
+      )
+    }
+
+    if (searchResults.length === 0) {
+      return (
+        <div className="text-center py-8">
+          <p className="text-gray-500">検索結果が見つかりませんでした</p>
+        </div>
+      )
+    }
+
+    return (
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-gray-900">検索結果 ({searchResults.length}件)</h3>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {searchResults.map((exam) => (
+            <div key={exam.id} className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
+              <div className="flex items-start justify-between mb-2">
+                <h4 className="font-medium text-gray-900 truncate">{exam.title}</h4>
+                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                  {exam.year}年
+                </span>
+              </div>
+              <p className="text-sm text-gray-600 mb-2">{exam.course_name}</p>
+              <p className="text-xs text-gray-500 mb-3">{exam.professor}</p>
+              <div className="flex items-center justify-between text-xs text-gray-500">
+                <span>{exam.university} {exam.faculty}</span>
+                <div className="flex items-center space-x-2">
+                  <span>📥 {exam.download_count}</span>
+                  <span>⭐ {exam.difficulty}/5</span>
+                </div>
+              </div>
+              <div className="mt-3">
+                <a
+                  href={exam.file_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-3 py-1 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-md hover:bg-indigo-100 transition-colors"
+                >
+                  ダウンロード
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
   }
 
   return (
