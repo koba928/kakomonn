@@ -15,7 +15,7 @@ interface Thread {
   university: string
   faculty: string
   department: string
-  exam_year?: number
+  exam_year?: number | null
   created_at: string
   updated_at: string
   users?: {
