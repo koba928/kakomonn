@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
   
   // 実験的機能
   experimental: {
-    optimizeCss: true,
+    // optimizeCss: true, // crittersが必要なため一時的に無効化
     optimizePackageImports: ['@supabase/supabase-js', 'lucide-react'],
   },
   
