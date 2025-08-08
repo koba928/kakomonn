@@ -53,7 +53,7 @@ export function VirtualizedAutocompleteSelect({
 
   const handleSelect = (option: Option) => {
     onChange(option.value)
-    setSearchQuery(option.label)
+    setSearchQuery('')  // Clear search query on selection
     setIsOpen(false)
   }
 
@@ -68,7 +68,12 @@ export function VirtualizedAutocompleteSelect({
         type="text"
         value={isOpen ? searchQuery : selectedOption?.label || ''}
         onChange={handleInputChange}
-        onFocus={() => setIsOpen(true)}
+        onFocus={() => {
+          setIsOpen(true)
+          if (selectedOption) {
+            setSearchQuery('')  // Clear search when focusing on already selected item
+          }
+        }}
         onBlur={() => setTimeout(() => setIsOpen(false), 150)}
         placeholder={placeholder}
         disabled={disabled}
