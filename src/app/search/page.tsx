@@ -113,7 +113,6 @@ function SearchPageClient() {
   const searchParams = useSearchParams()
   const [activeSection, setActiveSection] = useState<MainSection | null>(null)
   const [query, setQuery] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
   const [showUniversityModal, setShowUniversityModal] = useState(false)
   const [currentUniversityStep, setCurrentUniversityStep] = useState<UniversityStep>('university')
@@ -184,14 +183,8 @@ function SearchPageClient() {
       return
     }
 
-    setIsLoading(true)
-    
-    // Simulate API call - just for loading state
-    setTimeout(() => {
-      // In a real app, this would navigate to search results page
-      console.log('Searching for:', searchQuery)
-      setIsLoading(false)
-    }, 500)
+    // In a real app, this would navigate to search results page
+    console.log('Searching for:', searchQuery)
   }, [])
 
   const handleAcademicInfoChange = (newInfo: AcademicInfo) => {
