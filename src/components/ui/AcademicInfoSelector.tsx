@@ -137,7 +137,7 @@ export function AcademicInfoSelector({
         options={universityOptions}
         value={value.university}
         onChange={handleUniversityChange}
-        placeholder={placeholder.university}
+        placeholder={placeholder.university || '大学名を入力してください'}
       />
     </div>
   )
@@ -158,7 +158,7 @@ export function AcademicInfoSelector({
         options={facultyOptions}
         value={value.faculty}
         onChange={handleFacultyChange}
-        placeholder={placeholder.faculty}
+        placeholder={placeholder.faculty || '学部名を入力してください'}
         disabled={!value.university}
       />
     </div>
@@ -182,7 +182,7 @@ export function AcademicInfoSelector({
         options={departmentOptions}
         value={value.department}
         onChange={handleDepartmentChange}
-        placeholder={placeholder.department}
+        placeholder={placeholder.department || '学科名を入力してください'}
         disabled={!value.university || !value.faculty}
       />
     </div>
@@ -199,7 +199,7 @@ export function AcademicInfoSelector({
             options={universityOptions}
             value={value.university}
             onChange={handleUniversityChange}
-            placeholder={placeholder.university}
+            placeholder={placeholder.university || '大学名を入力してください'}
           />
         </div>
 
@@ -211,7 +211,7 @@ export function AcademicInfoSelector({
             options={facultyOptions}
             value={value.faculty}
             onChange={handleFacultyChange}
-            placeholder={placeholder.faculty}
+            placeholder={placeholder.faculty || '学部名を入力してください'}
             disabled={!value.university}
           />
         </div>
@@ -224,7 +224,7 @@ export function AcademicInfoSelector({
             options={departmentOptions}
             value={value.department}
             onChange={handleDepartmentChange}
-            placeholder={placeholder.department}
+            placeholder={placeholder.department || '学科名を入力してください'}
             disabled={!value.university || !value.faculty}
           />
         </div>
