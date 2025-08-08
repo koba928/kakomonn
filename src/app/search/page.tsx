@@ -808,7 +808,7 @@ function SearchPageClient() {
                     {activeSection === 'specialized' ? (
                       <>
                         <span className="text-sm text-indigo-600 font-medium">学部専門科目</span>
-                        <span className="text-sm text-gray-400">></span>
+                        <span className="text-sm text-gray-400">&gt;</span>
                         <span className="text-sm text-blue-600 font-medium">
                           {specializedCategory === 'department' ? '学科専門' : 'その他'}
                         </span>
@@ -816,7 +816,7 @@ function SearchPageClient() {
                     ) : (
                       <>
                         <span className="text-sm text-green-600 font-medium">全学共通科目</span>
-                        <span className="text-sm text-gray-400">></span>
+                        <span className="text-sm text-gray-400">&gt;</span>
                         <span className="text-sm text-blue-600 font-medium">
                           {generalGenre === 'language' ? '言語科目' : generalGenre === 'liberal' ? '教養科目' : 'その他'}
                         </span>
