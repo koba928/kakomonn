@@ -324,10 +324,11 @@ export default function UploadPage() {
                   <span className="text-xs font-bold">{step.number}</span>
                 )}
               </div>
-              <span className={`ml-1.5 text-xs font-medium hidden sm:inline ${
+              <span className={`ml-1.5 text-xs sm:text-sm font-medium ${
                 step.number <= currentStepNumber ? 'text-gray-900' : 'text-gray-400'
               }`}>
-                {step.label}
+                <span className="sm:hidden">{step.label.slice(0,2)}</span>
+                <span className="hidden sm:inline">{step.label}</span>
               </span>
               {index < displaySteps.length - 1 && (
                 <div className={`w-4 sm:w-8 h-0.5 mx-2 ${
@@ -1150,11 +1151,11 @@ export default function UploadPage() {
           
           {/* Navigation */}
           {currentStep !== 'complete' && (
-            <div className="flex justify-between items-center mt-8">
+            <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mt-8 gap-3 sm:gap-0">
               <button
                 onClick={goToPrevStep}
                 disabled={currentStep === 'courseCategory'}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                className={`flex items-center justify-center gap-2 px-6 py-3 sm:px-4 sm:py-2 rounded-lg font-medium transition-all min-h-[44px] ${
                   currentStep === 'courseCategory'
                     ? 'text-gray-400 cursor-not-allowed'
                     : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
@@ -1166,9 +1167,10 @@ export default function UploadPage() {
               
               <AnimatedButton
                 variant="primary"
+                size="md"
                 disabled={!isStepValid()}
                 onClick={currentStep === 'confirm' ? handleSubmit : goToNextStep}
-                className="flex items-center gap-2"
+                className="flex items-center justify-center gap-2 px-6 py-3 sm:px-4 sm:py-2 min-h-[44px]"
               >
                 {currentStep === 'confirm' ? '投稿する' : '次へ'}
                 {currentStep !== 'confirm' && <ArrowRightIcon size={16} />}

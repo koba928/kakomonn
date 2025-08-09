@@ -432,3 +432,104 @@ html {
     @apply relative bg-transparent border-t-0 z-auto;
   }
 }
+
+/* 長押し・右クリック防止とユーザー選択の制御 */
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 画像の長押しメニューを防止 */
+img {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  pointer-events: auto;
+}
+
+/* ボタンの誤選択を防止 */
+button {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* リンクのタップハイライト制御 */
+a {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+}
+
+/* 入力フィールドは選択可能にしておく */
+input, textarea, [contenteditable] {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+
+/* モバイル一画面最適化のための追加スタイル */
+@media (max-width: 640px) {
+  /* コンパクトなスペーシング */
+  .mobile-compact {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+  
+  /* 最小限の行間 */
+  .mobile-tight {
+    line-height: 1.2;
+  }
+  
+  /* プロっぽいボタンシャドウ */
+  .mobile-button-shadow {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06);
+  }
+  
+  .mobile-button-shadow:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* 画面端のマージン統一 */
+  .mobile-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    max-width: 100vw;
+  }
+}
+
+/* プロ仕様のグラデーションとシャドウ */
+.pro-gradient {
+  background: linear-gradient(135deg, 
+    rgb(99, 102, 241) 0%, 
+    rgb(139, 92, 246) 50%, 
+    rgb(168, 85, 247) 100%
+  );
+}
+
+.pro-glass {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.6) inset;
+}
+
+/* モバイル専用のクリーンなフォーカス */
+@media (max-width: 640px) {
+  *:focus-visible {
+    outline: 2px solid rgb(99, 102, 241);
+    outline-offset: 1px;
+    border-radius: 4px;
+  }
+}
