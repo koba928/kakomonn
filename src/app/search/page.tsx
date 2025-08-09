@@ -757,27 +757,27 @@ function SearchPageClient() {
 
         {!query ? (
           /* BEFORE SEARCH: Centered Focus Layout */
-          <div className="min-h-[calc(100vh-120px)] flex items-center justify-center px-4 sm:px-6 lg:px-8 animate-fade-in">
+          <div className="min-h-[calc(100vh-40px)] flex items-center justify-center px-3 sm:px-4 lg:px-6 animate-fade-in">
             <div className="w-full max-w-5xl">
               {/* Hero Section */}
-              <div className="text-center mb-8 sm:mb-10 lg:mb-12">
-                <div className="relative mb-6 sm:mb-8">
+              <div className="text-center mb-4 sm:mb-6 lg:mb-8">
+                <div className="relative mb-3 sm:mb-4">
                   <div className="absolute inset-0 bg-gradient-to-r from-indigo-300 to-purple-300 blur-3xl opacity-30 animate-glow" aria-hidden="true"></div>
                   <div className="relative">
                     <div 
-                      className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-4 sm:mb-6 animate-float filter drop-shadow-2xl"
+                      className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-2 sm:mb-3 animate-float filter drop-shadow-2xl"
                       role="img" 
                       aria-label="図書のアイコン"
                     >
                       📚
                     </div>
-                    <h1 className="text-2xl mobile-hero-text tablet-hero-text sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent leading-tight mb-3 sm:mb-4 animate-shimmer">
+                    <h1 className="text-xl mobile-hero-text tablet-hero-text sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent leading-tight mb-2 sm:mb-3 animate-shimmer">
                       過去問を探そう
                     </h1>
                     <div className="w-16 sm:w-20 md:w-24 h-0.5 sm:h-1 bg-gradient-to-r from-indigo-500 to-purple-500 mx-auto rounded-full shadow-glow" aria-hidden="true"></div>
                   </div>
                 </div>
-                <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed font-light px-4">
+                <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed font-light px-2">
                   最適な検索方法を選んで、<br className="hidden sm:block" />
                   <span className="font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                     欲しい過去問を見つけよう
@@ -787,15 +787,15 @@ function SearchPageClient() {
 
               {/* User Info Display */}
               {userInfo && (
-                <div className="flex justify-center mb-8">
-                  <div className="glass-strong rounded-2xl p-4 shadow-premium max-w-lg transform hover:scale-105 transition-all duration-300">
+                <div className="flex justify-center mb-6">
+                  <div className="glass-strong rounded-2xl p-3 shadow-premium max-w-md transform hover:scale-105 transition-all duration-300">
                     <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-glow animate-glow">
-                        <span className="text-xl text-white">🏫</span>
+                      <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-glow animate-glow">
+                        <span className="text-lg text-white">🏫</span>
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900 mb-1">{userInfo.university}</h3>
-                        <p className="text-gray-600 font-medium text-sm">{userInfo.faculty} • {userInfo.penName}</p>
+                        <h3 className="text-base font-bold text-gray-900 mb-0.5">{userInfo.university}</h3>
+                        <p className="text-gray-600 font-medium text-xs">{userInfo.faculty} • {userInfo.penName}</p>
                         <div className="w-full h-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full mt-2 opacity-50"></div>
                       </div>
                     </div>
@@ -804,7 +804,7 @@ function SearchPageClient() {
               )}
 
               {/* Main Selection Cards */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-8 mobile-card-grid">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-6 mobile-card-grid">
                 {/* Professor Search Card */}
                 <button 
                   className="group cursor-pointer transform transition-all duration-500 hover:scale-105 lg:hover:scale-110 hover:-rotate-1 focus:outline-none focus:ring-4 focus:ring-orange-500/50 focus:ring-offset-4 touch-large"
@@ -819,7 +819,7 @@ function SearchPageClient() {
                     }
                   }}
                 >
-                  <div className="glass-strong rounded-3xl p-4 sm:p-6 text-center h-full relative overflow-hidden shadow-float group-hover:shadow-premium text-left sm:text-center">
+                  <div className="glass-strong rounded-3xl p-3 sm:p-4 text-center h-full relative overflow-hidden shadow-float group-hover:shadow-premium text-left sm:text-center">
                     <div 
                       className="absolute top-0 right-0 bg-gradient-to-br from-orange-400 to-red-500 text-white text-xs font-bold px-2 py-1 rounded-bl-2xl shadow-lg animate-pulse"
                       aria-label="おすすめのオプション"
@@ -829,14 +829,14 @@ function SearchPageClient() {
                     <div className="absolute inset-0 bg-gradient-to-br from-orange-50/50 to-red-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true"></div>
                     <div className="relative z-10">
                       <div 
-                        className="text-4xl sm:text-5xl lg:text-6xl mb-4 group-hover:animate-float transition-all duration-300 filter drop-shadow-lg"
+                        className="text-3xl sm:text-4xl lg:text-5xl mb-3 group-hover:animate-float transition-all duration-300 filter drop-shadow-lg"
                         role="img"
                         aria-hidden="true"
                       >
                         👨‍🏫
                       </div>
-                      <h3 className="text-lg sm:text-xl lg:text-2xl font-black text-gray-900 mb-3 group-hover:text-orange-600 transition-colors">教授名で検索</h3>
-                      <p className="text-sm sm:text-base text-gray-600 mb-4 leading-relaxed">教授名から授業を特定する<br className="hidden sm:block" />最も確実で高速な方法</p>
+                      <h3 className="text-base sm:text-lg lg:text-xl font-black text-gray-900 mb-2 group-hover:text-orange-600 transition-colors">教授名で検索</h3>
+                      <p className="text-xs sm:text-sm text-gray-600 mb-3 leading-relaxed">教授名から授業を特定する<br className="hidden sm:block" />最も確実で高速な方法</p>
                       <div className="inline-flex items-center text-orange-600 font-bold text-base sm:text-lg group-hover:text-orange-700 transition-colors group-hover:animate-bounce-light touch-button">
                         モーダル検索
                         <svg className="w-5 h-5 sm:w-6 sm:h-6 ml-2 sm:ml-3 group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -862,18 +862,18 @@ function SearchPageClient() {
                     }
                   }}
                 >
-                  <div className="glass-strong rounded-3xl p-4 sm:p-6 text-center h-full relative overflow-hidden shadow-float group-hover:shadow-premium text-left sm:text-center">
+                  <div className="glass-strong rounded-3xl p-3 sm:p-4 text-center h-full relative overflow-hidden shadow-float group-hover:shadow-premium text-left sm:text-center">
                     <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-purple-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true"></div>
                     <div className="relative z-10">
                       <div 
-                        className="text-4xl sm:text-5xl lg:text-6xl mb-4 group-hover:animate-float transition-all duration-300 filter drop-shadow-lg"
+                        className="text-3xl sm:text-4xl lg:text-5xl mb-3 group-hover:animate-float transition-all duration-300 filter drop-shadow-lg"
                         role="img"
                         aria-hidden="true"
                       >
                         🎓
                       </div>
-                      <h3 className="text-lg sm:text-xl lg:text-2xl font-black text-gray-900 mb-3 group-hover:text-indigo-600 transition-colors">学部専門科目</h3>
-                      <p className="text-sm sm:text-base text-gray-600 mb-4 leading-relaxed">メジャーに特化した<br className="hidden sm:block" />専門的な科目を探す</p>
+                      <h3 className="text-base sm:text-lg lg:text-xl font-black text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors">学部専門科目</h3>
+                      <p className="text-xs sm:text-sm text-gray-600 mb-3 leading-relaxed">メジャーに特化した<br className="hidden sm:block" />専門的な科目を探す</p>
                       <div className="inline-flex items-center text-indigo-600 font-bold text-base sm:text-lg group-hover:text-indigo-700 transition-colors group-hover:animate-bounce-light touch-button">
                         専門科目を見る
                         <svg className="w-5 h-5 sm:w-6 sm:h-6 ml-2 sm:ml-3 group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -899,18 +899,18 @@ function SearchPageClient() {
                     }
                   }}
                 >
-                  <div className="glass-strong rounded-3xl p-4 sm:p-6 text-center h-full relative overflow-hidden shadow-float group-hover:shadow-premium text-left sm:text-center">
+                  <div className="glass-strong rounded-3xl p-3 sm:p-4 text-center h-full relative overflow-hidden shadow-float group-hover:shadow-premium text-left sm:text-center">
                     <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-emerald-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true"></div>
                     <div className="relative z-10">
                       <div 
-                        className="text-4xl sm:text-5xl lg:text-6xl mb-4 group-hover:animate-float transition-all duration-300 filter drop-shadow-lg"
+                        className="text-3xl sm:text-4xl lg:text-5xl mb-3 group-hover:animate-float transition-all duration-300 filter drop-shadow-lg"
                         role="img"
                         aria-hidden="true"
                       >
                         🌍
                       </div>
-                      <h3 className="text-lg sm:text-xl lg:text-2xl font-black text-gray-900 mb-3 group-hover:text-green-600 transition-colors">全学共通科目</h3>
-                      <p className="text-sm sm:text-base text-gray-600 mb-4 leading-relaxed">教養・言語・基礎科目など<br className="hidden sm:block" />全学生向けの科目を探す</p>
+                      <h3 className="text-base sm:text-lg lg:text-xl font-black text-gray-900 mb-2 group-hover:text-green-600 transition-colors">全学共通科目</h3>
+                      <p className="text-xs sm:text-sm text-gray-600 mb-3 leading-relaxed">教養・言語・基礎科目など<br className="hidden sm:block" />全学生向けの科目を探す</p>
                       <div className="inline-flex items-center text-green-600 font-bold text-base sm:text-lg group-hover:text-green-700 transition-colors group-hover:animate-bounce-light touch-button">
                         共通科目を見る
                         <svg className="w-5 h-5 sm:w-6 sm:h-6 ml-2 sm:ml-3 group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -925,8 +925,8 @@ function SearchPageClient() {
 
               {/* Step-by-Step Content - Compact Overlay Style */}
               {activeSection && (
-                <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4" onClick={resetFlow}>
-                  <div className="glass-strong rounded-3xl p-6 sm:p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-fade-in" onClick={(e) => e.stopPropagation()}>
+                <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center p-3" onClick={resetFlow}>
+                  <div className="glass-strong rounded-3xl p-5 sm:p-6 max-w-3xl w-full max-h-[85vh] overflow-y-auto animate-fade-in" onClick={(e) => e.stopPropagation()}>
                     
                     {/* Header with breadcrumb */}
                     <div className="flex items-center justify-between mb-6">
@@ -955,7 +955,7 @@ function SearchPageClient() {
                           )}
                         </div>
                         
-                        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                           {activeSection === 'professor' && professorStep === 'search' && '教授名を入力'}
                           {activeSection === 'professor' && professorStep === 'courses' && '授業を選択'}
                           {activeSection === 'professor' && professorStep === 'years' && '年度を選択'}
@@ -1195,12 +1195,12 @@ function SearchPageClient() {
           </div>
         ) : (
           /* AFTER SEARCH: Split Layout with Smooth Animation */
-          <div className="flex gap-8 min-h-[calc(100vh-200px)] animate-fade-in">
+          <div className="flex gap-6 min-h-[calc(100vh-140px)] animate-fade-in">
             {/* Left Sidebar - Compact Filters */}
-            <div className="w-80 flex-shrink-0">
+            <div className="w-72 flex-shrink-0">
               <div className="sticky top-4">
                 {/* Header with Back Button */}
-                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl p-6 mb-6 shadow-xl">
+                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl p-5 mb-5 shadow-xl">
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <h2 className="text-lg font-bold">📝 過去問検索</h2>
@@ -1233,7 +1233,7 @@ function SearchPageClient() {
                 </div>
                 
                 {/* Quick Filter Options */}
-                <div className="bg-white/70 backdrop-blur-sm border border-white/50 rounded-2xl shadow-xl p-4 space-y-3">
+                <div className="bg-white/70 backdrop-blur-sm border border-white/50 rounded-2xl shadow-xl p-3 space-y-2">
                   <h3 className="font-semibold text-gray-900 text-sm">新しい検索</h3>
                   <div className="space-y-2">
                     <button
@@ -1272,7 +1272,7 @@ function SearchPageClient() {
             <div className="flex-1 min-w-0">
               <div className="bg-white/70 backdrop-blur-sm border border-white/50 rounded-2xl shadow-xl overflow-hidden h-full">
                 {/* Results Header */}
-                <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-5 py-3 border-b border-gray-200">
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="text-xl font-bold text-gray-900">検索結果</h3>
@@ -1288,7 +1288,7 @@ function SearchPageClient() {
                 </div>
                 
                 {/* Results Content */}
-                <div className="p-6 h-[calc(100vh-320px)] overflow-y-auto">
+                <div className="p-5 h-[calc(100vh-260px)] overflow-y-auto">
                   {renderSearchResults()}
                 </div>
               </div>
