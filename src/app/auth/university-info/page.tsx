@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
 import { AcademicInfoSelector, AcademicInfo } from '@/components/ui/AcademicInfoSelector'
@@ -10,7 +10,7 @@ import { useAuth } from '@/hooks/useAuth'
 
 type Step = 'university' | 'faculty' | 'department' | 'year' | 'penname'
 
-export default function UniversityInfoPage() {
+function UniversityInfoPageContent() {
   const { user, updateProfile } = useAuth()
   const searchParams = useSearchParams()
   const [currentStep, setCurrentStep] = useState<Step>('university')
@@ -369,5 +369,20 @@ export default function UniversityInfoPage() {
         </div>
       </div>
     </main>
+  )
+}
+
+export default function UniversityInfoPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">読み込み中...</p>
+        </div>
+      </main>
+    }>
+      <UniversityInfoPageContent />
+    </Suspense>
   )
 }
