@@ -73,7 +73,7 @@ export default function Home() {
                 </AnimatedButton>
               </Link>
               <Link href="/auth/email?redirect=/upload">
-                <AnimatedButton variant="secondary" size="lg" aria-label="過去問を投稿する" className="w-full sm:w-auto">
+                <AnimatedButton variant="primary" size="lg" aria-label="過去問を投稿する" className="w-full sm:w-auto">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
