@@ -79,12 +79,8 @@ export default function Home() {
               <h2 id="guide-heading" className="mb-3 font-medium text-gray-700">💡 使い方</h2>
               <ul className="flex flex-wrap justify-center gap-4 sm:gap-6 text-xs opacity-90" role="list">
                 <li className="flex items-center gap-1 bg-white/50 px-2 py-1 rounded-full">
-                  <SearchIcon size={12} className="text-blue-600" aria-hidden={true} />
-                  <span>大学・学部で検索</span>
-                </li>
-                <li className="flex items-center gap-1 bg-white/50 px-2 py-1 rounded-full">
-                  <span aria-hidden="true">📝</span>
-                  <span>質問・相談を投稿</span>
+                  <span aria-hidden="true">↑</span>
+                  <span>過去問を検索</span>
                 </li>
                 <li className="flex items-center gap-1 bg-white/50 px-2 py-1 rounded-full">
                   <span aria-hidden="true">➕</span>
