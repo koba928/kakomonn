@@ -95,6 +95,61 @@ body {
   animation-delay: 4s;
 }
 
+/* 高度なアニメーション */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  background-size: 1000px 100%;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(99, 102, 241, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.6), 0 0 30px rgba(99, 102, 241, 0.4);
+  }
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes scale-breath {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.animate-breath {
+  animation: scale-breath 4s ease-in-out infinite;
+}
+
 /* Material Design transitions */
 * {
   transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
@@ -137,6 +192,16 @@ html {
   .mobile-padding {
     padding: 1rem;
   }
+  
+  .mobile-hero-text {
+    font-size: 2.5rem;
+    line-height: 1.1;
+  }
+  
+  .mobile-card-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
 }
 
 @media (max-width: 768px) {
@@ -146,6 +211,34 @@ html {
   
   .tablet-full {
     width: 100%;
+  }
+  
+  .tablet-hero-text {
+    font-size: 3rem;
+    line-height: 1.1;
+  }
+}
+
+@media (max-width: 1024px) {
+  .lg-stack {
+    flex-direction: column;
+  }
+  
+  .lg-full {
+    width: 100%;
+  }
+}
+
+/* Touch-friendly interactions */
+@media (hover: none) and (pointer: coarse) {
+  .touch-large {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .touch-button {
+    padding: 1rem 1.5rem;
+    font-size: 1.125rem;
   }
 }
 
@@ -173,6 +266,60 @@ html {
   @apply focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2;
 }
 
+/* アクセシビリティの改善 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 高コントラスト対応 */
+@media (prefers-contrast: high) {
+  .glass {
+    @apply bg-white border-2 border-gray-900;
+    backdrop-filter: none;
+  }
+  
+  .glass-strong {
+    @apply bg-white border-2 border-gray-900;
+    backdrop-filter: none;
+  }
+}
+
+/* モーション削減の設定 */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-slide-in,
+  .animate-bounce-light,
+  .animate-float,
+  .animate-glow,
+  .animate-breath,
+  .animate-shimmer {
+    animation: none;
+  }
+  
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ダークモード対応（基本設定） */
+@media (prefers-color-scheme: dark) {
+  .glass {
+    @apply bg-gray-900/70 border border-gray-700/30;
+  }
+  
+  .glass-strong {
+    @apply bg-gray-800/80 border border-gray-600/40;
+  }
+}
+
 /* ボタンのホバー効果 */
 .btn-hover {
   @apply transition-all duration-200 hover:scale-105 active:scale-95;
@@ -198,14 +345,68 @@ html {
   @apply bg-gradient-to-br from-indigo-50 via-white to-purple-50;
 }
 
+.gradient-bg-premium {
+  background: linear-gradient(135deg, 
+    #667eea 0%, 
+    #764ba2 100%
+  );
+}
+
+.gradient-bg-hero {
+  background: linear-gradient(135deg, 
+    rgba(99, 102, 241, 0.1) 0%, 
+    rgba(147, 197, 253, 0.1) 25%,
+    rgba(254, 202, 202, 0.1) 50%,
+    rgba(196, 181, 253, 0.1) 75%,
+    rgba(129, 140, 248, 0.1) 100%
+  );
+}
+
+.gradient-border {
+  background: linear-gradient(white, white) padding-box, 
+              linear-gradient(135deg, #667eea, #764ba2) border-box;
+  border: 2px solid transparent;
+}
+
 /* グラスモーフィズム効果 */
 .glass {
-  @apply bg-white/80 backdrop-blur-sm border border-white/20;
+  @apply bg-white/70 backdrop-blur-md border border-white/30;
+  box-shadow: 
+    0 8px 32px 0 rgba(31, 38, 135, 0.37),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.2);
+}
+
+.glass-strong {
+  @apply bg-white/80 backdrop-blur-lg border border-white/40;
+  box-shadow: 
+    0 12px 40px 0 rgba(31, 38, 135, 0.4),
+    inset 0 2px 0 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.3);
 }
 
 /* シャドウ効果 */
 .shadow-soft {
   box-shadow: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-premium {
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.shadow-glow {
+  box-shadow: 
+    0 0 20px rgba(99, 102, 241, 0.3),
+    0 0 40px rgba(99, 102, 241, 0.1);
+}
+
+.shadow-float {
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+    0 10px 10px -5px rgba(0, 0, 0, 0.04),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 /* テキストの省略 */
