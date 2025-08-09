@@ -902,297 +902,272 @@ function SearchPageClient() {
                 </button>
               </div>
 
-              {/* Step-by-Step Content */}
+              {/* Step-by-Step Content - Compact Overlay Style */}
               {activeSection && (
-                <div className="max-w-2xl mx-auto animate-slide-in">
-                  {/* Specialized Category Selection */}
-                  {activeSection === 'specialized' && specializedStep === 'category' && (
-                    <div className="glass rounded-3xl p-8 shadow-soft">
-                      <div className="flex items-center justify-between mb-8">
-                        <div className="text-center flex-1">
-                          <div className="text-sm text-indigo-600 font-medium mb-2">学部専門科目</div>
-                          <h2 className="text-3xl font-bold text-gray-900">専門分野を選択</h2>
-                        </div>
-                        <button
-                          onClick={resetFlow}
-                          className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-lg hover:bg-gray-100"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                      
-                      <div className="space-y-6">
-                        <button
-                          onClick={() => handleSpecializedCategorySelect('department')}
-                          className="w-full p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl hover:from-blue-100 hover:to-indigo-100 hover:shadow-lg transition-all duration-300 text-left group"
-                        >
-                          <div className="flex items-center space-x-4">
-                            <div className="text-4xl group-hover:animate-bounce-light transition-all">🏛️</div>
-                            <div>
-                              <h3 className="text-xl font-bold text-gray-900 mb-2">学科専門</h3>
-                              <p className="text-gray-600">学科に直接関連する専門科目</p>
-                            </div>
-                          </div>
-                        </button>
-                        
-                        <button
-                          onClick={() => handleSpecializedCategorySelect('other')}
-                          className="w-full p-6 bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-2xl hover:from-purple-100 hover:to-pink-100 hover:shadow-lg transition-all duration-300 text-left group"
-                        >
-                          <div className="flex items-center space-x-4">
-                            <div className="text-4xl group-hover:animate-bounce-light transition-all">📚</div>
-                            <div>
-                              <h3 className="text-xl font-bold text-gray-900 mb-2">その他</h3>
-                              <p className="text-gray-600">関連する専門分野の科目</p>
-                            </div>
-                          </div>
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* General Genre Selection */}
-                  {activeSection === 'general' && generalStep === 'genre' && (
-                    <div className="glass rounded-3xl p-8 shadow-soft">
-                      <div className="flex items-center justify-between mb-8">
-                        <div className="text-center flex-1">
-                          <div className="text-sm text-green-600 font-medium mb-2">全学共通科目</div>
-                          <h2 className="text-3xl font-bold text-gray-900">ジャンルを選択</h2>
-                        </div>
-                        <button
-                          onClick={resetFlow}
-                          className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-lg hover:bg-gray-100"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                      
-                      <div className="space-y-6">
-                        <button
-                          onClick={() => handleGeneralGenreSelect('language')}
-                          className="w-full p-6 bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 rounded-2xl hover:from-blue-100 hover:to-cyan-100 hover:shadow-lg transition-all duration-300 text-left group"
-                        >
-                          <div className="flex items-center space-x-4">
-                            <div className="text-4xl group-hover:animate-bounce-light transition-all">💬</div>
-                            <div>
-                              <h3 className="text-xl font-bold text-gray-900 mb-2">言語科目</h3>
-                              <p className="text-gray-600">外国語・コミュニケーション</p>
-                            </div>
-                          </div>
-                        </button>
-                        
-                        <button
-                          onClick={() => handleGeneralGenreSelect('liberal')}
-                          className="w-full p-6 bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-200 rounded-2xl hover:from-purple-100 hover:to-violet-100 hover:shadow-lg transition-all duration-300 text-left group"
-                        >
-                          <div className="flex items-center space-x-4">
-                            <div className="text-4xl group-hover:animate-bounce-light transition-all">🧠</div>
-                            <div>
-                              <h3 className="text-xl font-bold text-gray-900 mb-2">教養科目</h3>
-                              <p className="text-gray-600">人文・社会・自然科学</p>
-                            </div>
-                          </div>
-                        </button>
-                        
-                        <button
-                          onClick={() => handleGeneralGenreSelect('other')}
-                          className="w-full p-6 bg-gradient-to-br from-orange-50 to-red-50 border border-orange-200 rounded-2xl hover:from-orange-100 hover:to-red-100 hover:shadow-lg transition-all duration-300 text-left group"
-                        >
-                          <div className="flex items-center space-x-4">
-                            <div className="text-4xl group-hover:animate-bounce-light transition-all">🏃</div>
-                            <div>
-                              <h3 className="text-xl font-bold text-gray-900 mb-2">その他</h3>
-                              <p className="text-gray-600">実技・基礎・実験科目</p>
-                            </div>
-                          </div>
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Professor Search Flow */}
-                  {activeSection === 'professor' && professorStep === 'search' && (
-                    <div className="glass rounded-3xl p-8 shadow-soft">
-                      <div className="flex items-center justify-between mb-8">
-                        <div className="text-center flex-1">
-                          <div className="text-sm text-orange-600 font-medium mb-2">教授名検索</div>
-                          <h2 className="text-3xl font-bold text-gray-900">教授名を入力</h2>
-                          {userInfo && (
-                            <p className="text-gray-600 mt-2">{userInfo.university} {userInfo.faculty}</p>
+                <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4" onClick={resetFlow}>
+                  <div className="glass-strong rounded-3xl p-6 sm:p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-fade-in" onClick={(e) => e.stopPropagation()}>
+                    
+                    {/* Header with breadcrumb */}
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex-1">
+                        {/* Breadcrumb */}
+                        <div className="flex items-center space-x-2 text-sm mb-4">
+                          <span className="text-gray-400">検索方法選択</span>
+                          <span className="text-gray-400">→</span>
+                          <span className={
+                            activeSection === 'professor' ? 'text-orange-600 font-medium' :
+                            activeSection === 'specialized' ? 'text-indigo-600 font-medium' :
+                            'text-green-600 font-medium'
+                          }>
+                            {activeSection === 'professor' ? '教授名検索' :
+                             activeSection === 'specialized' ? '学部専門科目' : '全学共通科目'}
+                          </span>
+                          {/* Additional breadcrumb for deeper navigation */}
+                          {activeSection === 'professor' && professorStep !== 'search' && (
+                            <>
+                              <span className="text-gray-400">→</span>
+                              <span className="text-blue-600 font-medium">
+                                {professorStep === 'courses' ? selectedProfessor :
+                                 professorStep === 'years' ? selectedCourse : ''}
+                              </span>
+                            </>
                           )}
                         </div>
-                        <button
-                          onClick={resetFlow}
-                          className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-lg hover:bg-gray-100"
-                        >
-                          ✕
-                        </button>
+                        
+                        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                          {activeSection === 'professor' && professorStep === 'search' && '教授名を入力'}
+                          {activeSection === 'professor' && professorStep === 'courses' && '授業を選択'}
+                          {activeSection === 'professor' && professorStep === 'years' && '年度を選択'}
+                          {activeSection === 'specialized' && specializedStep === 'category' && '専門分野を選択'}
+                          {activeSection === 'general' && generalStep === 'genre' && 'ジャンルを選択'}
+                        </h2>
+                        
+                        {activeSection === 'professor' && professorStep === 'search' && userInfo && (
+                          <p className="text-gray-600 mt-2">{userInfo.university} {userInfo.faculty}</p>
+                        )}
                       </div>
                       
-                      {/* Professor Search Input */}
-                      <div className="mb-8">
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={professorQuery}
-                            onChange={(e) => setProfessorQuery(e.target.value)}
-                            placeholder="教授名を入力... (例: 田中)"
-                            className="w-full px-6 py-4 pl-14 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent shadow-sm"
-                          />
-                          <div className="absolute left-5 top-1/2 transform -translate-y-1/2">
-                            <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                          </div>
-                        </div>
-                      </div>
+                      <button
+                        onClick={resetFlow}
+                        className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-lg hover:bg-gray-100 flex-shrink-0"
+                      >
+                        ✕
+                      </button>
+                    </div>
 
-                      {/* Professor Results */}
-                      {professorQuery && userInfo && (
-                        <div className="space-y-4 max-h-96 overflow-y-auto">
+                    {/* Content Area */}
+                    <div className="space-y-6">
+                      
+                      {/* Professor Search Flow */}
+                      {activeSection === 'professor' && professorStep === 'search' && (
+                        <>
+                          {/* Search Input */}
+                          <div className="relative">
+                            <input
+                              type="text"
+                              value={professorQuery}
+                              onChange={(e) => setProfessorQuery(e.target.value)}
+                              placeholder="教授名を入力... (例: 田中)"
+                              className="w-full px-4 py-3 pl-12 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent shadow-sm"
+                              autoFocus
+                            />
+                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                              </svg>
+                            </div>
+                          </div>
+
+                          {/* Professor Results */}
+                          {professorQuery && userInfo ? (
+                            <div className="grid gap-3 max-h-96 overflow-y-auto">
+                              {getAllProfessorsForUser(userInfo.university, userInfo.faculty)
+                                .filter(prof => prof.professor.toLowerCase().includes(professorQuery.toLowerCase()))
+                                .map((prof, index) => (
+                                  <button
+                                    key={index}
+                                    onClick={() => {
+                                      setSelectedProfessor(prof.professor)
+                                      setProfessorStep('courses')
+                                    }}
+                                    className="p-4 bg-orange-50 border border-orange-200 rounded-xl hover:bg-orange-100 hover:shadow-md transition-all text-left group"
+                                  >
+                                    <div className="flex items-center space-x-3">
+                                      <div className="text-xl">👨‍🏫</div>
+                                      <div className="min-w-0 flex-1">
+                                        <h4 className="font-bold text-gray-900">{prof.professor} 教授</h4>
+                                        <p className="text-sm text-gray-600">
+                                          {prof.courses.length}授業 • {prof.courses.reduce((total, course) => total + course.years.length, 0)}年分
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </button>
+                                ))}
+                              
+                              {getAllProfessorsForUser(userInfo.university, userInfo.faculty)
+                                .filter(prof => prof.professor.toLowerCase().includes(professorQuery.toLowerCase())).length === 0 && (
+                                <div className="text-center py-8">
+                                  <div className="text-3xl mb-3">😔</div>
+                                  <p className="text-gray-500">「{professorQuery}」が見つかりません</p>
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="text-center py-8">
+                              <div className="text-6xl mb-4">🔍</div>
+                              <p className="text-gray-600">教授名を入力してください</p>
+                            </div>
+                          )}
+                        </>
+                      )}
+
+                      {/* Course Selection */}
+                      {activeSection === 'professor' && professorStep === 'courses' && selectedProfessor && userInfo && (
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                           {getAllProfessorsForUser(userInfo.university, userInfo.faculty)
-                            .filter(prof => prof.professor.toLowerCase().includes(professorQuery.toLowerCase()))
-                            .map((prof, index) => (
+                            .find(prof => prof.professor === selectedProfessor)
+                            ?.courses.map((course, index) => (
                               <button
                                 key={index}
                                 onClick={() => {
-                                  setSelectedProfessor(prof.professor)
-                                  setProfessorStep('courses')
+                                  setSelectedCourse(course.name)
+                                  setProfessorStep('years')
                                 }}
-                                className="w-full p-4 bg-orange-50 border border-orange-200 rounded-xl hover:bg-orange-100 hover:shadow-md transition-all text-left group"
+                                className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl hover:from-blue-100 hover:to-indigo-100 hover:shadow-lg transition-all text-center group"
                               >
-                                <div className="flex items-center space-x-4">
-                                  <div className="text-2xl group-hover:animate-bounce-light transition-all">👨‍🏫</div>
-                                  <div className="min-w-0 flex-1">
-                                    <h4 className="text-lg font-bold text-gray-900">{prof.professor} 教授</h4>
-                                    <p className="text-gray-600">
-                                      {prof.courses.length}授業 • {prof.courses.reduce((total, course) => total + course.years.length, 0)}年分
-                                    </p>
-                                  </div>
-                                </div>
+                                <div className="text-3xl mb-3">📖</div>
+                                <h4 className="font-bold text-gray-900 mb-2">{course.name}</h4>
+                                <p className="text-sm text-gray-600 mb-2">{course.years.length}年分</p>
+                                <p className="text-xs text-blue-600 font-medium">
+                                  {course.years.join('年, ')}年
+                                </p>
                               </button>
                             ))}
-                          
-                          {/* No results */}
-                          {getAllProfessorsForUser(userInfo.university, userInfo.faculty)
-                            .filter(prof => prof.professor.toLowerCase().includes(professorQuery.toLowerCase())).length === 0 && (
-                            <div className="text-center py-8">
-                              <div className="text-4xl mb-4">😔</div>
-                              <p className="text-gray-500 mb-1">「{professorQuery}」が見つかりません</p>
-                              <p className="text-gray-400">別の名前で検索してみてください</p>
-                            </div>
-                          )}
                         </div>
                       )}
 
-                      {/* Help Text */}
-                      {!professorQuery && (
-                        <div className="text-center py-12">
-                          <div className="text-8xl mb-6">🔍</div>
-                          <h3 className="text-2xl font-bold text-gray-900 mb-4">教授名を入力してください</h3>
-                          <p className="text-xl text-gray-600 mb-8">姓だけでも検索できます</p>
-                          {userInfo && (
-                            <div className="glass rounded-2xl p-6 max-w-md mx-auto">
-                              <p className="text-gray-700">
-                                <strong>{userInfo.university} {userInfo.faculty}</strong>の教授を検索します
-                              </p>
-                            </div>
-                          )}
+                      {/* Year Selection */}
+                      {activeSection === 'professor' && professorStep === 'years' && selectedProfessor && selectedCourse && userInfo && (
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                          {(() => {
+                            const selectedProfData = getAllProfessorsForUser(userInfo.university, userInfo.faculty)
+                              .find(prof => prof.professor === selectedProfessor)
+                            const selectedCourseData = selectedProfData?.courses.find(course => course.name === selectedCourse)
+                            
+                            return selectedCourseData?.years.map((year, index) => (
+                              <button
+                                key={index}
+                                onClick={() => {
+                                  setQuery(`${selectedCourse} ${selectedProfessor} ${year}年`)
+                                  handleSearch(`${selectedCourse} ${selectedProfessor} ${year}年`)
+                                  resetFlow() // Close modal after search
+                                }}
+                                className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl hover:from-green-100 hover:to-emerald-100 hover:shadow-lg transition-all text-center"
+                              >
+                                <div className="text-2xl mb-2">📅</div>
+                                <h4 className="font-bold text-gray-900 mb-1">{year}年</h4>
+                                <p className="text-xs text-green-600">検索実行</p>
+                              </button>
+                            )) || []
+                          })()}
                         </div>
                       )}
-                    </div>
-                  )}
 
-                  {/* Course Selection for Selected Professor */}
-                  {activeSection === 'professor' && professorStep === 'courses' && selectedProfessor && userInfo && (
-                    <div className="glass rounded-3xl p-8 shadow-soft">
-                      <div className="flex items-center justify-between mb-8">
-                        <div className="text-center flex-1">
-                          <div className="flex items-center justify-center space-x-2 mb-4">
-                            <span className="text-sm text-orange-600 font-medium">教授名検索</span>
-                            <span className="text-sm text-gray-400">→</span>
-                            <span className="text-sm text-blue-600 font-medium">{selectedProfessor} 教授</span>
-                          </div>
-                          <h2 className="text-3xl font-bold text-gray-900">授業を選択してください</h2>
-                        </div>
-                        <button
-                          onClick={() => setProfessorStep('search')}
-                          className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-lg hover:bg-gray-100"
-                        >
-                          ←
-                        </button>
-                      </div>
-                      
-                      <div className="grid sm:grid-cols-2 gap-6">
-                        {getAllProfessorsForUser(userInfo.university, userInfo.faculty)
-                          .find(prof => prof.professor === selectedProfessor)
-                          ?.courses.map((course, index) => (
-                            <button
-                              key={index}
-                              onClick={() => {
-                                setSelectedCourse(course.name)
-                                setProfessorStep('years')
-                              }}
-                              className="group p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl hover:from-blue-100 hover:to-indigo-100 hover:shadow-lg transition-all duration-300 text-center"
-                            >
-                              <div className="text-4xl mb-4 group-hover:animate-bounce-light transition-all">📖</div>
-                              <h4 className="text-xl font-bold text-gray-900 mb-2">{course.name}</h4>
-                              <p className="text-gray-600 mb-2">{course.years.length}年分の過去問</p>
-                              <p className="text-blue-600 font-medium">
-                                {course.years.join('年, ')}年
-                              </p>
-                            </button>
-                          ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Year Selection for Selected Course */}
-                  {activeSection === 'professor' && professorStep === 'years' && selectedProfessor && selectedCourse && userInfo && (
-                    <div className="glass rounded-3xl p-8 shadow-soft">
-                      <div className="flex items-center justify-between mb-8">
-                        <div className="text-center flex-1">
-                          <div className="flex items-center justify-center space-x-2 mb-4">
-                            <span className="text-sm text-orange-600 font-medium">教授名検索</span>
-                            <span className="text-sm text-gray-400">→</span>
-                            <span className="text-sm text-blue-600 font-medium">{selectedProfessor}</span>
-                            <span className="text-sm text-gray-400">→</span>
-                            <span className="text-sm text-green-600 font-medium">{selectedCourse}</span>
-                          </div>
-                          <h2 className="text-3xl font-bold text-gray-900">年度を選択してください</h2>
-                        </div>
-                        <button
-                          onClick={() => setProfessorStep('courses')}
-                          className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-lg hover:bg-gray-100"
-                        >
-                          ←
-                        </button>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                        {(() => {
-                          const selectedProfData = getAllProfessorsForUser(userInfo.university, userInfo.faculty)
-                            .find(prof => prof.professor === selectedProfessor)
-                          const selectedCourseData = selectedProfData?.courses.find(course => course.name === selectedCourse)
+                      {/* Specialized Category Selection */}
+                      {activeSection === 'specialized' && specializedStep === 'category' && (
+                        <div className="grid gap-4">
+                          <button
+                            onClick={() => handleSpecializedCategorySelect('department')}
+                            className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl hover:from-blue-100 hover:to-indigo-100 hover:shadow-lg transition-all text-left group"
+                          >
+                            <div className="flex items-center space-x-4">
+                              <div className="text-3xl">🏛️</div>
+                              <div>
+                                <h3 className="text-lg font-bold text-gray-900 mb-1">学科専門</h3>
+                                <p className="text-gray-600">学科に直接関連する専門科目</p>
+                              </div>
+                            </div>
+                          </button>
                           
-                          return selectedCourseData?.years.map((year, index) => (
-                            <button
-                              key={index}
-                              onClick={() => {
-                                setQuery(`${selectedCourse} ${selectedProfessor} ${year}年`)
-                                handleSearch(`${selectedCourse} ${selectedProfessor} ${year}年`)
-                              }}
-                              className="group p-6 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-2xl hover:from-green-100 hover:to-emerald-100 hover:shadow-lg transition-all duration-300 text-center"
-                            >
-                              <div className="text-3xl mb-3 group-hover:animate-bounce-light transition-all">📅</div>
-                              <h4 className="text-xl font-bold text-gray-900 mb-2">{year}年</h4>
-                              <p className="text-green-600 font-medium">過去問を見る</p>
-                            </button>
-                          )) || []
-                        })()}
-                      </div>
+                          <button
+                            onClick={() => handleSpecializedCategorySelect('other')}
+                            className="p-6 bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-xl hover:from-purple-100 hover:to-pink-100 hover:shadow-lg transition-all text-left group"
+                          >
+                            <div className="flex items-center space-x-4">
+                              <div className="text-3xl">📚</div>
+                              <div>
+                                <h3 className="text-lg font-bold text-gray-900 mb-1">その他</h3>
+                                <p className="text-gray-600">関連する専門分野の科目</p>
+                              </div>
+                            </div>
+                          </button>
+                        </div>
+                      )}
+
+                      {/* General Genre Selection */}
+                      {activeSection === 'general' && generalStep === 'genre' && (
+                        <div className="grid gap-4">
+                          <button
+                            onClick={() => handleGeneralGenreSelect('language')}
+                            className="p-6 bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 rounded-xl hover:from-blue-100 hover:to-cyan-100 hover:shadow-lg transition-all text-left group"
+                          >
+                            <div className="flex items-center space-x-4">
+                              <div className="text-3xl">💬</div>
+                              <div>
+                                <h3 className="text-lg font-bold text-gray-900 mb-1">言語科目</h3>
+                                <p className="text-gray-600">外国語・コミュニケーション</p>
+                              </div>
+                            </div>
+                          </button>
+                          
+                          <button
+                            onClick={() => handleGeneralGenreSelect('liberal')}
+                            className="p-6 bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-200 rounded-xl hover:from-purple-100 hover:to-violet-100 hover:shadow-lg transition-all text-left group"
+                          >
+                            <div className="flex items-center space-x-4">
+                              <div className="text-3xl">🧠</div>
+                              <div>
+                                <h3 className="text-lg font-bold text-gray-900 mb-1">教養科目</h3>
+                                <p className="text-gray-600">人文・社会・自然科学</p>
+                              </div>
+                            </div>
+                          </button>
+                          
+                          <button
+                            onClick={() => handleGeneralGenreSelect('other')}
+                            className="p-6 bg-gradient-to-br from-orange-50 to-red-50 border border-orange-200 rounded-xl hover:from-orange-100 hover:to-red-100 hover:shadow-lg transition-all text-left group"
+                          >
+                            <div className="flex items-center space-x-4">
+                              <div className="text-3xl">🏃</div>
+                              <div>
+                                <h3 className="text-lg font-bold text-gray-900 mb-1">その他</h3>
+                                <p className="text-gray-600">実技・基礎・実験科目</p>
+                              </div>
+                            </div>
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Navigation Buttons */}
+                      {activeSection === 'professor' && professorStep !== 'search' && (
+                        <div className="flex justify-between pt-6 border-t border-gray-200">
+                          <button
+                            onClick={() => {
+                              if (professorStep === 'courses') setProfessorStep('search')
+                              else if (professorStep === 'years') setProfessorStep('courses')
+                            }}
+                            className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors flex items-center space-x-2"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                            <span>戻る</span>
+                          </button>
+                        </div>
+                      )}
+                      
                     </div>
-                  )}
+                  </div>
                 </div>
               )}
             </div>

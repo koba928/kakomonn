@@ -34,10 +34,18 @@ export default function EmailAuthPage() {
         } else {
           // ユーザー情報を確認
           const userInfo = result.user
-          if (userInfo && userInfo.university && userInfo.university !== '未設定') {
-            // 大学情報が登録済みなら検索ページへ
+          console.log('ログイン成功 - ユーザー情報:', userInfo)
+          
+          // プロフィールが正常に取得され、大学情報が設定されている場合は検索ページへ
+          if (userInfo && 
+              userInfo.university && 
+              userInfo.university !== '未設定' && 
+              userInfo.faculty && 
+              userInfo.faculty !== '未設定') {
+            console.log('大学情報登録済み - 検索ページへリダイレクト')
             window.location.href = '/search'
           } else {
+            console.log('大学情報未登録 - 大学情報入力ページへリダイレクト')
             // 大学情報が未登録なら入力ページへ
             window.location.href = '/auth/university-info'
           }
