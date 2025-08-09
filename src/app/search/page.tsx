@@ -1104,7 +1104,7 @@ function SearchPageClient() {
                 <div>
                   <div className="mb-4 pb-3 border-b border-gray-200">
                     <h3 className="text-lg font-bold text-gray-900">検索結果</h3>
-                    <p className="text-sm text-gray-600">"{query}" の検索結果</p>
+                    <p className="text-sm text-gray-600">&ldquo;{query}&rdquo; の検索結果</p>
                   </div>
                   <div className="max-h-[calc(100vh-300px)] overflow-y-auto">
                     {renderSearchResults()}
