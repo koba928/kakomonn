@@ -190,8 +190,23 @@ function SearchPageClient() {
       
       // 検索フィルターを構築
       const filters: SearchFilters = {
-        ...searchFilters,
-        course: searchQuery
+        ...searchFilters
+      }
+
+      // 現在のセクションに応じて検索パラメータを設定
+      if (activeSection === 'professor') {
+        filters.professor = searchQuery
+      } else if (activeSection === 'subject') {
+        filters.course = searchQuery
+      } else {
+        // デフォルトは授業名検索
+        filters.course = searchQuery
+      }
+
+      // ユーザー情報があれば大学・学部でフィルタリング
+      if (userInfo) {
+        filters.university = userInfo.university
+        filters.faculty = userInfo.faculty
       }
       
       // APIを使用して過去問を検索
@@ -205,7 +220,7 @@ function SearchPageClient() {
     } finally {
       setIsSearching(false)
     }
-  }, [searchFilters])
+  }, [searchFilters, activeSection, userInfo])
 
   // ログインユーザーのプロファイル情報を読み込む
   useEffect(() => {
@@ -479,12 +494,6 @@ function SearchPageClient() {
   const handleSubjectTypeSelect = (type: SubjectType) => {
     setSubjectType(type)
     setSubjectStep('search')
-    // Navigate to appropriate search page based on type
-    if (type === 'specialized') {
-      window.location.href = '/search/specialized'
-    } else {
-      window.location.href = '/search/general'
-    }
   }
 
 
@@ -501,8 +510,20 @@ function SearchPageClient() {
 
     if (searchResults.length === 0) {
       return (
-        <div className="text-center py-8">
-          <p className="text-gray-500">検索結果が見つかりませんでした</p>
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">🔍</div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">検索結果が見つかりませんでした</h3>
+          <p className="text-gray-500 mb-4">
+            &ldquo;{query}&rdquo; に関する過去問は見つかりませんでした
+          </p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
+            <h4 className="font-medium text-blue-900 mb-2">検索のコツ</h4>
+            <ul className="text-sm text-blue-700 text-left space-y-1">
+              <li>• 授業名の一部で検索してみてください</li>
+              <li>• 教授名での検索も試してみてください</li>
+              <li>• 略語ではなく正式名称で検索してみてください</li>
+            </ul>
+          </div>
         </div>
       )
     }
@@ -533,8 +554,24 @@ function SearchPageClient() {
                   href={exam.file_url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={async () => {
+                    try {
+                      await api.pastExams.incrementDownloadCount(exam.id)
+                      // 検索結果を更新（ローカル状態を更新）
+                      setSearchResults(prev => prev.map(e => 
+                        e.id === exam.id 
+                          ? { ...e, download_count: (e.download_count || 0) + 1 }
+                          : e
+                      ))
+                    } catch (error) {
+                      console.error('ダウンロード数更新エラー:', error)
+                    }
+                  }}
                   className="inline-flex items-center px-3 py-1 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-md hover:bg-indigo-100 transition-colors"
                 >
+                  <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
                   ダウンロード
                 </a>
               </div>
@@ -1012,6 +1049,24 @@ function SearchPageClient() {
                             </div>
                           </div>
 
+                          {/* Direct Professor Search Button */}
+                          {professorQuery.trim() && (
+                            <button
+                              onClick={() => {
+                                setQuery(professorQuery)
+                                handleSearch(professorQuery)
+                              }}
+                              className="w-full p-4 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl hover:from-orange-600 hover:to-red-600 transition-all shadow-lg hover:shadow-xl"
+                            >
+                              <div className="flex items-center justify-center space-x-3">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                <span className="font-semibold">「{professorQuery}」で過去問を検索</span>
+                              </div>
+                            </button>
+                          )}
+
                           {/* Professor Results */}
                           {professorQuery && userInfo ? (
                             <div className="grid gap-3 max-h-96 overflow-y-auto">
@@ -1026,13 +1081,15 @@ function SearchPageClient() {
                                     }}
                                     className="p-4 bg-orange-50 border border-orange-200 rounded-xl hover:bg-orange-100 hover:shadow-md transition-all text-left group"
                                   >
-                                    <div className="flex items-center space-x-3">
-                                      <div className="text-xl">👨‍🏫</div>
-                                      <div className="min-w-0 flex-1">
-                                        <h4 className="font-bold text-gray-900">{prof.professor} 教授</h4>
-                                        <p className="text-sm text-gray-600">
-                                          {prof.courses.length}授業 • {prof.courses.reduce((total, course) => total + course.years.length, 0)}年分
-                                        </p>
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center space-x-3">
+                                        <div className="text-xl">👨‍🏫</div>
+                                        <div className="min-w-0 flex-1">
+                                          <h4 className="font-bold text-gray-900">{prof.professor} 教授</h4>
+                                          <p className="text-sm text-gray-600">
+                                            {prof.courses.length}授業 • {prof.courses.reduce((total, course) => total + course.years.length, 0)}年分
+                                          </p>
+                                        </div>
                                       </div>
                                     </div>
                                   </button>
@@ -1134,6 +1191,94 @@ function SearchPageClient() {
                                 <p className="text-gray-600">全学共通・教養科目を検索</p>
                               </div>
                             </div>
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Subject Search Input */}
+                      {activeSection === 'subject' && subjectStep === 'search' && (
+                        <div className="space-y-6">
+                          <div className="text-center mb-6">
+                            <div className="inline-flex items-center px-3 py-1 bg-indigo-100 text-indigo-800 text-sm rounded-full mb-3">
+                              {subjectType === 'specialized' ? '🎓 専門科目' : '🌍 一般科目'}
+                            </div>
+                            <p className="text-gray-600">
+                              {subjectType === 'specialized' 
+                                ? '学部・学科の専門科目名を入力してください' 
+                                : '全学共通・教養科目名を入力してください'
+                              }
+                            </p>
+                          </div>
+                          
+                          <div className="relative">
+                            <input
+                              type="text"
+                              value={query}
+                              onChange={(e) => setQuery(e.target.value)}
+                              placeholder={subjectType === 'specialized' 
+                                ? "例: 線形代数学、マクロ経済学、データ構造とアルゴリズム" 
+                                : "例: 英語、体育、情報リテラシー"
+                              }
+                              className="w-full px-4 py-3 pl-12 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm"
+                              autoFocus
+                              onKeyPress={(e) => {
+                                if (e.key === 'Enter' && query.trim()) {
+                                  handleSearch(query)
+                                }
+                              }}
+                            />
+                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                              </svg>
+                            </div>
+                          </div>
+
+                          {query.trim() && (
+                            <button
+                              onClick={() => {
+                                handleSearch(query)
+                                resetFlow() // Close modal after search
+                              }}
+                              className="w-full p-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl hover:from-indigo-600 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl"
+                            >
+                              <div className="flex items-center justify-center space-x-3">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                <span className="font-semibold">「{query}」を検索</span>
+                              </div>
+                            </button>
+                          )}
+
+                          {userInfo && (
+                            <div className="bg-gray-50 rounded-lg p-4">
+                              <h4 className="text-sm font-medium text-gray-900 mb-2">検索範囲</h4>
+                              <div className="text-sm text-gray-600">
+                                <p>{userInfo.university} {userInfo.faculty} {userInfo.department}</p>
+                                <p className="text-xs mt-1">
+                                  {subjectType === 'specialized' 
+                                    ? '専門科目として検索します' 
+                                    : '一般科目として検索します'
+                                  }
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Navigation Buttons */}
+                      {activeSection === 'subject' && subjectStep === 'search' && (
+                        <div className="flex justify-between pt-6 border-t border-gray-200">
+                          <button
+                            onClick={() => setSubjectStep('type')}
+                            className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors flex items-center space-x-2"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                            <span>戻る</span>
                           </button>
                         </div>
                       )}
