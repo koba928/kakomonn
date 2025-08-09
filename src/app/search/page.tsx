@@ -1159,7 +1159,6 @@ function SearchPageClient() {
                     </div>
                   </div>
                 </div>
-              )}
             </div>
           </div>
         ) : (
