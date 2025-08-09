@@ -221,6 +221,8 @@ function SearchPageClient() {
 
       try {
         const profile = await api.users.getById(user.id)
+        console.log('プロファイル取得結果:', profile)
+        
         if (profile) {
           // 既存のプロファイル情報がある場合は自動的に設定
           setAcademicInfo({
@@ -232,7 +234,7 @@ function SearchPageClient() {
           setPenName(profile.pen_name)
           
           // ユーザー情報を設定して、モーダルを表示しない
-          setUserInfo({
+          const userInfoData = {
             university: profile.university,
             faculty: profile.faculty,
             department: profile.department,
@@ -240,21 +242,30 @@ function SearchPageClient() {
             penName: profile.pen_name,
             isLoggedIn: true,
             completedAt: new Date().toISOString()
-          })
+          }
+          
+          setUserInfo(userInfoData)
           
           // LocalStorageにも保存
-          localStorage.setItem('kakomonn_user', JSON.stringify({
-            university: profile.university,
-            faculty: profile.faculty,
-            department: profile.department,
-            year: profile.year.toString() + '年生',
-            penName: profile.pen_name,
-            isLoggedIn: true,
-            completedAt: new Date().toISOString()
-          }))
+          localStorage.setItem('kakomonn_user', JSON.stringify(userInfoData))
+          
+          // 大学情報が設定されていればモーダルを非表示にする
+          if (profile.university && profile.university !== '未設定' && 
+              profile.faculty && profile.faculty !== '未設定') {
+            console.log('大学情報が完全に設定されているため、モーダルを非表示にします')
+            setShowUniversityModal(false)
+          } else {
+            console.log('大学情報が不完全なため、モーダルを表示します')
+            setShowUniversityModal(true)
+          }
+        } else {
+          console.log('プロファイルが見つからないため、モーダルを表示します')
+          setShowUniversityModal(true)
         }
       } catch (error) {
         console.error('Failed to load user profile:', error)
+        console.log('プロファイル読み込みエラーのため、モーダルを表示します')
+        setShowUniversityModal(true)
       } finally {
         setIsLoadingProfile(false)
       }
@@ -272,13 +283,21 @@ function SearchPageClient() {
   }, [searchParams, handleSearch])
 
   useEffect(() => {
-    // Load user information from localStorage
+    // ログインユーザーの場合は、プロファイルロード完了まで待つ
+    if (isLoggedIn) {
+      console.log('ログインユーザーのためプロファイルロード完了まで待機')
+      return
+    }
+    
+    // ゲストユーザーの場合のみlocalStorageから情報を読み込み
+    console.log('ゲストユーザーのlocalStorage情報を確認')
     const savedUserInfo = localStorage.getItem('kakomonn_user')
     const guestUniversityInfo = localStorage.getItem('kakomonn_guest_university')
     
     if (savedUserInfo) {
       try {
         const parsed = JSON.parse(savedUserInfo)
+        console.log('localStorage からユーザー情報復元:', parsed)
         setUserInfo(parsed)
       } catch (error) {
         console.error('Failed to parse user info:', error)
@@ -287,6 +306,7 @@ function SearchPageClient() {
     } else if (guestUniversityInfo) {
       try {
         const parsed = JSON.parse(guestUniversityInfo)
+        console.log('localStorage からゲスト大学情報復元:', parsed)
         setUserInfo({
           ...parsed,
           penName: 'ゲストユーザー',
@@ -298,10 +318,11 @@ function SearchPageClient() {
         setShowUniversityModal(true)
       }
     } else {
-      // No user info found, show university selection modal
+      // ゲストでも情報がない場合のみモーダル表示
+      console.log('ゲストユーザーで大学情報なし - モーダル表示')
       setShowUniversityModal(true)
     }
-  }, [])
+  }, [isLoggedIn])
 
   const handleAcademicInfoChange = (newInfo: AcademicInfo) => {
     setAcademicInfo(newInfo)
@@ -803,7 +824,7 @@ function SearchPageClient() {
                       className="absolute top-0 right-0 bg-gradient-to-br from-orange-400 to-red-500 text-white text-xs sm:text-sm font-bold px-3 py-1.5 sm:px-4 sm:py-2 rounded-bl-2xl shadow-lg animate-pulse"
                       aria-label="おすすめのオプション"
                     >
-                      おすすめ
+                      🔥 NEW
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-br from-orange-50/50 to-red-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true"></div>
                     <div className="relative z-10">
@@ -817,7 +838,7 @@ function SearchPageClient() {
                       <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-gray-900 mb-4 sm:mb-6 group-hover:text-orange-600 transition-colors">教授名で検索</h3>
                       <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 leading-relaxed">教授名から授業を特定する<br className="hidden sm:block" />最も確実で高速な方法</p>
                       <div className="inline-flex items-center text-orange-600 font-bold text-base sm:text-lg group-hover:text-orange-700 transition-colors group-hover:animate-bounce-light touch-button">
-                        今すぐ始める
+                        モーダル検索
                         <svg className="w-5 h-5 sm:w-6 sm:h-6 ml-2 sm:ml-3 group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
