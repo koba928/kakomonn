@@ -146,13 +146,24 @@ export function useAuth() {
 
       if (error) throw error
 
+      let userProfile = null
       if (data.user) {
-        await fetchUserProfile(data.user.id)
+        // ユーザープロフィールを取得
+        const { data: profile, error: profileError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', data.user.id)
+          .single()
+        
+        if (!profileError && profile) {
+          userProfile = profile
+          setUser(profile)
+        }
       }
 
-      return { data, error: null }
+      return { data, error: null, user: userProfile }
     } catch (error) {
-      return { data: null, error }
+      return { data: null, error, user: null }
     }
   }
 

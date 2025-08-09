@@ -5,10 +5,12 @@ import { useState, useEffect } from 'react'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
 import { AcademicInfoSelector, AcademicInfo } from '@/components/ui/AcademicInfoSelector'
 import { VirtualizedAutocompleteSelect } from '@/components/ui/VirtualizedAutocompleteSelect'
+import { useAuth } from '@/hooks/useAuth'
 
 type Step = 'university' | 'faculty' | 'department' | 'year' | 'penname'
 
 export default function UniversityInfoPage() {
+  const { user, updateProfile } = useAuth()
   const [currentStep, setCurrentStep] = useState<Step>('university')
   const [academicInfo, setAcademicInfo] = useState<AcademicInfo>({
     university: '',
@@ -22,13 +24,19 @@ export default function UniversityInfoPage() {
 
   useEffect(() => {
     // 既に大学情報が完了しているかチェック
-    const checkExistingInfo = () => {
-      const savedUserInfo = localStorage.getItem('kakomonn_user')
+    const checkExistingInfo = async () => {
+      // Supabaseのユーザー情報を確認
+      if (user && user.university && user.university !== '未設定') {
+        // 大学情報が既に登録済みなら検索ページへ
+        window.location.href = '/search'
+        return
+      }
       
+      // localStorageも確認（互換性のため）
+      const savedUserInfo = localStorage.getItem('kakomonn_user')
       if (savedUserInfo) {
         try {
           const parsed = JSON.parse(savedUserInfo)
-          // 大学情報が既に完了している場合、検索ページへリダイレクト
           if (parsed.university && parsed.faculty && parsed.department && parsed.universityInfoCompleted) {
             window.location.href = '/search'
             return
@@ -42,7 +50,7 @@ export default function UniversityInfoPage() {
     }
 
     checkExistingInfo()
-  }, [])
+  }, [user])
 
   // チェック中はローディング表示
   if (isChecking) {
@@ -100,24 +108,45 @@ export default function UniversityInfoPage() {
   const handleComplete = async () => {
     setIsLoading(true)
 
-    // デモ用：ユーザー情報をlocalStorageに保存
-    const userInfo = {
-      ...academicInfo,
-      year,
-      penName: penName || '匿名さん',
-      isLoggedIn: true,
-      completedAt: new Date().toISOString(),
-      // 次回以降はスキップするための完了フラグ
-      universityInfoCompleted: true
-    }
-    
-    localStorage.setItem('kakomonn_user', JSON.stringify(userInfo))
+    try {
+      // Supabaseに大学情報を保存
+      const yearNumber = year.includes('1') ? 1 : 
+                        year.includes('2') ? 2 : 
+                        year.includes('3') ? 3 : 
+                        year.includes('4') ? 4 : 1
+      
+      const { error } = await updateProfile({
+        university: academicInfo.university,
+        faculty: academicInfo.faculty,
+        department: academicInfo.department,
+        year: yearNumber,
+        pen_name: penName || '匿名さん'
+      })
 
-    setTimeout(() => {
+      if (error) {
+        console.error('プロフィール更新エラー:', error)
+      }
+
+      // localStorageにも保存（互換性のため）
+      const userInfo = {
+        ...academicInfo,
+        year,
+        penName: penName || '匿名さん',
+        isLoggedIn: true,
+        completedAt: new Date().toISOString(),
+        universityInfoCompleted: true
+      }
+      
+      localStorage.setItem('kakomonn_user', JSON.stringify(userInfo))
+
+      setTimeout(() => {
+        setIsLoading(false)
+        window.location.href = '/search'
+      }, 1500)
+    } catch (err) {
+      console.error('完了処理エラー:', err)
       setIsLoading(false)
-      // 検索ページに遷移（大学情報で最適化される）
-      window.location.href = '/search'
-    }, 1500)
+    }
   }
 
   const canProceed = () => {
@@ -301,14 +330,14 @@ export default function UniversityInfoPage() {
             </AnimatedButton>
           </div>
 
-          {/* 認証方法を変更するリンク（最初のステップのみ表示） */}
+          {/* ログインページに戻るリンク（最初のステップのみ表示） */}
           {currentStep === 'university' && (
             <div className="text-center">
               <Link 
-                href="/auth/method-select"
+                href="/auth/email"
                 className="text-sm text-gray-500 hover:text-gray-700"
               >
-                ← 認証方法を変更
+                ← ログインに戻る
               </Link>
             </div>
           )}

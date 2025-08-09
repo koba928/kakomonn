@@ -32,7 +32,15 @@ export default function EmailAuthPage() {
           console.error('ログインエラー:', result.error)
           setError((result.error as any).message || 'ログインに失敗しました')
         } else {
-          window.location.href = '/search'
+          // ユーザー情報を確認
+          const userInfo = result.user
+          if (userInfo && userInfo.university && userInfo.university !== '未設定') {
+            // 大学情報が登録済みなら検索ページへ
+            window.location.href = '/search'
+          } else {
+            // 大学情報が未登録なら入力ページへ
+            window.location.href = '/auth/university-info'
+          }
         }
       } else {
         // 新規登録の場合は大学情報も必要
@@ -213,10 +221,10 @@ export default function EmailAuthPage() {
         {/* フッター */}
         <div className="mt-8 text-center">
           <Link 
-            href="/auth/method-select" 
+            href="/" 
             className="text-sm text-gray-500 hover:text-gray-700"
           >
-            ← 認証方法を変更
+            ← ホームに戻る
           </Link>
         </div>
 

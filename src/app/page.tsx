@@ -8,7 +8,7 @@ import HomeContent from '@/components/home/HomeContent'
 import { APP_CONFIG } from '@/constants/app'
 
 export default function Home() {
-  const [mainButtonHref, setMainButtonHref] = useState('/auth/method-select')
+  const [mainButtonHref, setMainButtonHref] = useState('/auth/email')
 
   useEffect(() => {
     // ログイン済みかつ大学情報が登録済みかチェック
@@ -52,20 +52,20 @@ export default function Home() {
               大学生のための学習プラットフォーム
             </div>
             
-            <h1 id="hero-heading" className="text-4xl sm:text-5xl md:text-7xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-gray-900 via-indigo-800 to-indigo-600 bg-clip-text text-transparent animate-slide-in leading-tight">
+            <h1 id="hero-heading" className="text-4xl sm:text-5xl md:text-7xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-gray-900 via-indigo-800 to-indigo-600 bg-clip-text text-transparent animate-fade-in leading-tight">
               {APP_CONFIG.name.split('hub')[0]}<span className="text-indigo-600">hub</span>
             </h1>
             
-            <p className="text-xl sm:text-2xl md:text-3xl text-gray-800 mb-3 sm:mb-4 font-medium animate-slide-in">
+            <p className="text-xl sm:text-2xl md:text-3xl text-gray-800 mb-3 sm:mb-4 font-medium animate-fade-in">
               {APP_CONFIG.tagline}
             </p>
             
-            <p className="text-base sm:text-lg md:text-xl text-gray-700 mb-8 sm:mb-12 max-w-2xl mx-auto animate-slide-in leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-gray-700 mb-8 sm:mb-12 max-w-2xl mx-auto animate-fade-in leading-relaxed">
               {APP_CONFIG.fullDescription}
             </p>
 
             {/* メインアクション - 過去問を探すボタン */}
-            <nav className="flex justify-center animate-slide-in mb-4" aria-label="メインナビゲーション">
+            <nav className="flex justify-center animate-fade-in mb-4" aria-label="メインナビゲーション">
               <Link href={mainButtonHref}>
                 <AnimatedButton variant="primary" size="lg" aria-label="過去問を検索する">
                   <SearchIcon size={24} aria-hidden={true} />
