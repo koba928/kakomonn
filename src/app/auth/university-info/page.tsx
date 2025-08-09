@@ -61,7 +61,7 @@ function UniversityInfoPageContent() {
     }
 
     checkExistingInfo()
-  }, [user, searchParams])
+  }, [user, searchParams, router])
 
   // チェック中はローディング表示
   if (isChecking) {

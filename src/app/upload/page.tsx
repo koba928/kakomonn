@@ -552,7 +552,7 @@ export default function UploadPage() {
         exam_type: formData.examType || 'final',
         file_url: fileUrl,
         file_name: formData.file.name,
-        uploaded_by: user.id,
+        uploaded_by: user?.id || '',
         difficulty: formData.teachers.length > 0 
           ? formData.teachers.map(t => Number(t.difficulty) || 3).reduce((sum, val) => sum + val, 0) / formData.teachers.length 
           : 3, // 教員の難易度の平均を保存
