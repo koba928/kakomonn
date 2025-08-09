@@ -90,8 +90,7 @@ const TEACHER_POSITIONS = [
 ]
 
 export default function UploadPage() {
-  const { user, loading } = useAuthContext()
-  const isLoggedIn = !!user
+  const { user, loading, isLoggedIn } = useAuthContext()
   const formErrorHandler = useFormErrorHandler()
   
   // All hooks must be called before any conditional returns

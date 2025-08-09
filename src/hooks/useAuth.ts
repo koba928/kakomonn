@@ -146,6 +146,9 @@ export function useAuth() {
 
       if (error) throw error
 
+      // セッション情報を手動で設定
+      setSession(data.session)
+
       let userProfile = null
       if (data.user) {
         // ユーザープロフィールを取得
