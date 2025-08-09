@@ -2,7 +2,7 @@ export const APP_CONFIG = {
   name: '過去問hub',
   description: '大学生のための過去問共有プラットフォーム',
   tagline: '過去問を探せて、話せる。',
-  fullDescription: '全国の大学生が集まる、勉強記録と情報交換のコミュニティ。先輩の知識を活用して、効率的な試験対策を。',
+  fullDescription: '',
   version: '0.1.2'
 }
 
