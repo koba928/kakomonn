@@ -27,7 +27,7 @@ export default function EmailAuthPage() {
     
     try {
       if (isLogin) {
-        const { data, error } = await signIn(email, password)
+        const { error } = await signIn(email, password)
         if (error) {
           console.error('ログインエラー:', error)
           setError(error.message || 'ログインに失敗しました')
