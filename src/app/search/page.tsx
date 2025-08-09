@@ -531,18 +531,18 @@ function SearchPageClient() {
     return (
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-900">検索結果 ({searchResults.length}件)</h3>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
           {searchResults.map((exam) => (
-            <div key={exam.id} className="bg-white rounded-lg shadow-md p-4 border border-gray-200 hover:shadow-lg transition-shadow">
+            <div key={exam.id} className="bg-white rounded-lg shadow-md p-3 sm:p-4 border border-gray-200 hover:shadow-lg transition-shadow">
               <div className="flex items-start justify-between mb-2">
                 <h4 className="font-medium text-gray-900 truncate">{exam.title}</h4>
-                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
                   {exam.year}年
                 </span>
               </div>
               <p className="text-sm text-gray-600 mb-2">{exam.course_name}</p>
-              <p className="text-xs text-gray-500 mb-3">{exam.professor}</p>
-              <div className="flex items-center justify-between text-xs text-gray-500">
+              <p className="text-sm text-gray-500 mb-3">{exam.professor}</p>
+              <div className="flex items-center justify-between text-sm text-gray-500">
                 <span>{exam.university} {exam.faculty}</span>
                 <div className="flex items-center space-x-2">
                   <span>📥 {exam.download_count}</span>
@@ -567,7 +567,7 @@ function SearchPageClient() {
                       console.error('ダウンロード数更新エラー:', error)
                     }
                   }}
-                  className="inline-flex items-center px-3 py-1 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-md hover:bg-indigo-100 transition-colors"
+                  className="inline-flex items-center px-3 py-1 text-sm font-medium text-indigo-600 bg-indigo-50 rounded-md hover:bg-indigo-100 transition-colors"
                 >
                   <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -594,7 +594,7 @@ function SearchPageClient() {
       {/* University Selection Modal */}
       {showUniversityModal && !isLoadingProfile && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm sm:max-w-md w-full p-4 sm:p-6">
             {/* ヘッダー */}
             <div className="text-center mb-6">
               <div className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
@@ -684,7 +684,7 @@ function SearchPageClient() {
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                       maxLength={20}
                     />
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-sm text-gray-500">
                       {penName ? `${penName.length}/20文字` : '空欄の場合は「ゲストユーザー」として表示されます'}
                     </p>
                   </div>
@@ -745,7 +745,7 @@ function SearchPageClient() {
 
             {/* デモ情報 */}
             <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-              <p className="text-xs text-yellow-700">
+              <p className="text-sm text-yellow-700">
                 この情報は過去問の最適化のみに使用され、いつでも変更可能です
               </p>
             </div>
@@ -766,13 +766,13 @@ function SearchPageClient() {
           <div className="flex items-center space-x-2 sm:space-x-4">
             {userInfo && (
               <Link href="/profile">
-                <div className="text-xs sm:text-sm text-indigo-600 bg-indigo-50 px-2 py-1 sm:px-3 rounded-full hover:bg-indigo-100 transition-colors cursor-pointer">
+                <div className="text-sm text-indigo-600 bg-indigo-50 px-2 py-1 sm:px-3 rounded-full hover:bg-indigo-100 transition-colors cursor-pointer">
                   <span className="hidden sm:inline">👤 {userInfo.penName || 'ゲストユーザー'} ({userInfo.university})</span>
                   <span className="sm:hidden">👤 {userInfo.university}</span>
                 </div>
               </Link>
             )}
-            <div className="text-xs sm:text-sm text-gray-500 hidden md:block">
+            <div className="text-sm text-gray-500 hidden md:block">
               {query ? (
                 `"${query}" の検索結果${activeSection ? ` - ${activeSection === 'subject' ? '授業検索' : '教授検索'}` : ''}`
               ) : activeSection ? (
@@ -797,7 +797,7 @@ function SearchPageClient() {
                   <h1 className="text-base sm:text-lg font-semibold text-gray-900">
                     過去問検索
                   </h1>
-                  <p className="text-xs text-gray-500 hidden sm:block">
+                  <p className="text-sm text-gray-500 hidden sm:block">
                     検索方法を選んでください
                   </p>
                 </div>
@@ -810,7 +810,7 @@ function SearchPageClient() {
                     </div>
                     <div className="text-left">
                       <p className="text-xs font-medium text-gray-900">{userInfo.university}</p>
-                      <p className="text-xs text-gray-500 hidden sm:block">{userInfo.faculty}</p>
+                      <p className="text-sm text-gray-500 hidden sm:block">{userInfo.faculty}</p>
                     </div>
                   </div>
                 )}
@@ -840,7 +840,7 @@ function SearchPageClient() {
                         <span className="font-semibold text-orange-600">最も確実で高速</span>
                       </p>
                     </div>
-                    <div className="inline-flex items-center bg-orange-500 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-full font-bold group-hover:bg-orange-600 transition-colors shadow-lg text-sm">
+                    <div className="inline-flex items-center bg-orange-500 text-white px-3 py-2 sm:px-6 sm:py-3 rounded-full font-bold group-hover:bg-orange-600 transition-colors shadow-lg text-sm">
                       検索開始
                       <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -868,7 +868,7 @@ function SearchPageClient() {
                         <span className="font-semibold text-indigo-600">直接検索</span>
                       </p>
                     </div>
-                    <div className="inline-flex items-center bg-indigo-500 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-full font-bold group-hover:bg-indigo-600 transition-colors shadow-lg text-sm">
+                    <div className="inline-flex items-center bg-indigo-500 text-white px-3 py-2 sm:px-6 sm:py-3 rounded-full font-bold group-hover:bg-indigo-600 transition-colors shadow-lg text-sm">
                       検索開始
                       <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -958,7 +958,7 @@ function SearchPageClient() {
                 </div>
                 
                 {/* Results Content */}
-                <div className="p-5 h-[calc(100vh-260px)] overflow-y-auto">
+                <div className="p-3 sm:p-5 h-[calc(100vh-200px)] sm:h-[calc(100vh-260px)] overflow-y-auto">
                   {renderSearchResults()}
                 </div>
               </div>
@@ -969,7 +969,7 @@ function SearchPageClient() {
         {/* Step-by-Step Content - Compact Overlay Style */}
         {activeSection && (
           <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center p-3" onClick={resetFlow}>
-            <div className="glass-strong rounded-3xl p-5 sm:p-6 max-w-3xl w-full max-h-[85vh] overflow-y-auto animate-fade-in" onClick={(e) => e.stopPropagation()}>
+            <div className="glass-strong rounded-3xl p-4 sm:p-5 md:p-6 max-w-sm sm:max-w-2xl md:max-w-3xl w-full max-h-[85vh] overflow-y-auto animate-fade-in" onClick={(e) => e.stopPropagation()}>
                     
                     {/* Header with breadcrumb */}
                     <div className="flex items-center justify-between mb-6">

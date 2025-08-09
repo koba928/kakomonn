@@ -86,31 +86,32 @@ export default function ProfilePage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-4 sm:mb-6 md:mb-8">
           <Link 
             href="/search" 
-            className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"
+            className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"
           >
             KakoMoNN
           </Link>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             <Link 
               href="/search"
-              className="text-sm text-gray-500 hover:text-gray-700"
+              className="text-sm text-gray-500 hover:text-gray-700 min-h-[44px] flex items-center"
+              aria-label="検索ページに戻る"
             >
               ← 検索に戻る
             </Link>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">プロフィール設定</h1>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-5 md:p-6">
+              <div className="flex items-center justify-between mb-4 sm:mb-5 md:mb-6">
+                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">プロフィール設定</h1>
                 {!isEditing && (
                   <AnimatedButton
                     variant="secondary"
@@ -124,10 +125,10 @@ export default function ProfilePage() {
               </div>
 
               {isEditing ? (
-                <div className="space-y-8">
+                <div className="space-y-4 sm:space-y-6 md:space-y-8">
                   {/* Academic Information */}
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">大学情報</h3>
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">大学情報</h3>
                     <AcademicInfoSelector
                       value={{
                         university: editedInfo?.university || '',
@@ -146,7 +147,7 @@ export default function ProfilePage() {
                     <select
                       value={editedInfo?.year || ''}
                       onChange={(e) => editedInfo && setEditedInfo({ ...editedInfo, year: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full px-3 py-3 sm:px-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent min-h-[44px] text-base"
                     >
                       <option value="">選択してください</option>
                       <option value="1年生">1年生</option>
@@ -169,13 +170,13 @@ export default function ProfilePage() {
                       value={editedInfo?.penName || ''}
                       onChange={(e) => editedInfo && setEditedInfo({ ...editedInfo, penName: e.target.value })}
                       placeholder="例: 工学太郎、理系さん"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full px-3 py-3 sm:px-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent min-h-[44px] text-base"
                       maxLength={20}
                     />
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex space-x-4">
+                  <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
                     <AnimatedButton
                       variant="primary"
                       size="lg"
@@ -199,28 +200,28 @@ export default function ProfilePage() {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-6">
+                <div className="space-y-4 sm:space-y-5 md:space-y-6">
                   {/* Current Information Display */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">表示名</label>
-                      <p className="text-lg text-gray-900">{userInfo.penName || '匿名ユーザー'}</p>
+                      <p className="text-base sm:text-lg text-gray-900">{userInfo.penName || '匿名ユーザー'}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">学年</label>
-                      <p className="text-lg text-gray-900">{userInfo.year}</p>
+                      <p className="text-base sm:text-lg text-gray-900">{userInfo.year}</p>
                     </div>
-                    <div className="md:col-span-2">
+                    <div className="sm:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1">大学</label>
-                      <p className="text-lg text-gray-900">{userInfo.university}</p>
+                      <p className="text-base sm:text-lg text-gray-900">{userInfo.university}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">学部</label>
-                      <p className="text-lg text-gray-900">{userInfo.faculty}</p>
+                      <p className="text-base sm:text-lg text-gray-900">{userInfo.faculty}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">学科</label>
-                      <p className="text-lg text-gray-900">{userInfo.department}</p>
+                      <p className="text-base sm:text-lg text-gray-900">{userInfo.department}</p>
                     </div>
                   </div>
 
@@ -236,10 +237,10 @@ export default function ProfilePage() {
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 space-y-4 sm:space-y-5 md:space-y-6">
             {/* Account Actions */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">アカウント操作</h3>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-5 md:p-6">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">アカウント操作</h3>
               <div className="space-y-3">
                 <Link href="/search">
                   <AnimatedButton variant="secondary" size="sm" className="w-full">
@@ -248,7 +249,8 @@ export default function ProfilePage() {
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="w-full px-4 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors"
+                  className="w-full px-4 py-3 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors min-h-[44px]"
+                  aria-label="ログアウトする"
                 >
                   🚪 ログアウト
                 </button>
@@ -256,9 +258,9 @@ export default function ProfilePage() {
             </div>
 
             {/* Tips */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
               <h4 className="text-sm font-medium text-blue-800 mb-2">💡 プロフィールのメリット</h4>
-              <ul className="text-xs text-blue-700 space-y-1">
+              <ul className="text-sm text-blue-700 space-y-1">
                 <li>• あなたの大学の情報が優先表示されます</li>
                 <li>• 同じ大学・学部の投稿が見つけやすくなります</li>
                 <li>• 関連度の高いトピックが表示されます</li>
@@ -267,9 +269,9 @@ export default function ProfilePage() {
             </div>
 
             {/* Demo Info */}
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 sm:p-4">
               <h4 className="text-sm font-medium text-yellow-800 mb-2">🚧 デモモード</h4>
-              <p className="text-xs text-yellow-700">
+              <p className="text-sm text-yellow-700">
                 現在はデモ版です。情報はブラウザ内にのみ保存されます。
                 実際のサービスでは安全なサーバーで管理されます。
               </p>

@@ -107,20 +107,21 @@ export default function ThreadsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 p-4">
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 p-3 sm:p-4">
       <div className="max-w-6xl mx-auto">
         {/* ヘッダー */}
-        <header className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <header className="mb-4 sm:mb-6 md:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">スレッド一覧</h1>
-              <p className="text-gray-600">大学生の質問・相談・情報交換</p>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2">スレッド一覧</h1>
+              <p className="text-sm sm:text-base text-gray-600">大学生の質問・相談・情報交換</p>
             </div>
             
             {user && (
               <Link 
                 href="/upload"
-                className="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+                className="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-3 sm:px-4 sm:py-2 rounded-lg hover:bg-indigo-700 transition-colors min-h-[44px] text-sm sm:text-base"
+                aria-label="新規スレッドを投稿する"
               >
                 <span>新規投稿</span>
               </Link>
@@ -129,8 +130,8 @@ export default function ThreadsPage() {
         </header>
 
         {/* フィルター */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4 mb-4 sm:mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
             {/* 大学選択 */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">大学</label>
@@ -140,7 +141,7 @@ export default function ThreadsPage() {
                   setSelectedUniversity(e.target.value)
                   setSelectedFaculty('')
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[44px] text-base"
               >
                 <option value="">全ての大学</option>
                 {universities.map((university) => (
@@ -157,7 +158,7 @@ export default function ThreadsPage() {
               <select
                 value={selectedFaculty}
                 onChange={(e) => setSelectedFaculty(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[44px] text-base"
                 disabled={!selectedUniversity}
               >
                 <option value="">全ての学部</option>
@@ -177,14 +178,14 @@ export default function ThreadsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="科目名で検索..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[44px] text-base"
               />
             </div>
           </div>
         </div>
 
         {/* スレッド一覧 */}
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {threads.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-500 mb-4">該当するスレッドが見つかりません</p>
@@ -199,20 +200,20 @@ export default function ThreadsPage() {
             </div>
           ) : (
             threads.map((thread) => (
-              <article key={thread.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between mb-4">
+              <article key={thread.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-5 md:p-6 hover:shadow-md transition-shadow">
+                <div className="flex items-start justify-between mb-3 sm:mb-4">
                   <div className="flex-1">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                    <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
                       <Link href={`/threads/${thread.id}`} className="hover:text-indigo-600 transition-colors">
                         {thread.title}
                       </Link>
                     </h2>
-                    <p className="text-gray-600 mb-3 line-clamp-2">{thread.content}</p>
+                    <p className="text-sm sm:text-base text-gray-600 mb-3 line-clamp-2">{thread.content}</p>
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-between text-sm text-gray-500">
-                  <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 text-xs sm:text-sm text-gray-500">
+                  <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
                     <span className="flex items-center gap-1">
                       <span className="w-2 h-2 bg-green-500 rounded-full"></span>
                       {thread.users?.pen_name || '匿名ユーザー'}
@@ -221,7 +222,7 @@ export default function ThreadsPage() {
                     <span>{thread.course}</span>
                     {thread.exam_year && <span>{thread.exam_year}年度</span>}
                   </div>
-                  <time dateTime={thread.created_at}>{formatDate(thread.created_at)}</time>
+                  <time dateTime={thread.created_at} className="text-xs sm:text-sm">{formatDate(thread.created_at)}</time>
                 </div>
               </article>
             ))

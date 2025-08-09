@@ -307,11 +307,11 @@ export default function UploadPage() {
     const currentStepNumber = getCurrentStepNumber()
 
     return (
-      <nav className="mb-6 px-4" aria-label="投稿手順">
-        <ol className="flex items-center justify-center flex-wrap gap-2" role="list">
+      <nav className="mb-4 sm:mb-5 md:mb-6 px-2 sm:px-4" aria-label="投稿手順">
+        <ol className="flex items-center justify-center flex-wrap gap-1 sm:gap-2" role="list">
           {displaySteps.map((step, index) => (
             <li key={step.key} className="flex items-center">
-              <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 transition-all duration-200 ${
+              <div className={`flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 transition-all duration-200 ${
                 step.number < currentStepNumber
                   ? 'bg-green-500 border-green-500 text-white'
                   : step.number === currentStepNumber
@@ -319,19 +319,19 @@ export default function UploadPage() {
                   : 'bg-gray-100 border-gray-300 text-gray-400'
               }`}>
                 {step.number < currentStepNumber ? (
-                  <CheckIcon size={14} />
+                  <CheckIcon size={12} className="sm:w-3.5 sm:h-3.5" />
                 ) : (
-                  <span className="text-xs font-bold">{step.number}</span>
+                  <span className="text-xs sm:text-sm font-bold">{step.number}</span>
                 )}
               </div>
-              <span className={`ml-1.5 text-xs sm:text-sm font-medium ${
+              <span className={`ml-1 sm:ml-1.5 text-xs sm:text-sm font-medium ${
                 step.number <= currentStepNumber ? 'text-gray-900' : 'text-gray-400'
               }`}>
                 <span className="sm:hidden">{step.label.slice(0,2)}</span>
                 <span className="hidden sm:inline">{step.label}</span>
               </span>
               {index < displaySteps.length - 1 && (
-                <div className={`w-4 sm:w-8 h-0.5 mx-2 ${
+                <div className={`w-2 sm:w-4 md:w-8 h-0.5 mx-1 sm:mx-2 ${
                   step.number < currentStepNumber ? 'bg-green-500' : 'bg-gray-300'
                 }`} />
               )}
@@ -577,8 +577,8 @@ export default function UploadPage() {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">大学を選択してください</h2>
-              <p className="text-gray-600">過去問を投稿する大学を選んでください</p>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-2">大学を選択してください</h2>
+              <p className="text-sm sm:text-base text-gray-600">過去問を投稿する大学を選んでください</p>
             </div>
             
             <VirtualizedAutocompleteSelect
@@ -595,8 +595,8 @@ export default function UploadPage() {
           <div className="space-y-6">
             <div className="text-center">
               <span className="text-sm text-indigo-600 font-medium">{formData.university}</span>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">学部を選択してください</h2>
-              <p className="text-gray-600">過去問の学部を選んでください</p>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-2">学部を選択してください</h2>
+              <p className="text-sm sm:text-base text-gray-600">過去問の学部を選んでください</p>
             </div>
             
             <VirtualizedAutocompleteSelect
@@ -1131,27 +1131,27 @@ export default function UploadPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8 max-w-4xl">
         {/* Header */}
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-block mb-4">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-indigo-600 bg-clip-text text-transparent">
+        <div className="text-center mb-4 sm:mb-6 md:mb-8">
+          <Link href="/" className="inline-block mb-3 sm:mb-4">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-indigo-600 bg-clip-text text-transparent">
               過去問<span className="text-indigo-600">hub</span>
             </h1>
           </Link>
-          <p className="text-gray-600">過去問を投稿して、みんなの学習を支援しよう</p>
+          <p className="text-sm sm:text-base text-gray-600">過去問を投稿して、みんなの学習を支援しよう</p>
         </div>
 
         {/* Step Indicator */}
         {currentStep !== 'complete' && renderStepIndicator()}
 
         {/* Content Card */}
-        <div className="bg-white/90 backdrop-blur-sm p-6 sm:p-8 rounded-2xl shadow-xl border border-gray-100">
+        <div className="bg-white/90 backdrop-blur-sm p-4 sm:p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100">
           {renderStepContent()}
           
           {/* Navigation */}
           {currentStep !== 'complete' && (
-            <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mt-8 gap-3 sm:gap-0">
+            <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mt-6 sm:mt-8 gap-3 sm:gap-0">
               <button
                 onClick={goToPrevStep}
                 disabled={currentStep === 'courseCategory'}
