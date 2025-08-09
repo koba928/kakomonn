@@ -850,11 +850,96 @@ function SearchPageClient() {
             </div>
           </div>
         ) : (
+          /* AFTER SEARCH: Split Layout with Smooth Animation */
+          <div className="flex gap-6 min-h-[calc(100vh-140px)] animate-fade-in">
+            {/* Left Sidebar - Compact Filters */}
+            <div className="w-72 flex-shrink-0">
+              <div className="sticky top-4">
+                {/* Header with Back Button */}
+                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl p-5 mb-5 shadow-xl">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h2 className="text-lg font-bold">📝 過去問検索</h2>
+                      <p className="text-sm opacity-90">"{query}"</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setQuery('')
+                        setSearchResults([])
+                      }}
+                      className="text-white/80 hover:text-white hover:bg-white/10 rounded-lg p-2 transition-colors"
+                      aria-label="検索をリセット"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  
+                  {userInfo && (
+                    <div className="text-xs opacity-80">
+                      {userInfo.university} {userInfo.faculty}
+                    </div>
+                  )}
+                </div>
+                
+                {/* Quick Filter Options */}
+                <div className="bg-white/70 backdrop-blur-sm border border-white/50 rounded-2xl shadow-xl p-3 space-y-2">
+                  <h3 className="font-semibold text-gray-900 text-sm">新しい検索</h3>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => {
+                        setQuery('')
+                        handleSectionSelect('professor')
+                      }}
+                      className="w-full p-2 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors text-left text-sm"
+                    >
+                      👨‍🏫 教授名で検索
+                    </button>
+                    <button
+                      onClick={() => {
+                        setQuery('')
+                        handleSectionSelect('subject')
+                      }}
+                      className="w-full p-2 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors text-left text-sm"
+                    >
+                      📚 授業検索
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Right Side - Search Results */}
+            <div className="flex-1 min-w-0">
+              <div className="bg-white/70 backdrop-blur-sm border border-white/50 rounded-2xl shadow-xl overflow-hidden h-full">
+                {/* Results Header */}
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-5 py-3 border-b border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900">検索結果</h3>
+                      <p className="text-gray-600 mt-1">&ldquo;{query}&rdquo; の結果を表示中</p>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm text-gray-500">
+                      <div className="flex items-center space-x-1">
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        <span>ライブ</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Results Content */}
+                <div className="p-5 h-[calc(100vh-260px)] overflow-y-auto">
+                  {renderSearchResults()}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
-              {/* Step-by-Step Content - Compact Overlay Style */}
-              {activeSection && (
-                <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center p-3" onClick={resetFlow}>
-                  <div className="glass-strong rounded-3xl p-5 sm:p-6 max-w-3xl w-full max-h-[85vh] overflow-y-auto animate-fade-in" onClick={(e) => e.stopPropagation()}>
+        {/* Step-by-Step Content - Compact Overlay Style */}
+        {activeSection && (
+          <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center p-3" onClick={resetFlow}>
+            <div className="glass-strong rounded-3xl p-5 sm:p-6 max-w-3xl w-full max-h-[85vh] overflow-y-auto animate-fade-in" onClick={(e) => e.stopPropagation()}>
                     
                     {/* Header with breadcrumb */}
                     <div className="flex items-center justify-between mb-6">
@@ -1167,6 +1252,8 @@ function SearchPageClient() {
                   {renderSearchResults()}
                 </div>
               </div>
+            </div>
+          </div>
             </div>
           </div>
         )}
