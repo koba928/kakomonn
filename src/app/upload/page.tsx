@@ -105,10 +105,9 @@ export default function UploadPage() {
     
     // 科目情報
     courseName: '',
-    courseCode: '',
     year: 2024,
     term: '',
-    targetAudiences: [] as string[],
+    targetAudiences: 'all-years' as string,
     
     // 試験情報
     examType: '',
@@ -174,30 +173,17 @@ export default function UploadPage() {
   //   return faculty?.departments || []
   // }, [formData.university, formData.faculty])
 
-  // 科目分類に基づいてターゲット層を生成
+  // 対象者のオプション（学年ベース）
   const availableTargetAudiences = useMemo((): TargetAudience[] => {
-    const baseTargets: TargetAudience[] = []
-    
-    if (formData.courseCategory === 'general') {
-      baseTargets.push(
-        { id: 'all-undergrad', name: '全学部生', description: 'すべての学部の学生' },
-        { id: 'lower-years', name: '下級生（1-2年）', description: '主に1-2年生向け' },
-        { id: 'upper-years', name: '上級生（3-4年）', description: '主に3-4年生向け' },
-        { id: 'all-years', name: '全学年', description: 'すべての学年' }
-      )
-    }
-    
-    if (formData.courseCategory === 'specialized') {
-      baseTargets.push(
-        { id: 'department-all', name: `${formData.department}全学年`, description: `${formData.department}のすべての学年` },
-        { id: 'department-lower', name: `${formData.department}下級生`, description: `${formData.department}の1-2年生` },
-        { id: 'department-upper', name: `${formData.department}上級生`, description: `${formData.department}の3-4年生` },
-        { id: 'related-departments', name: '関連学科生', description: '関連する他学科の学生' }
-      )
-    }
-    
-    return baseTargets
-  }, [formData.courseCategory, formData.department])
+    return [
+      { id: 'all-years', name: '学年問わず', description: 'すべての学年' },
+      { id: '1st-year', name: '1年生', description: '1年生向け' },
+      { id: '2nd-year', name: '2年生', description: '2年生向け' },
+      { id: '3rd-year', name: '3年生', description: '3年生向け' },
+      { id: '4th-year', name: '4年生', description: '4年生向け' },
+      { id: 'graduate', name: '大学院生', description: '大学院生向け' }
+    ]
+  }, [])
 
   // Get university options for autocomplete
   const universityOptions = useMemo(() => {
@@ -285,7 +271,7 @@ export default function UploadPage() {
         return formData.courseName !== '' && 
                formData.year > 0 && 
                formData.term !== '' &&
-               formData.targetAudiences.length > 0
+               formData.targetAudiences !== ''
       case 'examInfo':
         return formData.examType !== '' && selectedFile !== null
       case 'teacher':
@@ -303,11 +289,11 @@ export default function UploadPage() {
       { key: 'university', label: '大学', number: 1 },
       { key: 'faculty', label: '学部', number: 2 },
       { key: 'department', label: '学科', number: 3 },
-      { key: 'courseCategory', label: '科目分類', number: 4 },
-      { key: 'courseInfo', label: '科目情報', number: 5 },
-      { key: 'examInfo', label: '試験情報', number: 6 },
-      { key: 'teacher', label: '教員情報', number: 7 },
-      { key: 'confirm', label: '確認', number: 8 },
+      { key: 'courseCategory', label: '科目分類', number: 1 },
+      { key: 'courseInfo', label: '科目情報', number: 2 },
+      { key: 'examInfo', label: '試験情報', number: 3 },
+      { key: 'teacher', label: '教員情報', number: 4 },
+      { key: 'confirm', label: '確認', number: 5 },
     ]
 
     // Always skip university steps since login is required
@@ -380,14 +366,6 @@ export default function UploadPage() {
     }))
   }
 
-  const handleTargetAudienceToggle = (targetId: string) => {
-    setFormData(prev => ({
-      ...prev,
-      targetAudiences: prev.targetAudiences.includes(targetId)
-        ? prev.targetAudiences.filter(id => id !== targetId)
-        : [...prev.targetAudiences, targetId]
-    }))
-  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -557,10 +535,10 @@ export default function UploadPage() {
           ? formData.teachers.map(t => Number(t.difficulty) || 3).reduce((sum, val) => sum + val, 0) / formData.teachers.length 
           : 3, // 教員の難易度の平均を保存
         tags: formData.tags || [],
-        target_audiences: formData.targetAudiences.map(id => ({
-          id: id,
-          name: availableTargetAudiences.find(t => t.id === id)?.name || '不明'
-        }))
+        target_audiences: [{
+          id: formData.targetAudiences,
+          name: availableTargetAudiences.find(t => t.id === formData.targetAudiences)?.name || '不明'
+        }]
       }
 
       console.log('過去問データ保存開始:', pastExamData)
@@ -698,19 +676,6 @@ export default function UploadPage() {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  科目コード（任意）
-                </label>
-                <input
-                  type="text"
-                  value={formData.courseCode}
-                  onChange={(e) => setFormData(prev => ({ ...prev, courseCode: e.target.value }))}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  placeholder="例：MATH101"
-                />
-              </div>
-
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -752,24 +717,17 @@ export default function UploadPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   対象者 <span className="text-red-500">*</span>
                 </label>
-                <div className="space-y-2">
+                <select
+                  value={formData.targetAudiences}
+                  onChange={(e) => setFormData(prev => ({ ...prev, targetAudiences: e.target.value }))}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                >
                   {availableTargetAudiences.map(target => (
-                    <label key={target.id} className="flex items-start p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.targetAudiences.includes(target.id)}
-                        onChange={() => handleTargetAudienceToggle(target.id)}
-                        className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                      />
-                      <div className="ml-3">
-                        <span className="font-medium text-gray-900">{target.name}</span>
-                        {target.description && (
-                          <p className="text-sm text-gray-600">{target.description}</p>
-                        )}
-                      </div>
-                    </label>
+                    <option key={target.id} value={target.id}>
+                      {target.name}
+                    </option>
                   ))}
-                </div>
+                </select>
               </div>
             </div>
           </div>
@@ -1042,12 +1000,6 @@ export default function UploadPage() {
                     <dt className="font-medium text-gray-600 w-24">科目名:</dt>
                     <dd className="text-gray-900">{formData.courseName}</dd>
                   </div>
-                  {formData.courseCode && (
-                    <div className="flex">
-                      <dt className="font-medium text-gray-600 w-24">科目コード:</dt>
-                      <dd className="text-gray-900">{formData.courseCode}</dd>
-                    </div>
-                  )}
                   <div className="flex">
                     <dt className="font-medium text-gray-600 w-24">年度:</dt>
                     <dd className="text-gray-900">{formData.year}年度</dd>
