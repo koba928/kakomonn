@@ -23,7 +23,7 @@ function HomeContent() {
         {/* プラスマークで投稿ボタン */}
         <FloatingActionButton
           icon={<PlusIcon size={24} />}
-          onClick={() => window?.location && (window.location.href = '/upload')}
+          onClick={() => window?.location && (window.location.href = '/auth/email?redirect=/upload')}
           position="bottom-right"
           aria-label="投稿する"
         />
@@ -41,7 +41,7 @@ function HomeContent() {
       {/* プラスマークで投稿ボタン */}
       <FloatingActionButton
         icon={<PlusIcon size={24} />}
-        onClick={() => window.location.href = '/upload'}
+        onClick={() => window.location.href = '/auth/email?redirect=/upload'}
         position="bottom-right"
         aria-label="投稿する"
       />
