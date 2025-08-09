@@ -68,12 +68,16 @@ const EXAM_TYPE_OPTIONS = [
 ]
 
 const COURSE_CATEGORIES = [
-  { value: 'general', label: '全学共通科目', description: '全学部生が履修可能な共通科目' },
-  { value: 'faculty-wide', label: '学部共通科目', description: '学部内の全学科で共通の科目' },
-  { value: 'faculty-core', label: '学部基幹科目', description: '学部の中核となる重要科目' },
-  { value: 'department-core', label: '学科専門科目', description: '学科の専門教育科目' },
-  { value: 'department-advanced', label: '学科発展科目', description: '高度な専門知識を扱う科目' },
-  { value: 'other', label: 'その他', description: '上記に当てはまらない科目' },
+  { 
+    value: 'specialized', 
+    label: '専門科目', 
+    description: '学部・学科の専門科目（検索時に専門科目として検索されます）' 
+  },
+  { 
+    value: 'general', 
+    label: '一般科目', 
+    description: '全学共通・教養科目（検索時に一般科目として検索されます）' 
+  },
 ]
 
 const TEACHER_POSITIONS = [
@@ -90,7 +94,31 @@ export default function UploadPage() {
   const isLoggedIn = !!user
   const formErrorHandler = useFormErrorHandler()
   
-  const [currentStep, setCurrentStep] = useState<Step>('university')
+  // ログインしていない場合はログインページに誘導
+  if (!isLoggedIn) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 flex items-center justify-center">
+        <div className="bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-gray-100 text-center max-w-md">
+          <div className="text-6xl mb-4">🔒</div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">ログインが必要です</h1>
+          <p className="text-gray-600 mb-6">
+            過去問を投稿するにはログインが必要です。<br />
+            ログイン後、大学情報が自動入力されて便利です！
+          </p>
+          <div className="space-y-3">
+            <Link href="/auth/email" className="block w-full bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors">
+              ログイン・新規登録
+            </Link>
+            <Link href="/" className="block w-full text-gray-600 hover:text-gray-800 transition-colors">
+              ホームに戻る
+            </Link>
+          </div>
+        </div>
+      </main>
+    )
+  }
+  
+  const [currentStep, setCurrentStep] = useState<Step>('courseCategory')
   const [showTeacherSearchModal, setShowTeacherSearchModal] = useState(false)
   const [formData, setFormData] = useState({
     // 基本情報
@@ -339,10 +367,8 @@ export default function UploadPage() {
       { key: 'confirm', label: '確認', number: 8 },
     ]
 
-    // Skip university steps for logged-in users
-    const displaySteps = user && isLoggedIn 
-      ? steps.filter(s => !['university', 'faculty', 'department'].includes(s.key))
-      : steps
+    // Always skip university steps since login is required
+    const displaySteps = steps.filter(s => !['university', 'faculty', 'department'].includes(s.key))
 
     const getCurrentStepNumber = () => {
       const step = steps.find(s => s.key === currentStep)
@@ -684,8 +710,8 @@ export default function UploadPage() {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">科目の分類を選択してください</h2>
-              <p className="text-gray-600">該当する科目の種類を選んでください</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">科目タイプを選択してください</h2>
+              <p className="text-gray-600">検索ページと同じ分類で、どちらのタイプか選んでください</p>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1167,8 +1193,6 @@ export default function UploadPage() {
     }
   }
 
-  // Skip login check for logged-in users
-  const canProceed = user && isLoggedIn && ['university', 'faculty', 'department'].includes(currentStep)
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50">
@@ -1195,9 +1219,9 @@ export default function UploadPage() {
             <div className="flex justify-between items-center mt-8">
               <button
                 onClick={goToPrevStep}
-                disabled={currentStep === 'university' || (!!user && !!isLoggedIn && currentStep === 'courseCategory')}
+                disabled={currentStep === 'courseCategory'}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                  currentStep === 'university' || (!!user && !!isLoggedIn && currentStep === 'courseCategory')
+                  currentStep === 'courseCategory'
                     ? 'text-gray-400 cursor-not-allowed'
                     : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                 }`}
@@ -1208,7 +1232,7 @@ export default function UploadPage() {
               
               <AnimatedButton
                 variant="primary"
-                disabled={!isStepValid() && !canProceed}
+                disabled={!isStepValid()}
                 onClick={currentStep === 'confirm' ? handleSubmit : goToNextStep}
                 className="flex items-center gap-2"
               >
