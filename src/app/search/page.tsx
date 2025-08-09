@@ -728,66 +728,73 @@ function SearchPageClient() {
           </div>
         </div>
 
-        {/* Main Selection Interface - Fullscreen */}
-        <div className="min-h-[calc(100vh-120px)] flex flex-col justify-center">
-          <div className="text-center mb-8 sm:mb-12">
-            <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4 sm:py-6 px-6 sm:px-8 rounded-2xl shadow-lg mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold mb-2">📝 過去問データベース</h2>
-              <p className="text-sm sm:text-lg opacity-90">あなたの学部に合わせた過去問を簡単検索</p>
+        {/* Main Interface - Left-Right Layout */}
+        <div className="flex gap-6 min-h-[calc(100vh-200px)]">
+          {/* Left Sidebar - Search Filters */}
+          <div className="w-80 flex-shrink-0">
+            <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 px-4 rounded-xl shadow-lg mb-4">
+              <h2 className="text-lg font-bold mb-1">📝 過去問検索</h2>
+              <p className="text-sm opacity-90">条件を選択して検索</p>
             </div>
             
             {userInfo && (
-              <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3 sm:p-4 mb-6 max-w-2xl mx-auto">
-                <div className="flex items-center justify-center space-x-2 text-sm sm:text-base">
+              <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3 mb-4">
+                <div className="flex items-center space-x-2 text-sm">
                   <span className="text-indigo-600">🏫</span>
-                  <span className="text-indigo-800 font-medium">{userInfo.university} {userInfo.faculty}</span>
-                  <span className="text-indigo-600 hidden sm:inline">の情報を優先表示中</span>
+                  <div className="text-indigo-800 font-medium">
+                    <div>{userInfo.university}</div>
+                    <div className="text-xs">{userInfo.faculty}</div>
+                  </div>
                 </div>
               </div>
             )}
-          </div>
           
-          {/* Step-by-step Flow - Centered and Fullscreen */}
-          <div className="flex-1 flex items-center justify-center px-4 sm:px-6">
-            <div className="max-w-4xl w-full">
+          {/* Filter Content */}
+          <div className="space-y-4">
               {/* Step 1: Main Section Selection */}
               {!activeSection && (
-                <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8">
-                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-6 text-center">まず、検索方法を選択してください</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+                  <h3 className="text-base font-bold text-gray-900 mb-4">検索方法を選択</h3>
+                  <div className="space-y-3">
                     <button
                       onClick={() => handleSectionSelect('professor')}
-                      className="group p-6 sm:p-8 bg-gradient-to-br from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl hover:from-yellow-100 hover:to-orange-100 hover:shadow-md transition-all duration-200"
+                      className="w-full p-3 bg-gradient-to-br from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg hover:from-yellow-100 hover:to-orange-100 hover:shadow-sm transition-all duration-200 text-left"
                     >
-                      <div className="text-center">
-                        <div className="text-4xl sm:text-5xl mb-4">👨‍🏫</div>
-                        <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">教授名で検索</h4>
-                        <p className="text-sm sm:text-base text-gray-600">教授名から授業を特定</p>
-                        <p className="text-xs sm:text-sm text-orange-600 mt-2 font-medium">おすすめ・最速</p>
+                      <div className="flex items-center space-x-3">
+                        <div className="text-2xl">👨‍🏫</div>
+                        <div>
+                          <h4 className="text-sm font-bold text-gray-900">教授名で検索</h4>
+                          <p className="text-xs text-gray-600">教授名から授業を特定</p>
+                          <p className="text-xs text-orange-600 font-medium">おすすめ・最速</p>
+                        </div>
                       </div>
                     </button>
                     
                     <button
                       onClick={() => handleSectionSelect('specialized')}
-                      className="group p-6 sm:p-8 bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl hover:from-indigo-100 hover:to-purple-100 hover:shadow-md transition-all duration-200"
+                      className="w-full p-3 bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 rounded-lg hover:from-indigo-100 hover:to-purple-100 hover:shadow-sm transition-all duration-200 text-left"
                     >
-                      <div className="text-center">
-                        <div className="text-4xl sm:text-5xl mb-4">🎓</div>
-                        <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">学部専門科目</h4>
-                        <p className="text-sm sm:text-base text-gray-600">メジャーの専門的な科目</p>
-                        <p className="text-xs sm:text-sm text-indigo-600 mt-2 font-medium">学科専門 / その他</p>
+                      <div className="flex items-center space-x-3">
+                        <div className="text-2xl">🎓</div>
+                        <div>
+                          <h4 className="text-sm font-bold text-gray-900">学部専門科目</h4>
+                          <p className="text-xs text-gray-600">メジャーの専門的な科目</p>
+                          <p className="text-xs text-indigo-600 font-medium">学科専門 / その他</p>
+                        </div>
                       </div>
                     </button>
                     
                     <button
                       onClick={() => handleSectionSelect('general')}
-                      className="group p-6 sm:p-8 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl hover:from-green-100 hover:to-emerald-100 hover:shadow-md transition-all duration-200"
+                      className="w-full p-3 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg hover:from-green-100 hover:to-emerald-100 hover:shadow-sm transition-all duration-200 text-left"
                     >
-                      <div className="text-center">
-                        <div className="text-4xl sm:text-5xl mb-4">🌍</div>
-                        <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">全学共通科目</h4>
-                        <p className="text-sm sm:text-base text-gray-600">教養・言語・基礎科目</p>
-                        <p className="text-xs sm:text-sm text-green-600 mt-2 font-medium">言語 / 教養 / その他</p>
+                      <div className="flex items-center space-x-3">
+                        <div className="text-2xl">🌍</div>
+                        <div>
+                          <h4 className="text-sm font-bold text-gray-900">全学共通科目</h4>
+                          <p className="text-xs text-gray-600">教養・言語・基礎科目</p>
+                          <p className="text-xs text-green-600 font-medium">言語 / 教養 / その他</p>
+                        </div>
                       </div>
                     </button>
                   </div>
@@ -796,41 +803,44 @@ function SearchPageClient() {
 
               {/* Step 2: Specialized Category Selection */}
               {activeSection === 'specialized' && specializedStep === 'category' && (
-                <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8">
-                  <div className="flex items-center justify-between mb-6">
+                <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+                  <div className="flex items-center justify-between mb-3">
                     <div>
-                      <span className="text-sm text-indigo-600 font-medium">学部専門科目</span>
-                      <h3 className="text-lg sm:text-xl font-bold text-gray-900">専門分野を選択してください</h3>
+                      <span className="text-xs text-indigo-600 font-medium">学部専門科目</span>
+                      <h3 className="text-sm font-bold text-gray-900">専門分野を選択</h3>
                     </div>
                     <button
                       onClick={resetFlow}
-                      className="text-gray-400 hover:text-gray-600 transition-colors p-2"
+                      className="text-gray-400 hover:text-gray-600 transition-colors p-1 text-xs"
                     >
-                      <span className="hidden sm:inline">← 戻る</span>
-                      <span className="sm:hidden">←</span>
+                      ← 戻る
                     </button>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                  <div className="space-y-3">
                     <button
                       onClick={() => handleSpecializedCategorySelect('department')}
-                      className="group p-6 sm:p-8 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl hover:from-blue-100 hover:to-indigo-100 hover:shadow-md transition-all duration-200"
+                      className="w-full p-3 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg hover:from-blue-100 hover:to-indigo-100 hover:shadow-sm transition-all duration-200 text-left"
                     >
-                      <div className="text-center">
-                        <div className="text-4xl sm:text-5xl mb-3 sm:mb-4 ">🏛️</div>
-                        <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">学科専門</h4>
-                        <p className="text-sm sm:text-base text-gray-600">学科に直接関連する専門科目</p>
+                      <div className="flex items-center space-x-3">
+                        <div className="text-xl">🏛️</div>
+                        <div>
+                          <h4 className="text-sm font-bold text-gray-900">学科専門</h4>
+                          <p className="text-xs text-gray-600">学科に直接関連する専門科目</p>
+                        </div>
                       </div>
                     </button>
                     
                     <button
                       onClick={() => handleSpecializedCategorySelect('other')}
-                      className="group p-6 sm:p-8 bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-xl hover:from-purple-100 hover:to-pink-100 hover:shadow-md transition-all duration-200"
+                      className="w-full p-3 bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-lg hover:from-purple-100 hover:to-pink-100 hover:shadow-sm transition-all duration-200 text-left"
                     >
-                      <div className="text-center">
-                        <div className="text-4xl sm:text-5xl mb-3 sm:mb-4 ">📚</div>
-                        <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">その他</h4>
-                        <p className="text-sm sm:text-base text-gray-600">関連する専門分野の科目</p>
+                      <div className="flex items-center space-x-3">
+                        <div className="text-xl">📚</div>
+                        <div>
+                          <h4 className="text-sm font-bold text-gray-900">その他</h4>
+                          <p className="text-xs text-gray-600">関連する専門分野の科目</p>
+                        </div>
                       </div>
                     </button>
                   </div>
@@ -839,52 +849,57 @@ function SearchPageClient() {
 
               {/* Step 2: General Genre Selection */}
               {activeSection === 'general' && generalStep === 'genre' && (
-                <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8">
-                  <div className="flex items-center justify-between mb-6">
+                <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+                  <div className="flex items-center justify-between mb-3">
                     <div>
-                      <span className="text-sm text-green-600 font-medium">全学共通科目</span>
-                      <h3 className="text-lg sm:text-xl font-bold text-gray-900">ジャンルを選択してください</h3>
+                      <span className="text-xs text-green-600 font-medium">全学共通科目</span>
+                      <h3 className="text-sm font-bold text-gray-900">ジャンルを選択</h3>
                     </div>
                     <button
                       onClick={resetFlow}
-                      className="text-gray-400 hover:text-gray-600 transition-colors p-2"
+                      className="text-gray-400 hover:text-gray-600 transition-colors p-1 text-xs"
                     >
-                      <span className="hidden sm:inline">← 戻る</span>
-                      <span className="sm:hidden">←</span>
+                      ← 戻る
                     </button>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="space-y-3">
                     <button
                       onClick={() => handleGeneralGenreSelect('language')}
-                      className="group p-6 bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 rounded-xl hover:from-blue-100 hover:to-cyan-100 hover:shadow-md transition-all duration-200"
+                      className="w-full p-3 bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 rounded-lg hover:from-blue-100 hover:to-cyan-100 hover:shadow-sm transition-all duration-200 text-left"
                     >
-                      <div className="text-center">
-                        <div className="text-3xl sm:text-4xl mb-3 ">💬</div>
-                        <h4 className="text-lg font-bold text-gray-900 mb-2">言語科目</h4>
-                        <p className="text-sm text-gray-600">外国語・コミュニケーション</p>
+                      <div className="flex items-center space-x-3">
+                        <div className="text-xl">💬</div>
+                        <div>
+                          <h4 className="text-sm font-bold text-gray-900">言語科目</h4>
+                          <p className="text-xs text-gray-600">外国語・コミュニケーション</p>
+                        </div>
                       </div>
                     </button>
                     
                     <button
                       onClick={() => handleGeneralGenreSelect('liberal')}
-                      className="group p-6 bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-200 rounded-xl hover:from-purple-100 hover:to-violet-100 hover:shadow-md transition-all duration-200"
+                      className="w-full p-3 bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-200 rounded-lg hover:from-purple-100 hover:to-violet-100 hover:shadow-sm transition-all duration-200 text-left"
                     >
-                      <div className="text-center">
-                        <div className="text-3xl sm:text-4xl mb-3 ">🧠</div>
-                        <h4 className="text-lg font-bold text-gray-900 mb-2">教養科目</h4>
-                        <p className="text-sm text-gray-600">人文・社会・自然科学</p>
+                      <div className="flex items-center space-x-3">
+                        <div className="text-xl">🧠</div>
+                        <div>
+                          <h4 className="text-sm font-bold text-gray-900">教養科目</h4>
+                          <p className="text-xs text-gray-600">人文・社会・自然科学</p>
+                        </div>
                       </div>
                     </button>
                     
                     <button
                       onClick={() => handleGeneralGenreSelect('other')}
-                      className="group p-6 bg-gradient-to-br from-orange-50 to-red-50 border border-orange-200 rounded-xl hover:from-orange-100 hover:to-red-100 hover:shadow-md transition-all duration-200"
+                      className="w-full p-3 bg-gradient-to-br from-orange-50 to-red-50 border border-orange-200 rounded-lg hover:from-orange-100 hover:to-red-100 hover:shadow-sm transition-all duration-200 text-left"
                     >
-                      <div className="text-center">
-                        <div className="text-3xl sm:text-4xl mb-3 ">🏃</div>
-                        <h4 className="text-lg font-bold text-gray-900 mb-2">その他</h4>
-                        <p className="text-sm text-gray-600">実技・基礎・実験科目</p>
+                      <div className="flex items-center space-x-3">
+                        <div className="text-xl">🏃</div>
+                        <div>
+                          <h4 className="text-sm font-bold text-gray-900">その他</h4>
+                          <p className="text-xs text-gray-600">実技・基礎・実験科目</p>
+                        </div>
                       </div>
                     </button>
                   </div>
@@ -893,36 +908,35 @@ function SearchPageClient() {
 
               {/* Professor Search Flow */}
               {activeSection === 'professor' && professorStep === 'search' && (
-                <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8">
-                  <div className="flex items-center justify-between mb-6">
+                <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+                  <div className="flex items-center justify-between mb-3">
                     <div>
-                      <span className="text-sm text-orange-600 font-medium">教授名検索</span>
-                      <h3 className="text-lg sm:text-xl font-bold text-gray-900">教授名を入力してください</h3>
+                      <span className="text-xs text-orange-600 font-medium">教授名検索</span>
+                      <h3 className="text-sm font-bold text-gray-900">教授名を入力</h3>
                       {userInfo && (
-                        <p className="text-sm text-gray-600 mt-1">{userInfo.university} {userInfo.faculty} の教授を検索</p>
+                        <p className="text-xs text-gray-600 mt-1">{userInfo.university} {userInfo.faculty}</p>
                       )}
                     </div>
                     <button
                       onClick={resetFlow}
-                      className="text-gray-400 hover:text-gray-600 transition-colors p-2"
+                      className="text-gray-400 hover:text-gray-600 transition-colors p-1 text-xs"
                     >
-                      <span className="hidden sm:inline">← 戻る</span>
-                      <span className="sm:hidden">←</span>
+                      ← 戻る
                     </button>
                   </div>
                   
                   {/* Professor Search Input */}
-                  <div className="mb-6">
+                  <div className="mb-4">
                     <div className="relative">
                       <input
                         type="text"
                         value={professorQuery}
                         onChange={(e) => setProfessorQuery(e.target.value)}
-                        placeholder="教授名を入力... (例: 田中、佐藤)"
-                        className="w-full px-4 py-4 pl-12 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        placeholder="教授名を入力... (例: 田中)"
+                        className="w-full px-3 py-2 pl-8 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                       />
-                      <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                        <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="absolute left-2 top-1/2 transform -translate-y-1/2">
+                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                       </div>
@@ -931,7 +945,7 @@ function SearchPageClient() {
 
                   {/* Professor Results */}
                   {professorQuery && userInfo && (
-                    <div className="space-y-3 max-h-96 overflow-y-auto">
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
                       {getAllProfessorsForUser(userInfo.university, userInfo.faculty)
                         .filter(prof => prof.professor.toLowerCase().includes(professorQuery.toLowerCase()))
                         .map((prof, index) => (
@@ -941,17 +955,14 @@ function SearchPageClient() {
                               setSelectedProfessor(prof.professor)
                               setProfessorStep('courses')
                             }}
-                            className="w-full p-4 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 hover:shadow-md transition-all text-left"
+                            className="w-full p-2 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 hover:shadow-sm transition-all text-left"
                           >
-                            <div className="flex items-center space-x-3">
-                              <div className="text-2xl">👨‍🏫</div>
-                              <div>
-                                <h4 className="font-bold text-gray-900">{prof.professor} 教授</h4>
-                                <p className="text-sm text-gray-600">
-                                  {prof.courses.length}つの授業 • {prof.courses.reduce((total, course) => total + course.years.length, 0)}年分の過去問
-                                </p>
-                                <p className="text-xs text-orange-600 mt-1">
-                                  {prof.courses.map(c => c.name).join(', ')}
+                            <div className="flex items-center space-x-2">
+                              <div className="text-lg">👨‍🏫</div>
+                              <div className="min-w-0 flex-1">
+                                <h4 className="text-sm font-bold text-gray-900 truncate">{prof.professor} 教授</h4>
+                                <p className="text-xs text-gray-600">
+                                  {prof.courses.length}授業 • {prof.courses.reduce((total, course) => total + course.years.length, 0)}年分
                                 </p>
                               </div>
                             </div>
@@ -961,9 +972,9 @@ function SearchPageClient() {
                       {/* No results */}
                       {getAllProfessorsForUser(userInfo.university, userInfo.faculty)
                         .filter(prof => prof.professor.toLowerCase().includes(professorQuery.toLowerCase())).length === 0 && (
-                        <div className="text-center py-8">
-                          <p className="text-gray-500 mb-2">「{professorQuery}」に該当する教授が見つかりませんでした</p>
-                          <p className="text-sm text-gray-400">別の名前で検索してみてください</p>
+                        <div className="text-center py-4">
+                          <p className="text-xs text-gray-500 mb-1">「{professorQuery}」が見つかりません</p>
+                          <p className="text-xs text-gray-400">別の名前で検索してみてください</p>
                         </div>
                       )}
                     </div>
@@ -1085,14 +1096,32 @@ function SearchPageClient() {
               )}
             </div>
           </div>
-        </div>
-
-        {/* 検索結果の表示 */}
-        {query && (
-          <div className="container mx-auto px-4 py-8 max-w-6xl">
-            {renderSearchResults()}
+          
+          {/* Right Side - Search Results */}
+          <div className="flex-1 min-w-0">
+            <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4 h-full">
+              {query ? (
+                <div>
+                  <div className="mb-4 pb-3 border-b border-gray-200">
+                    <h3 className="text-lg font-bold text-gray-900">検索結果</h3>
+                    <p className="text-sm text-gray-600">"{query}" の検索結果</p>
+                  </div>
+                  <div className="max-h-[calc(100vh-300px)] overflow-y-auto">
+                    {renderSearchResults()}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-full text-center">
+                  <div>
+                    <div className="text-6xl mb-4">🔍</div>
+                    <h3 className="text-lg font-bold text-gray-700 mb-2">検索結果がここに表示されます</h3>
+                    <p className="text-gray-500">左側から検索条件を選択してください</p>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        )}
+        </div>
 
       </div>
     </div>
