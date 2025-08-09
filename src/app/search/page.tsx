@@ -754,24 +754,25 @@ function SearchPageClient() {
       )}
       
       
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+      <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-2 sm:py-4">
+        {/* Header - モバイル圧縮版 */}
+        <div className="flex items-center justify-between mb-3 sm:mb-6">
           <Link 
             href="/" 
-            className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"
+            className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"
           >
             KakoMoNN
           </Link>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             {userInfo && (
               <Link href="/profile">
-                <div className="text-sm text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full hover:bg-indigo-100 transition-colors cursor-pointer">
-                  👤 {userInfo.penName || 'ゲストユーザー'} ({userInfo.university})
+                <div className="text-xs sm:text-sm text-indigo-600 bg-indigo-50 px-2 py-1 sm:px-3 rounded-full hover:bg-indigo-100 transition-colors cursor-pointer">
+                  <span className="hidden sm:inline">👤 {userInfo.penName || 'ゲストユーザー'} ({userInfo.university})</span>
+                  <span className="sm:hidden">👤 {userInfo.university}</span>
                 </div>
               </Link>
             )}
-            <div className="text-sm text-gray-500">
+            <div className="text-xs sm:text-sm text-gray-500 hidden md:block">
               {query ? (
                 `"${query}" の検索結果${activeSection ? ` - ${activeSection === 'subject' ? '授業検索' : '教授検索'}` : ''}`
               ) : activeSection ? (
@@ -786,103 +787,95 @@ function SearchPageClient() {
         </div>
 
         {!query ? (
-          /* BEFORE SEARCH: Search-Focused Layout */
-          <div className="min-h-[calc(100vh-40px)] px-3 sm:px-4 lg:px-6 animate-fade-in">
+          /* BEFORE SEARCH: モバイル一画面対応の検索レイアウト */
+          <div className="min-h-[calc(100vh-80px)] animate-fade-in">
             <div className="w-full max-w-4xl mx-auto">
-              {/* Top Info Bar - Small & Compact */}
-              <div className="flex flex-col sm:flex-row justify-between items-center py-4 mb-8 border-b border-gray-100">
+              {/* Top Info Bar - 超コンパクト */}
+              <div className="flex flex-col sm:flex-row justify-between items-center py-2 sm:py-4 mb-4 sm:mb-8 border-b border-gray-100">
                 {/* Left: Welcome message */}
-                <div className="text-left mb-3 sm:mb-0">
-                  <h1 className="text-lg sm:text-xl font-semibold text-gray-900 mb-1">
+                <div className="text-center sm:text-left mb-2 sm:mb-0">
+                  <h1 className="text-base sm:text-lg font-semibold text-gray-900">
                     過去問検索
                   </h1>
-                  <p className="text-xs sm:text-sm text-gray-500">
+                  <p className="text-xs text-gray-500 hidden sm:block">
                     検索方法を選んでください
                   </p>
                 </div>
                 
-                {/* Right: User Info */}
+                {/* Right: User Info - モバイルで縮小 */}
                 {userInfo && (
-                  <div className="flex items-center space-x-2 bg-gray-50 rounded-lg px-3 py-2">
-                    <div className="w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-md flex items-center justify-center">
+                  <div className="flex items-center space-x-1.5 bg-gray-50 rounded-lg px-2 py-1.5 sm:px-3 sm:py-2">
+                    <div className="w-4 h-4 sm:w-6 sm:h-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-md flex items-center justify-center">
                       <span className="text-xs text-white">🏫</span>
                     </div>
                     <div className="text-left">
                       <p className="text-xs font-medium text-gray-900">{userInfo.university}</p>
-                      <p className="text-xs text-gray-500">{userInfo.faculty}</p>
+                      <p className="text-xs text-gray-500 hidden sm:block">{userInfo.faculty}</p>
                     </div>
                   </div>
                 )}
               </div>
               
-              {/* Main Content Container */}
-              <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-                <div className="w-full">
-
-
-              {/* Main Search Selection - Prominent Center Layout */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                {/* Professor Search Card - Large & Prominent */}
+              {/* Main Search Selection - モバイル最適化 */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 px-2 sm:px-0">
+                {/* Professor Search Card - モバイル圧縮版 */}
                 <button 
-                  className="group cursor-pointer transform transition-all duration-300 hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-orange-500/50 focus:ring-offset-4"
+                  className="group cursor-pointer transform transition-all duration-300 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-orange-500/50"
                   onClick={() => handleSectionSelect('professor')}
                   aria-label="教授名で検索を開始する"
                 >
-                  <div className="bg-gradient-to-br from-orange-50 to-red-50 border-2 border-orange-200 rounded-2xl p-8 text-center h-full relative overflow-hidden shadow-lg group-hover:shadow-xl group-hover:border-orange-300 transition-all duration-300">
-                    <div className="absolute top-4 right-4 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-lg shadow-lg">
+                  <div className="bg-gradient-to-br from-orange-50 to-red-50 border-2 border-orange-200 rounded-xl p-4 sm:p-6 text-center h-full relative overflow-hidden shadow-lg group-hover:shadow-xl group-hover:border-orange-300 transition-all duration-300">
+                    <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-1.5 py-0.5 rounded shadow-lg">
                       推奨
                     </div>
-                    <div className="mb-6">
-                      <div className="text-6xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <div className="mb-4">
+                      <div className="text-4xl sm:text-5xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300">
                         👨‍🏫
                       </div>
-                      <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 group-hover:text-orange-600 transition-colors">
+                      <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 group-hover:text-orange-600 transition-colors">
                         教授名で検索
                       </h2>
-                      <p className="text-gray-600 text-base sm:text-lg leading-relaxed">
+                      <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
                         教授名から授業を特定<br />
                         <span className="font-semibold text-orange-600">最も確実で高速</span>
                       </p>
                     </div>
-                    <div className="inline-flex items-center bg-orange-500 text-white px-6 py-3 rounded-full font-bold group-hover:bg-orange-600 transition-colors shadow-lg">
+                    <div className="inline-flex items-center bg-orange-500 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-full font-bold group-hover:bg-orange-600 transition-colors shadow-lg text-sm">
                       検索開始
-                      <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                       </svg>
                     </div>
                   </div>
                 </button>
 
-                {/* Subject Search Card - Large & Prominent */}
+                {/* Subject Search Card - モバイル圧縮版 */}
                 <button 
-                  className="group cursor-pointer transform transition-all duration-300 hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-indigo-500/50 focus:ring-offset-4"
+                  className="group cursor-pointer transform transition-all duration-300 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                   onClick={() => handleSectionSelect('subject')}
                   aria-label="授業名で検索を開始する"
                 >
-                  <div className="bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-2xl p-8 text-center h-full relative overflow-hidden shadow-lg group-hover:shadow-xl group-hover:border-indigo-300 transition-all duration-300">
-                    <div className="mb-6">
-                      <div className="text-6xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <div className="bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-xl p-4 sm:p-6 text-center h-full relative overflow-hidden shadow-lg group-hover:shadow-xl group-hover:border-indigo-300 transition-all duration-300">
+                    <div className="mb-4">
+                      <div className="text-4xl sm:text-5xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300">
                         📚
                       </div>
-                      <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 group-hover:text-indigo-600 transition-colors">
+                      <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors">
                         授業名で検索
                       </h2>
-                      <p className="text-gray-600 text-base sm:text-lg leading-relaxed">
+                      <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
                         科目名から過去問を<br />
                         <span className="font-semibold text-indigo-600">直接検索</span>
                       </p>
                     </div>
-                    <div className="inline-flex items-center bg-indigo-500 text-white px-6 py-3 rounded-full font-bold group-hover:bg-indigo-600 transition-colors shadow-lg">
+                    <div className="inline-flex items-center bg-indigo-500 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-full font-bold group-hover:bg-indigo-600 transition-colors shadow-lg text-sm">
                       検索開始
-                      <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                       </svg>
                     </div>
                   </div>
                 </button>
-              </div>
-
-                </div>
               </div>
             </div>
           </div>

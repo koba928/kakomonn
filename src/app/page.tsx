@@ -73,15 +73,15 @@ export default function Home() {
             </p>
 
             {/* メインアクション - モバイル最適化 */}
-            <nav className="flex flex-col gap-3 sm:flex-row sm:justify-center sm:gap-4 animate-fade-in" aria-label="メインナビゲーション">
-              <Link href={mainButtonHref} className="w-full sm:w-auto">
-                <AnimatedButton variant="primary" size="md" aria-label="過去問を検索する" className="w-full justify-center">
+            <nav className="flex flex-col gap-3 sm:flex-row sm:justify-center sm:gap-4 animate-fade-in max-w-sm mx-auto sm:max-w-none" aria-label="メインナビゲーション">
+              <Link href={mainButtonHref} className="flex-1 sm:flex-initial">
+                <AnimatedButton variant="primary" size="md" aria-label="過去問を検索する" className="w-full justify-center max-w-xs mx-auto sm:mx-0">
                   <SearchIcon size={20} aria-hidden={true} />
                   過去問を探す
                 </AnimatedButton>
               </Link>
-              <Link href="/auth/email?redirect=/upload" className="w-full sm:w-auto">
-                <AnimatedButton variant="secondary" size="md" aria-label="過去問を投稿する" className="w-full justify-center">
+              <Link href="/auth/email?redirect=/upload" className="flex-1 sm:flex-initial">
+                <AnimatedButton variant="secondary" size="md" aria-label="過去問を投稿する" className="w-full justify-center max-w-xs mx-auto sm:mx-0">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
