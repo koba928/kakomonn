@@ -860,7 +860,7 @@ function SearchPageClient() {
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <h2 className="text-lg font-bold">📝 過去問検索</h2>
-                      <p className="text-sm opacity-90">"{query}"</p>
+                      <p className="text-sm opacity-90">&ldquo;{query}&rdquo;</p>
                     </div>
                     <button
                       onClick={() => {
