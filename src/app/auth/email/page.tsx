@@ -2,10 +2,10 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { useAuthContext } from '@/components/providers/AuthProvider'
+import { useAuth } from '@/hooks/useAuth'
 
 export default function EmailAuthPage() {
-  const { signIn, signUp } = useAuthContext()
+  const { signIn, signUp } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -15,41 +15,26 @@ export default function EmailAuthPage() {
   const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log('handleSubmit開始')
     e.preventDefault()
     setError('')
     
-    console.log('フォームバリデーション開始:', { isLogin, email, password, confirmPassword })
-    
     if (!isLogin && password !== confirmPassword) {
-      console.log('パスワード不一致エラー')
       setError('パスワードが一致しません')
       return
     }
     
-    console.log('フォームバリデーション通過')
     setIsLoading(true)
-    
-    // デバッグログ
-    console.log('認証開始:', { isLogin, email })
-    console.log('環境変数確認:', {
-      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
-      hasAnonKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    })
     
     try {
       if (isLogin) {
-        console.log('ログイン処理開始')
-        const { error } = await signIn(email, password)
+        const { data, error } = await signIn(email, password)
         if (error) {
           console.error('ログインエラー:', error)
-          setError(error.message)
+          setError(error.message || 'ログインに失敗しました')
         } else {
-          console.log('ログイン成功')
           window.location.href = '/search'
         }
       } else {
-        console.log('新規登録処理開始')
         // 新規登録の場合は大学情報も必要
         const emailName = email.split('@')[0] || 'user'
         const userData = {
@@ -61,16 +46,13 @@ export default function EmailAuthPage() {
           year: 1,
           pen_name: emailName
         }
-        console.log('ユーザーデータ:', userData)
-        console.log('signUp関数呼び出し前')
+        
         const result = await signUp(email, password, userData)
-        console.log('signUp関数呼び出し後:', result)
         
         if (result.error) {
           console.error('新規登録エラー:', result.error)
           setError(result.error.message || '新規登録に失敗しました')
         } else {
-          console.log('新規登録成功')
           window.location.href = '/auth/university-info'
         }
       }
@@ -223,7 +205,6 @@ export default function EmailAuthPage() {
                 : 'bg-indigo-600 text-white hover:bg-indigo-700'
             }`}
             disabled={!isFormValid() || isLoading}
-            onClick={() => console.log('ボタンクリック:', { isFormValid: isFormValid(), isLoading })}
           >
             {isLoading ? (isLogin ? 'ログイン中...' : '作成中...') : (isLogin ? 'ログイン' : 'アカウント作成')}
           </button>
