@@ -100,12 +100,10 @@ interface Course {
 // }
 */
 
-type MainSection = 'specialized' | 'general' | 'professor'
+type MainSection = 'subject' | 'professor'
 type UniversityStep = 'university' | 'faculty' | 'department' | 'year' | 'penname'
-type SpecializedStep = 'category' | 'subject'
-type SpecializedCategory = 'department' | 'other'
-type GeneralStep = 'genre' | 'subject'
-type GeneralGenre = 'language' | 'liberal' | 'other'
+type SubjectStep = 'type' | 'search'
+type SubjectType = 'specialized' | 'general'
 type ProfessorStep = 'search' | 'courses' | 'years'
 
 
@@ -166,10 +164,8 @@ function SearchPageClient() {
   const [isLoadingProfile, setIsLoadingProfile] = useState(true)
   
   // New state for step-by-step flow
-  const [specializedStep, setSpecializedStep] = useState<SpecializedStep>('category')
-  const [specializedCategory, setSpecializedCategory] = useState<SpecializedCategory | null>(null)
-  const [generalStep, setGeneralStep] = useState<GeneralStep>('genre')
-  const [generalGenre, setGeneralGenre] = useState<GeneralGenre | null>(null)
+  const [subjectStep, setSubjectStep] = useState<SubjectStep>('type')
+  const [subjectType, setSubjectType] = useState<SubjectType | null>(null)
   
   // Professor search flow state
   const [professorStep, setProfessorStep] = useState<ProfessorStep>('search')
@@ -459,10 +455,8 @@ function SearchPageClient() {
 
   const resetFlow = () => {
     setActiveSection(null)
-    setSpecializedStep('category')
-    setSpecializedCategory(null)
-    setGeneralStep('genre')
-    setGeneralGenre(null)
+    setSubjectStep('type')
+    setSubjectType(null)
     setProfessorStep('search')
     setProfessorQuery('')
     setSelectedProfessor(null)
@@ -471,12 +465,9 @@ function SearchPageClient() {
 
   const handleSectionSelect = (section: MainSection) => {
     setActiveSection(section)
-    if (section === 'specialized') {
-      setSpecializedStep('category')
-      setSpecializedCategory(null)
-    } else if (section === 'general') {
-      setGeneralStep('genre')
-      setGeneralGenre(null)
+    if (section === 'subject') {
+      setSubjectStep('type')
+      setSubjectType(null)
     } else if (section === 'professor') {
       setProfessorStep('search')
       setProfessorQuery('')
@@ -485,15 +476,17 @@ function SearchPageClient() {
     }
   }
 
-  const handleSpecializedCategorySelect = (category: SpecializedCategory) => {
-    setSpecializedCategory(category)
-    setSpecializedStep('subject')
+  const handleSubjectTypeSelect = (type: SubjectType) => {
+    setSubjectType(type)
+    setSubjectStep('search')
+    // Navigate to appropriate search page based on type
+    if (type === 'specialized') {
+      window.location.href = '/search/specialized'
+    } else {
+      window.location.href = '/search/general'
+    }
   }
 
-  const handleGeneralGenreSelect = (genre: GeneralGenre) => {
-    setGeneralGenre(genre)
-    setGeneralStep('subject')
-  }
 
   // 検索結果を表示するコンポーネント
   const renderSearchResults = () => {
@@ -743,11 +736,11 @@ function SearchPageClient() {
             )}
             <div className="text-sm text-gray-500">
               {query ? (
-                `"${query}" の検索結果${activeSection ? ` - ${activeSection === 'specialized' ? '学部専門科目' : '全学共通科目'}` : ''}`
+                `"${query}" の検索結果${activeSection ? ` - ${activeSection === 'subject' ? '授業検索' : '教授検索'}` : ''}`
               ) : activeSection ? (
-                activeSection === 'specialized' 
-                  ? `学部専門科目${specializedCategory ? ` > ${specializedCategory === 'department' ? '学科専門' : 'その他'}` : ''}`
-                  : `全学共通科目${generalGenre ? ` > ${generalGenre === 'language' ? '言語科目' : generalGenre === 'liberal' ? '教養科目' : 'その他'}` : ''}`
+                activeSection === 'subject' 
+                  ? `授業検索${subjectType ? ` > ${subjectType === 'specialized' ? '専門科目' : '一般科目'}` : ''}`
+                  : '教授検索'
               ) : (
                 'カテゴリを選択してください'
               )}
@@ -804,7 +797,7 @@ function SearchPageClient() {
               )}
 
               {/* Main Selection Cards */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-6 mobile-card-grid">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-8 mobile-card-grid">
                 {/* Professor Search Card */}
                 <button 
                   className="group cursor-pointer transform transition-all duration-500 hover:scale-105 lg:hover:scale-110 hover:-rotate-1 focus:outline-none focus:ring-4 focus:ring-orange-500/50 focus:ring-offset-4 touch-large"
@@ -848,75 +841,38 @@ function SearchPageClient() {
                   </div>
                 </button>
 
-                {/* Specialized Subject Card */}
+                {/* Subject Search Card */}
                 <button 
                   className="group cursor-pointer transform transition-all duration-500 hover:scale-105 lg:hover:scale-110 hover:rotate-1 focus:outline-none focus:ring-4 focus:ring-indigo-500/50 focus:ring-offset-4 touch-large"
-                  onClick={() => handleSectionSelect('specialized')}
-                  aria-label="学部専門科目の検索を開始する"
+                  onClick={() => handleSectionSelect('subject')}
+                  aria-label="授業名で検索を開始する"
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault()
-                      handleSectionSelect('specialized')
+                      handleSectionSelect('subject')
                     }
                   }}
                 >
-                  <div className="glass-strong rounded-3xl p-3 sm:p-4 text-center h-full relative overflow-hidden shadow-float group-hover:shadow-premium text-left sm:text-center">
+                  <div className="glass-strong rounded-3xl p-4 sm:p-6 text-center h-full relative overflow-hidden shadow-float group-hover:shadow-premium text-left sm:text-center">
                     <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-purple-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true"></div>
                     <div className="relative z-10">
                       <div 
-                        className="text-3xl sm:text-4xl lg:text-5xl mb-3 group-hover:animate-float transition-all duration-300 filter drop-shadow-lg"
+                        className="text-4xl sm:text-5xl lg:text-6xl mb-4 group-hover:animate-float transition-all duration-300 filter drop-shadow-lg"
                         role="img"
                         aria-hidden="true"
                       >
-                        🎓
+                        📚
                       </div>
-                      <h3 className="text-base sm:text-lg lg:text-xl font-black text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors">学部専門科目</h3>
-                      <p className="text-xs sm:text-sm text-gray-600 mb-3 leading-relaxed">メジャーに特化した<br className="hidden sm:block" />専門的な科目を探す</p>
+                      <h3 className="text-lg sm:text-xl lg:text-2xl font-black text-gray-900 mb-3 group-hover:text-indigo-600 transition-colors">授業名で検索</h3>
+                      <p className="text-sm sm:text-base text-gray-600 mb-4 leading-relaxed">科目名から過去問を<br className="hidden sm:block" />直接検索する方法</p>
                       <div className="inline-flex items-center text-indigo-600 font-bold text-base sm:text-lg group-hover:text-indigo-700 transition-colors group-hover:animate-bounce-light touch-button">
-                        専門科目を見る
+                        授業を探す
                         <svg className="w-5 h-5 sm:w-6 sm:h-6 ml-2 sm:ml-3 group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
-                        <span className="sr-only">学部専門科目検索ページに移動</span>
-                      </div>
-                    </div>
-                  </div>
-                </button>
-
-                {/* General Subject Card */}
-                <button 
-                  className="group cursor-pointer transform transition-all duration-500 hover:scale-105 lg:hover:scale-110 hover:-rotate-1 focus:outline-none focus:ring-4 focus:ring-green-500/50 focus:ring-offset-4 touch-large"
-                  onClick={() => handleSectionSelect('general')}
-                  aria-label="全学共通科目の検索を開始する"
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault()
-                      handleSectionSelect('general')
-                    }
-                  }}
-                >
-                  <div className="glass-strong rounded-3xl p-3 sm:p-4 text-center h-full relative overflow-hidden shadow-float group-hover:shadow-premium text-left sm:text-center">
-                    <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-emerald-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true"></div>
-                    <div className="relative z-10">
-                      <div 
-                        className="text-3xl sm:text-4xl lg:text-5xl mb-3 group-hover:animate-float transition-all duration-300 filter drop-shadow-lg"
-                        role="img"
-                        aria-hidden="true"
-                      >
-                        🌍
-                      </div>
-                      <h3 className="text-base sm:text-lg lg:text-xl font-black text-gray-900 mb-2 group-hover:text-green-600 transition-colors">全学共通科目</h3>
-                      <p className="text-xs sm:text-sm text-gray-600 mb-3 leading-relaxed">教養・言語・基礎科目など<br className="hidden sm:block" />全学生向けの科目を探す</p>
-                      <div className="inline-flex items-center text-green-600 font-bold text-base sm:text-lg group-hover:text-green-700 transition-colors group-hover:animate-bounce-light touch-button">
-                        共通科目を見る
-                        <svg className="w-5 h-5 sm:w-6 sm:h-6 ml-2 sm:ml-3 group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                        </svg>
-                        <span className="sr-only">全学共通科目検索ページに移動</span>
+                        <span className="sr-only">授業名検索ページに移動</span>
                       </div>
                     </div>
                   </div>
@@ -937,11 +893,11 @@ function SearchPageClient() {
                           <span className="text-gray-400">→</span>
                           <span className={
                             activeSection === 'professor' ? 'text-orange-600 font-medium' :
-                            activeSection === 'specialized' ? 'text-indigo-600 font-medium' :
+                            activeSection === 'subject' ? 'text-indigo-600 font-medium' :
                             'text-green-600 font-medium'
                           }>
                             {activeSection === 'professor' ? '教授名検索' :
-                             activeSection === 'specialized' ? '学部専門科目' : '全学共通科目'}
+                             activeSection === 'subject' ? '授業検索' : 'その他'}
                           </span>
                           {/* Additional breadcrumb for deeper navigation */}
                           {activeSection === 'professor' && professorStep !== 'search' && (
@@ -959,8 +915,8 @@ function SearchPageClient() {
                           {activeSection === 'professor' && professorStep === 'search' && '教授名を入力'}
                           {activeSection === 'professor' && professorStep === 'courses' && '授業を選択'}
                           {activeSection === 'professor' && professorStep === 'years' && '年度を選択'}
-                          {activeSection === 'specialized' && specializedStep === 'category' && '専門分野を選択'}
-                          {activeSection === 'general' && generalStep === 'genre' && 'ジャンルを選択'}
+                          {activeSection === 'subject' && subjectStep === 'type' && '科目タイプを選択'}
+                          {activeSection === 'subject' && subjectStep === 'search' && '検索を実行'}
                         </h2>
                         
                         {activeSection === 'professor' && professorStep === 'search' && userInfo && (
@@ -1094,75 +1050,31 @@ function SearchPageClient() {
                         </div>
                       )}
 
-                      {/* Specialized Category Selection */}
-                      {activeSection === 'specialized' && specializedStep === 'category' && (
+                      {/* Subject Type Selection */}
+                      {activeSection === 'subject' && subjectStep === 'type' && (
                         <div className="grid gap-4">
                           <button
-                            onClick={() => handleSpecializedCategorySelect('department')}
+                            onClick={() => handleSubjectTypeSelect('specialized')}
                             className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl hover:from-blue-100 hover:to-indigo-100 hover:shadow-lg transition-all text-left group"
                           >
                             <div className="flex items-center space-x-4">
-                              <div className="text-3xl">🏛️</div>
+                              <div className="text-3xl">🎓</div>
                               <div>
-                                <h3 className="text-lg font-bold text-gray-900 mb-1">学科専門</h3>
-                                <p className="text-gray-600">学科に直接関連する専門科目</p>
+                                <h3 className="text-lg font-bold text-gray-900 mb-1">専門科目</h3>
+                                <p className="text-gray-600">学部・学科の専門科目を検索</p>
                               </div>
                             </div>
                           </button>
                           
                           <button
-                            onClick={() => handleSpecializedCategorySelect('other')}
-                            className="p-6 bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-xl hover:from-purple-100 hover:to-pink-100 hover:shadow-lg transition-all text-left group"
+                            onClick={() => handleSubjectTypeSelect('general')}
+                            className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl hover:from-green-100 hover:to-emerald-100 hover:shadow-lg transition-all text-left group"
                           >
                             <div className="flex items-center space-x-4">
-                              <div className="text-3xl">📚</div>
+                              <div className="text-3xl">🌍</div>
                               <div>
-                                <h3 className="text-lg font-bold text-gray-900 mb-1">その他</h3>
-                                <p className="text-gray-600">関連する専門分野の科目</p>
-                              </div>
-                            </div>
-                          </button>
-                        </div>
-                      )}
-
-                      {/* General Genre Selection */}
-                      {activeSection === 'general' && generalStep === 'genre' && (
-                        <div className="grid gap-4">
-                          <button
-                            onClick={() => handleGeneralGenreSelect('language')}
-                            className="p-6 bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 rounded-xl hover:from-blue-100 hover:to-cyan-100 hover:shadow-lg transition-all text-left group"
-                          >
-                            <div className="flex items-center space-x-4">
-                              <div className="text-3xl">💬</div>
-                              <div>
-                                <h3 className="text-lg font-bold text-gray-900 mb-1">言語科目</h3>
-                                <p className="text-gray-600">外国語・コミュニケーション</p>
-                              </div>
-                            </div>
-                          </button>
-                          
-                          <button
-                            onClick={() => handleGeneralGenreSelect('liberal')}
-                            className="p-6 bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-200 rounded-xl hover:from-purple-100 hover:to-violet-100 hover:shadow-lg transition-all text-left group"
-                          >
-                            <div className="flex items-center space-x-4">
-                              <div className="text-3xl">🧠</div>
-                              <div>
-                                <h3 className="text-lg font-bold text-gray-900 mb-1">教養科目</h3>
-                                <p className="text-gray-600">人文・社会・自然科学</p>
-                              </div>
-                            </div>
-                          </button>
-                          
-                          <button
-                            onClick={() => handleGeneralGenreSelect('other')}
-                            className="p-6 bg-gradient-to-br from-orange-50 to-red-50 border border-orange-200 rounded-xl hover:from-orange-100 hover:to-red-100 hover:shadow-lg transition-all text-left group"
-                          >
-                            <div className="flex items-center space-x-4">
-                              <div className="text-3xl">🏃</div>
-                              <div>
-                                <h3 className="text-lg font-bold text-gray-900 mb-1">その他</h3>
-                                <p className="text-gray-600">実技・基礎・実験科目</p>
+                                <h3 className="text-lg font-bold text-gray-900 mb-1">一般科目</h3>
+                                <p className="text-gray-600">全学共通・教養科目を検索</p>
                               </div>
                             </div>
                           </button>
@@ -1248,20 +1160,11 @@ function SearchPageClient() {
                     <button
                       onClick={() => {
                         setQuery('')
-                        handleSectionSelect('specialized')
+                        handleSectionSelect('subject')
                       }}
                       className="w-full p-2 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors text-left text-sm"
                     >
-                      🎓 学部専門科目
-                    </button>
-                    <button
-                      onClick={() => {
-                        setQuery('')
-                        handleSectionSelect('general')
-                      }}
-                      className="w-full p-2 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors text-left text-sm"
-                    >
-                      🌍 全学共通科目
+                      📚 授業検索
                     </button>
                   </div>
                 </div>
