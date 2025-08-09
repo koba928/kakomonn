@@ -94,30 +94,7 @@ export default function UploadPage() {
   const isLoggedIn = !!user
   const formErrorHandler = useFormErrorHandler()
   
-  // ログインしていない場合はログインページに誘導
-  if (!isLoggedIn) {
-    return (
-      <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 flex items-center justify-center">
-        <div className="bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-gray-100 text-center max-w-md">
-          <div className="text-6xl mb-4">🔒</div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">ログインが必要です</h1>
-          <p className="text-gray-600 mb-6">
-            過去問を投稿するにはログインが必要です。<br />
-            ログイン後、大学情報が自動入力されて便利です！
-          </p>
-          <div className="space-y-3">
-            <Link href="/auth/email" className="block w-full bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors">
-              ログイン・新規登録
-            </Link>
-            <Link href="/" className="block w-full text-gray-600 hover:text-gray-800 transition-colors">
-              ホームに戻る
-            </Link>
-          </div>
-        </div>
-      </main>
-    )
-  }
-  
+  // All hooks must be called before any conditional returns
   const [currentStep, setCurrentStep] = useState<Step>('courseCategory')
   const [showTeacherSearchModal, setShowTeacherSearchModal] = useState(false)
   const [formData, setFormData] = useState({
@@ -211,50 +188,17 @@ export default function UploadPage() {
       )
     }
     
-    if (formData.courseCategory === 'faculty-wide' && formData.faculty) {
-      baseTargets.push(
-        { id: 'faculty-all', name: `${formData.faculty}全学科`, description: `${formData.faculty}内すべての学科` },
-        { id: 'faculty-lower', name: `${formData.faculty}下級生`, description: `${formData.faculty}の1-2年生` },
-        { id: 'faculty-upper', name: `${formData.faculty}上級生`, description: `${formData.faculty}の3-4年生` }
-      )
-    }
-    
-    if (formData.courseCategory === 'faculty-core' && formData.faculty) {
-      baseTargets.push(
-        { id: 'faculty-all', name: `${formData.faculty}全学科`, description: `${formData.faculty}内すべての学科（必修レベル）` },
-        { id: 'faculty-core-students', name: '基幹科目履修者', description: '学部の基幹となる科目の履修者' },
-        { id: 'related-faculty', name: '関連学部生', description: '関連する他学部の学生' }
-      )
-    }
-    
-    if (formData.courseCategory === 'department-core' && formData.faculty && formData.department) {
+    if (formData.courseCategory === 'specialized') {
       baseTargets.push(
         { id: 'department-all', name: `${formData.department}全学年`, description: `${formData.department}のすべての学年` },
-        { id: 'department-required', name: '必修履修者', description: '必修科目として履修する学生' },
         { id: 'department-lower', name: `${formData.department}下級生`, description: `${formData.department}の1-2年生` },
-        { id: 'department-upper', name: `${formData.department}上級生`, description: `${formData.department}の3-4年生` }
-      )
-    }
-    
-    if (formData.courseCategory === 'department-advanced' && formData.faculty && formData.department) {
-      baseTargets.push(
-        { id: 'department-advanced', name: `${formData.department}専門履修者`, description: `${formData.department}の専門科目履修者` },
         { id: 'department-upper', name: `${formData.department}上級生`, description: `${formData.department}の3-4年生` },
-        { id: 'related-departments', name: '関連学科生', description: '関連する他学科の学生' },
-        { id: 'graduate-students', name: '大学院進学予定者', description: '大学院進学を考える学生' }
-      )
-    }
-    
-    if (formData.courseCategory === 'other') {
-      baseTargets.push(
-        { id: 'specified-students', name: '指定された学生', description: '特定の条件を満たす学生' },
-        { id: 'interested-students', name: '興味のある学生', description: 'この分野に興味がある学生' },
-        { id: 'all-students', name: 'すべての学生', description: '制限なし' }
+        { id: 'related-departments', name: '関連学科生', description: '関連する他学科の学生' }
       )
     }
     
     return baseTargets
-  }, [formData.courseCategory, formData.faculty, formData.department])
+  }, [formData.courseCategory, formData.department])
 
   // Get university options for autocomplete
   const universityOptions = useMemo(() => {
@@ -1193,6 +1137,29 @@ export default function UploadPage() {
     }
   }
 
+  // ログインしていない場合はログインページに誘導
+  if (!isLoggedIn) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 flex items-center justify-center">
+        <div className="bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-gray-100 text-center max-w-md">
+          <div className="text-6xl mb-4">🔒</div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">ログインが必要です</h1>
+          <p className="text-gray-600 mb-6">
+            過去問を投稿するにはログインが必要です。<br />
+            ログイン後、大学情報が自動入力されて便利です！
+          </p>
+          <div className="space-y-3">
+            <Link href="/auth/email" className="block w-full bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors">
+              ログイン・新規登録
+            </Link>
+            <Link href="/" className="block w-full text-gray-600 hover:text-gray-800 transition-colors">
+              ホームに戻る
+            </Link>
+          </div>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50">
