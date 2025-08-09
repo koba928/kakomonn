@@ -90,7 +90,7 @@ const TEACHER_POSITIONS = [
 ]
 
 export default function UploadPage() {
-  const { user } = useAuthContext()
+  const { user, loading } = useAuthContext()
   const isLoggedIn = !!user
   const formErrorHandler = useFormErrorHandler()
   
@@ -1135,6 +1135,18 @@ export default function UploadPage() {
       default:
         return null
     }
+  }
+
+  // 認証状態読み込み中はローディング表示
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">認証状態を確認中...</p>
+        </div>
+      </main>
+    )
   }
 
   // ログインしていない場合はログインページに誘導
