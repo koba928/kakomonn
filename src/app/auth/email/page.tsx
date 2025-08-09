@@ -27,10 +27,10 @@ export default function EmailAuthPage() {
     
     try {
       if (isLogin) {
-        const { error } = await signIn(email, password)
-        if (error) {
-          console.error('ログインエラー:', error)
-          setError(error.message || 'ログインに失敗しました')
+        const result = await signIn(email, password)
+        if (result.error) {
+          console.error('ログインエラー:', result.error)
+          setError((result.error as any).message || 'ログインに失敗しました')
         } else {
           window.location.href = '/search'
         }
@@ -51,7 +51,7 @@ export default function EmailAuthPage() {
         
         if (result.error) {
           console.error('新規登録エラー:', result.error)
-          setError(result.error.message || '新規登録に失敗しました')
+          setError((result.error as any).message || '新規登録に失敗しました')
         } else {
           window.location.href = '/auth/university-info'
         }
