@@ -64,30 +64,23 @@ export default function Home() {
               {APP_CONFIG.fullDescription}
             </p>
 
-            {/* メインアクション - 過去問を探すボタン */}
-            <nav className="flex justify-center animate-fade-in mb-4" aria-label="メインナビゲーション">
+            {/* メインアクション */}
+            <nav className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in" aria-label="メインナビゲーション">
               <Link href={mainButtonHref}>
-                <AnimatedButton variant="primary" size="lg" aria-label="過去問を検索する">
+                <AnimatedButton variant="primary" size="lg" aria-label="過去問を検索する" className="w-full sm:w-auto">
                   <SearchIcon size={24} aria-hidden={true} />
                   過去問を探す
                 </AnimatedButton>
               </Link>
+              <Link href="/auth/email?redirect=/upload">
+                <AnimatedButton variant="secondary" size="lg" aria-label="過去問を投稿する" className="w-full sm:w-auto">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  過去問を投稿
+                </AnimatedButton>
+              </Link>
             </nav>
-            
-            {/* 使い方ガイド */}
-            <section className="text-center text-sm text-gray-600 animate-fade-in" aria-labelledby="guide-heading">
-              <h2 id="guide-heading" className="mb-4 font-medium text-gray-700">使い方</h2>
-              <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-6 max-w-md mx-auto">
-                <div className="flex items-center justify-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-lg shadow-sm border border-gray-200">
-                  <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-                  <span className="text-sm font-medium text-gray-800">過去問を検索</span>
-                </div>
-                <div className="flex items-center justify-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-lg shadow-sm border border-gray-200">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm font-medium text-gray-800">右下で新規投稿</span>
-                </div>
-              </div>
-            </section>
           </header>
         </section>
       </div>
