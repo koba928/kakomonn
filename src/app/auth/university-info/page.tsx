@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useEffect, Suspense } from 'react'
+import { useRouter } from 'next/navigation'
 import { useSearchParams } from 'next/navigation'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
 import { AcademicInfoSelector, AcademicInfo } from '@/components/ui/AcademicInfoSelector'
@@ -12,6 +13,7 @@ type Step = 'university' | 'faculty' | 'department' | 'year' | 'penname'
 
 function UniversityInfoPageContent() {
   const { user, updateProfile } = useAuth()
+  const router = useRouter()
   const searchParams = useSearchParams()
   const [currentStep, setCurrentStep] = useState<Step>('university')
   const [redirectUrl, setRedirectUrl] = useState('/search')
@@ -37,7 +39,7 @@ function UniversityInfoPageContent() {
       // Supabaseのユーザー情報を確認
       if (user && user.university && user.university !== '未設定') {
         // 大学情報が既に登録済みなら指定されたページへ
-        window.location.href = redirect || '/search'
+        router.push(redirect || '/search')
         return
       }
       
@@ -47,7 +49,7 @@ function UniversityInfoPageContent() {
         try {
           const parsed = JSON.parse(savedUserInfo)
           if (parsed.university && parsed.faculty && parsed.department && parsed.universityInfoCompleted) {
-            window.location.href = redirect || '/search'
+            router.push(redirect || '/search')
             return
           }
         } catch (error) {
@@ -150,7 +152,7 @@ function UniversityInfoPageContent() {
 
       setTimeout(() => {
         setIsLoading(false)
-        window.location.href = redirectUrl
+        router.push(redirectUrl)
       }, 1500)
     } catch (err) {
       console.error('完了処理エラー:', err)

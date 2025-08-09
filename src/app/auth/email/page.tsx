@@ -2,11 +2,13 @@
 
 import Link from 'next/link'
 import { useState, useEffect, Suspense } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { useSearchParams } from 'next/navigation'
 
 function EmailAuthPageContent() {
   const { signIn, signUp } = useAuth()
+  const router = useRouter()
   const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -53,14 +55,19 @@ function EmailAuthPageContent() {
               userInfo.faculty && 
               userInfo.faculty !== '未設定') {
             console.log('大学情報登録済み - 指定されたページへリダイレクト:', redirectUrl)
-            window.location.href = redirectUrl
+            // 少し待ってから遷移（認証状態の反映を待つ）
+            setTimeout(() => {
+              router.push(redirectUrl)
+            }, 500)
           } else {
             console.log('大学情報未登録 - 大学情報入力ページへリダイレクト')
             // 大学情報が未登録なら入力ページへ（リダイレクト先を保持）
             const universityInfoUrl = redirectUrl === '/search' 
               ? '/auth/university-info'
               : `/auth/university-info?redirect=${encodeURIComponent(redirectUrl)}`
-            window.location.href = universityInfoUrl
+            setTimeout(() => {
+              router.push(universityInfoUrl)
+            }, 500)
           }
         }
       } else {
@@ -86,7 +93,9 @@ function EmailAuthPageContent() {
           const universityInfoUrl = redirectUrl === '/search' 
             ? '/auth/university-info'
             : `/auth/university-info?redirect=${encodeURIComponent(redirectUrl)}`
-          window.location.href = universityInfoUrl
+          setTimeout(() => {
+            router.push(universityInfoUrl)
+          }, 500)
         }
       }
     } catch (err: any) {
