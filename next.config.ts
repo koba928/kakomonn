@@ -11,15 +11,11 @@ const nextConfig: NextConfig = {
   
   // 実験的機能
   experimental: {
-    // optimizeCss: true, // crittersが必要なため一時的に無効化
     optimizePackageImports: ['@supabase/supabase-js', 'lucide-react'],
   },
   
   // 圧縮
   compress: true,
-  
-  // パフォーマンス最適化
-  // swcMinify: true, // Next.js 15ではデフォルトで有効
   
   // セキュリティヘッダー
   async headers() {
@@ -53,11 +49,6 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
     ]
-  },
-  
-  // 環境変数
-  env: {
-    CUSTOM_KEY: process.env.CUSTOM_KEY,
   },
   
   // バンドル分析

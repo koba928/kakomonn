@@ -16,11 +16,11 @@ function HomeContent() {
       <>
         {/* プラスマークで投稿ボタン */}
         <FloatingActionButton
-          icon={<PlusIcon size={24} />}
           onClick={() => window?.location && (window.location.href = '/auth/email?redirect=/upload')}
-          position="bottom-right"
           aria-label="投稿する"
-        />
+        >
+          <PlusIcon size={24} />
+        </FloatingActionButton>
       </>
     )
   }
@@ -29,12 +29,12 @@ function HomeContent() {
     <>
       {/* プラスマークで投稿ボタン - モバイル最適化 */}
       <FloatingActionButton
-        icon={<PlusIcon size={20} />}
         onClick={() => window.location.href = '/auth/email?redirect=/upload'}
-        position="bottom-right"
         aria-label="過去問を投稿する"
         className="shadow-lg hover:shadow-xl transition-shadow duration-300"
-      />
+      >
+        <PlusIcon size={20} />
+      </FloatingActionButton>
     </>
   )
 }

@@ -16,7 +16,6 @@ export interface University {
   faculties: Faculty[]
 }
 
-// import { additionalUniversities } from './additionalUniversities'
 
 const baseUniversities: University[] = [
   // 国立大学
