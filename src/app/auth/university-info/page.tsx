@@ -287,7 +287,7 @@ function UniversityInfoPageContent() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-lg">
         {/* ヘッダー */}
         <div className="text-center mb-8">
           <Link 
@@ -362,13 +362,6 @@ function UniversityInfoPageContent() {
           </div>
         </div>
 
-        {/* デモ情報 */}
-        <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <h4 className="text-sm font-medium text-yellow-800 mb-2">🚧 デモモード</h4>
-          <p className="text-xs text-yellow-700">
-            現在はデモ版です。入力された情報はブラウザ内にのみ保存されます。
-          </p>
-        </div>
       </div>
     </main>
   )
