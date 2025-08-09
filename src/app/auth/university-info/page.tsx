@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
 import { AcademicInfoSelector, AcademicInfo } from '@/components/ui/AcademicInfoSelector'
 import { VirtualizedAutocompleteSelect } from '@/components/ui/VirtualizedAutocompleteSelect'
@@ -11,7 +12,9 @@ type Step = 'university' | 'faculty' | 'department' | 'year' | 'penname'
 
 export default function UniversityInfoPage() {
   const { user, updateProfile } = useAuth()
+  const searchParams = useSearchParams()
   const [currentStep, setCurrentStep] = useState<Step>('university')
+  const [redirectUrl, setRedirectUrl] = useState('/search')
   const [academicInfo, setAcademicInfo] = useState<AcademicInfo>({
     university: '',
     faculty: '',
@@ -23,12 +26,18 @@ export default function UniversityInfoPage() {
   const [isChecking, setIsChecking] = useState(true)
 
   useEffect(() => {
+    // リダイレクトパラメータを取得
+    const redirect = searchParams.get('redirect')
+    if (redirect) {
+      setRedirectUrl(redirect)
+    }
+    
     // 既に大学情報が完了しているかチェック
     const checkExistingInfo = async () => {
       // Supabaseのユーザー情報を確認
       if (user && user.university && user.university !== '未設定') {
-        // 大学情報が既に登録済みなら検索ページへ
-        window.location.href = '/search'
+        // 大学情報が既に登録済みなら指定されたページへ
+        window.location.href = redirect || '/search'
         return
       }
       
@@ -38,7 +47,7 @@ export default function UniversityInfoPage() {
         try {
           const parsed = JSON.parse(savedUserInfo)
           if (parsed.university && parsed.faculty && parsed.department && parsed.universityInfoCompleted) {
-            window.location.href = '/search'
+            window.location.href = redirect || '/search'
             return
           }
         } catch (error) {
@@ -50,7 +59,7 @@ export default function UniversityInfoPage() {
     }
 
     checkExistingInfo()
-  }, [user])
+  }, [user, searchParams])
 
   // チェック中はローディング表示
   if (isChecking) {
@@ -141,7 +150,7 @@ export default function UniversityInfoPage() {
 
       setTimeout(() => {
         setIsLoading(false)
-        window.location.href = '/search'
+        window.location.href = redirectUrl
       }, 1500)
     } catch (err) {
       console.error('完了処理エラー:', err)

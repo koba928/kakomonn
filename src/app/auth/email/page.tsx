@@ -1,11 +1,13 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import { useSearchParams } from 'next/navigation'
 
 export default function EmailAuthPage() {
   const { signIn, signUp } = useAuth()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -13,6 +15,14 @@ export default function EmailAuthPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
+  const [redirectUrl, setRedirectUrl] = useState('/search')
+
+  useEffect(() => {
+    const redirect = searchParams.get('redirect')
+    if (redirect) {
+      setRedirectUrl(redirect)
+    }
+  }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,18 +46,21 @@ export default function EmailAuthPage() {
           const userInfo = result.user
           console.log('ログイン成功 - ユーザー情報:', userInfo)
           
-          // プロフィールが正常に取得され、大学情報が設定されている場合は検索ページへ
+          // プロフィールが正常に取得され、大学情報が設定されている場合は指定されたページへ
           if (userInfo && 
               userInfo.university && 
               userInfo.university !== '未設定' && 
               userInfo.faculty && 
               userInfo.faculty !== '未設定') {
-            console.log('大学情報登録済み - 検索ページへリダイレクト')
-            window.location.href = '/search'
+            console.log('大学情報登録済み - 指定されたページへリダイレクト:', redirectUrl)
+            window.location.href = redirectUrl
           } else {
             console.log('大学情報未登録 - 大学情報入力ページへリダイレクト')
-            // 大学情報が未登録なら入力ページへ
-            window.location.href = '/auth/university-info'
+            // 大学情報が未登録なら入力ページへ（リダイレクト先を保持）
+            const universityInfoUrl = redirectUrl === '/search' 
+              ? '/auth/university-info'
+              : `/auth/university-info?redirect=${encodeURIComponent(redirectUrl)}`
+            window.location.href = universityInfoUrl
           }
         }
       } else {
@@ -69,7 +82,11 @@ export default function EmailAuthPage() {
           console.error('新規登録エラー:', result.error)
           setError((result.error as any).message || '新規登録に失敗しました')
         } else {
-          window.location.href = '/auth/university-info'
+          // 新規登録時もリダイレクト先を保持
+          const universityInfoUrl = redirectUrl === '/search' 
+            ? '/auth/university-info'
+            : `/auth/university-info?redirect=${encodeURIComponent(redirectUrl)}`
+          window.location.href = universityInfoUrl
         }
       }
     } catch (err: any) {
