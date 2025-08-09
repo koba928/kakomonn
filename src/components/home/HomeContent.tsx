@@ -1,15 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { UserIcon, PlusIcon } from '@/components/icons/IconSystem'
+import { PlusIcon } from '@/components/icons/IconSystem'
 import { ThemeToggle } from '@/components/theme/ThemeProvider'
 import { FloatingActionButton } from '@/components/ui/MicroInteractions'
-import { useAuthContext } from '@/components/providers/AuthProvider'
 
 function HomeContent() {
-  const { user } = useAuthContext()
-  const isLoggedIn = !!user
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
