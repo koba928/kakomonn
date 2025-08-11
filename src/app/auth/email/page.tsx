@@ -5,9 +5,10 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { useSearchParams } from 'next/navigation'
+import LoginLoadingScreen, { LoginMessages } from '@/components/auth/LoginLoadingScreen'
 
 function EmailAuthPageContent() {
-  const { signIn, signUp } = useAuth()
+  const { signIn, signUp, isAuthenticating, authStep } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
@@ -43,6 +44,7 @@ function EmailAuthPageContent() {
         if (result.error) {
           console.error('ログインエラー:', result.error)
           setError((result.error as any).message || 'ログインに失敗しました')
+          setIsLoading(false)
         } else {
           // ユーザー情報を確認
           const userInfo = result.user
@@ -110,6 +112,24 @@ function EmailAuthPageContent() {
     if (!email || !password) return false
     if (!isLogin && (!confirmPassword || password !== confirmPassword)) return false
     return email.includes('@') && password.length >= 6
+  }
+
+  // ログイン中画面を表示
+  if (isAuthenticating) {
+    const messageConfig = (() => {
+      switch (authStep) {
+        case 'signing-in':
+          return LoginMessages.PROCESSING
+        case 'profile-loading':
+          return LoginMessages.PROFILE_LOADING
+        case 'redirecting':
+          return LoginMessages.REDIRECTING
+        default:
+          return LoginMessages.PROCESSING
+      }
+    })()
+    
+    return <LoginLoadingScreen {...messageConfig} />
   }
 
   return (

@@ -17,6 +17,8 @@ export function useAuth() {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isAuthenticating, setIsAuthenticating] = useState(false)
+  const [authStep, setAuthStep] = useState<'idle' | 'signing-in' | 'verifying' | 'profile-loading' | 'redirecting'>('idle')
 
   useEffect(() => {
     // 現在のセッションを取得
@@ -139,6 +141,9 @@ export function useAuth() {
 
   const signIn = async (email: string, password: string) => {
     try {
+      setIsAuthenticating(true)
+      setAuthStep('signing-in')
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
@@ -146,6 +151,8 @@ export function useAuth() {
 
       if (error) throw error
 
+      setAuthStep('profile-loading')
+      
       // セッション情報を手動で設定
       setSession(data.session)
 
@@ -163,6 +170,14 @@ export function useAuth() {
           setUser(profile)
         }
       }
+
+      setAuthStep('redirecting')
+      
+      // 少し待ってからリセット
+      setTimeout(() => {
+        setIsAuthenticating(false)
+        setAuthStep('idle')
+      }, 1000)
 
       return { data, error: null, user: userProfile }
     } catch (error) {
@@ -207,9 +222,12 @@ export function useAuth() {
     session,
     loading,
     isLoggedIn: !!session,
+    isAuthenticating,
+    authStep,
     signUp,
     signIn,
     signOut,
-    updateProfile
+    updateProfile,
+    setAuthStep
   }
 }
