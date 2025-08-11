@@ -31,7 +31,7 @@ export function VirtualizedAutocompleteSelect({
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredOptions = useMemo(() => {
-    if (!searchQuery) return options
+    if (!searchQuery) return []
     return options.filter(option => {
       // 通常の柔軟マッチング
       if (flexibleMatch(option.label, searchQuery)) return true
