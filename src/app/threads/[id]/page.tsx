@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import ThreadDetailClient from './ThreadDetailClient'
+import { api } from '@/services/api'
 
 interface Thread {
   id: string
@@ -78,11 +79,47 @@ const mockComments: Comment[] = [
   }
 ]
 
-export default async function ThreadDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
+export default async function ThreadDetailPage({ params }: { params: { id: string } }) {
+  const { id } = params
   
-  // TODO: Use id to fetch thread data from API/database
-  console.log('Thread ID:', id)
+  // APIからスレッドとコメント取得
+  let threadData = mockThread
+  let initialComments = mockComments
+  
+  try {
+    // スレッド詳細取得
+    const thread = await api.threads.getById(id)
+    if (thread) {
+      threadData = {
+        id: thread.id,
+        title: thread.title,
+        content: thread.content,
+        author: thread.users?.pen_name || thread.author_id,
+        course: thread.course,
+        university: thread.university,
+        faculty: thread.faculty,
+        createdAt: new Date(thread.created_at).toLocaleDateString('ja-JP'),
+        examYear: thread.exam_year || undefined,
+        fileUrl: undefined,
+        fileName: undefined
+      }
+    }
+    
+    // コメント取得
+    const comments = await api.comments.getByThreadId(id)
+    if (comments && Array.isArray(comments)) {
+      initialComments = comments.map(c => ({
+        id: c.id,
+        content: c.content,
+        author: c.author_id,
+        createdAt: new Date(c.created_at).toLocaleDateString('ja-JP'),
+        likes: 0,
+      })) as any
+    }
+  } catch (e) {
+    console.error('API取得エラー:', e)
+    // 失敗時はモック継続
+  }
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -118,41 +155,41 @@ export default async function ThreadDetailPage({ params }: { params: Promise<{ i
               </div>
               <div className="flex-1">
                 <div className="flex items-center space-x-2">
-                  <span className="font-bold text-gray-900">{mockThread.author}</span>
+                  <span className="font-bold text-gray-900">{threadData.author}</span>
                   <span className="text-gray-500">·</span>
-                  <span className="text-gray-500 text-sm">{mockThread.createdAt}</span>
+                  <span className="text-gray-500 text-sm">{threadData.createdAt}</span>
                 </div>
                 
                 {/* Tags */}
                 <div className="flex flex-wrap gap-2 mt-2 mb-3">
                   <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                    {mockThread.university}
+                    {threadData.university}
                   </span>
                   <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-                    {mockThread.faculty}
+                    {threadData.faculty}
                   </span>
                   <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
-                    {mockThread.course}
+                    {threadData.course}
                   </span>
-                  {mockThread.examYear && (
+                  {threadData.examYear && (
                     <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
-                      {mockThread.examYear}年度
+                      {threadData.examYear}年度
                     </span>
                   )}
                 </div>
                 
                 {/* Title */}
                 <h2 className="text-xl font-bold text-gray-900 mb-3">
-                  {mockThread.title}
+                  {threadData.title}
                 </h2>
                 
                 {/* Content */}
                 <div className="text-gray-700 whitespace-pre-line leading-relaxed mb-4">
-                  {mockThread.content}
+                  {threadData.content}
                 </div>
                 
                 {/* Attached file */}
-                {mockThread.fileUrl && (
+                {threadData.fileUrl && (
                   <div className="border border-gray-200 rounded-xl p-4 mb-4">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
@@ -161,7 +198,7 @@ export default async function ThreadDetailPage({ params }: { params: Promise<{ i
                         </svg>
                       </div>
                       <div className="flex-1">
-                        <p className="font-medium text-gray-900">{mockThread.fileName}</p>
+                        <p className="font-medium text-gray-900">{threadData.fileName}</p>
                         <p className="text-sm text-gray-500">PDF ファイル</p>
                       </div>
                       <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors">
@@ -228,7 +265,7 @@ export default async function ThreadDetailPage({ params }: { params: Promise<{ i
         </div>
 
         {/* クライアントコンポーネント（インタラクティブ機能） */}
-        <ThreadDetailClient initialComments={mockComments} threadId={id} />
+        <ThreadDetailClient initialComments={initialComments as any} threadId={id} />
       </div>
 
     </main>

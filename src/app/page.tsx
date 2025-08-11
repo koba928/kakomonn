@@ -95,6 +95,8 @@ export default function Home() {
 
       {/* Client Component */}
       <HomeContent />
+      {/* 安全領域に配慮したフッタースペーサ（モバイル） */}
+      <div className="h-[24px] sm:h-0" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }} />
     </main>
   )
 }

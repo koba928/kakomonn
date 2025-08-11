@@ -161,21 +161,8 @@ export const api = {
     },
 
     async incrementDownloadCount(id: string): Promise<void> {
-      // 現在の値を取得してから更新
-      const { data: current } = await supabase
-        .from('past_exams')
-        .select('download_count')
-        .eq('id', id)
-        .single()
-      
-      if (current) {
-        const { error } = await supabase
-          .from('past_exams')
-          .update({ download_count: (current.download_count || 0) + 1 })
-          .eq('id', id)
-        
-        if (error) throw error
-      }
+      const { error } = await supabase.rpc('increment_download_count', { exam_id: id })
+      if (error) throw error
     }
   },
 
@@ -294,6 +281,73 @@ export const api = {
         .eq('id', id)
       
       if (error) throw error
+    }
+  },
+
+  // 過去問コメント機能
+  pastExamComments: {
+    async getByPastExamId(pastExamId: string): Promise<any[]> {
+      const { data, error } = await supabase
+        .from('past_exam_comments')
+        .select(`
+          *,
+          users!past_exam_comments_author_id_fkey(name, pen_name)
+        `)
+        .eq('past_exam_id', pastExamId)
+        .is('parent_comment_id', null) // 親コメントのみ
+        .order('created_at', { ascending: true })
+
+      if (error) throw error
+      return data || []
+    },
+
+    async getReplies(parentCommentId: string): Promise<any[]> {
+      const { data, error } = await supabase
+        .from('past_exam_comments')
+        .select(`
+          *,
+          users!past_exam_comments_author_id_fkey(name, pen_name)
+        `)
+        .eq('parent_comment_id', parentCommentId)
+        .order('created_at', { ascending: true })
+
+      if (error) throw error
+      return data || []
+    },
+
+    async create(comment: {
+      past_exam_id: string
+      content: string
+      author_id: string
+      parent_comment_id?: string
+    }): Promise<any> {
+      const { data, error } = await supabase
+        .from('past_exam_comments')
+        .insert(comment)
+        .select(`
+          *,
+          users!past_exam_comments_author_id_fkey(name, pen_name)
+        `)
+        .single()
+
+      if (error) throw error
+
+      // コメント数をインクリメント
+      await supabase.rpc('increment_comment_count', { exam_id: comment.past_exam_id })
+
+      return data
+    },
+
+    async delete(id: string, pastExamId: string): Promise<void> {
+      const { error } = await supabase
+        .from('past_exam_comments')
+        .delete()
+        .eq('id', id)
+
+      if (error) throw error
+
+      // コメント数をデクリメント
+      await supabase.rpc('decrement_comment_count', { exam_id: pastExamId })
     }
   },
 

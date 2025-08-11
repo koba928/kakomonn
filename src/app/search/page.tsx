@@ -546,10 +546,20 @@ function SearchPageClient() {
                 <span>{exam.university} {exam.faculty}</span>
                 <div className="flex items-center space-x-2">
                   <span>📥 {exam.download_count}</span>
+                  {/* コメント数はAPI拡張時に復活させる */}
                   <span>⭐ {exam.difficulty}/5</span>
                 </div>
               </div>
-              <div className="mt-3">
+              <div className="mt-3 flex space-x-2">
+                <a
+                  href={`/exams/${exam.id}`}
+                  className="inline-flex items-center px-3 py-1 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                >
+                  <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                  詳細・コメント
+                </a>
                 <a
                   href={exam.file_url}
                   target="_blank"
@@ -1295,11 +1305,15 @@ function SearchPageClient() {
                       )}
                       
                     </div>
+              {/* iOS Safari等のセーフエリア対応スペーサ */}
+              <div className="h-4" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }} />
             </div>
           </div>
         )}
 
       </div>
+      {/* モバイルの安全領域余白 */}
+      <div className="h-[24px] sm:h-0" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }} />
     </div>
   )
 }

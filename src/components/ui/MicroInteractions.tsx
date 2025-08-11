@@ -47,6 +47,7 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = React.memo(function
         ${sizeStyles[size]}
         ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
         touch-manipulation select-none
+        group
         ${className}
       `}
       onClick={onClick}
@@ -68,19 +69,21 @@ interface FloatingActionButtonProps {
   children: React.ReactNode
   className?: string
   'aria-label'?: string
+  style?: React.CSSProperties
 }
 
 export const FloatingActionButton: React.FC<FloatingActionButtonProps> = React.memo(function FloatingActionButton({
   onClick,
   children,
   className = '',
-  'aria-label': ariaLabel
+  'aria-label': ariaLabel,
+  style
 }) {
   return (
     <button
       onClick={onClick}
       className={`
-        fixed bottom-6 right-6 z-50
+        fixed right-6 z-50
         bg-gradient-to-r from-indigo-500 to-purple-600
         hover:from-indigo-600 hover:to-purple-700
         text-white p-4 rounded-full shadow-lg
@@ -91,6 +94,7 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = React.m
         touch-manipulation
         ${className}
       `}
+      style={{ bottom: 'calc(env(safe-area-inset-bottom) + 24px)', ...(style || {}) }}
       aria-label={ariaLabel}
     >
       {children}

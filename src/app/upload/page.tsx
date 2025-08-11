@@ -391,9 +391,11 @@ export default function UploadPage() {
         return
       }
 
+      // UI表示用と送信用の両方を更新
+      setSelectedFile(file)
       setFormData(prev => ({
         ...prev,
-        file: file
+        file
       }))
       
       console.log('ファイル選択:', { name: file.name, size: file.size, type: file.type })
@@ -535,11 +537,7 @@ export default function UploadPage() {
         difficulty: formData.teachers.length > 0 
           ? formData.teachers.map(t => Number(t.difficulty) || 3).reduce((sum, val) => sum + val, 0) / formData.teachers.length 
           : 3, // 教員の難易度の平均を保存
-        tags: formData.tags || [],
-        target_audiences: [{
-          id: formData.targetAudiences,
-          name: availableTargetAudiences.find(t => t.id === formData.targetAudiences)?.name || '不明'
-        }]
+        tags: formData.tags || []
       }
 
       console.log('過去問データ保存開始:', pastExamData)
@@ -809,7 +807,7 @@ export default function UploadPage() {
                         <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
                           <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
-                        <div className="flex text-sm text-gray-600">
+                    <div className="flex text-sm text-gray-600">
                           <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
                             <span>ファイルを選択</span>
                             <input 
@@ -818,12 +816,12 @@ export default function UploadPage() {
                               type="file" 
                               className="sr-only" 
                               onChange={handleFileChange}
-                              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                          accept=".pdf,.jpg,.jpeg,.png"
                             />
                           </label>
                           <p className="pl-1">またはドラッグ＆ドロップ</p>
                         </div>
-                        <p className="text-xs text-gray-500">PDF, DOC, DOCX, JPG, PNG 最大20MB</p>
+                    <p className="text-xs text-gray-500">PDF, JPG, PNG 最大10MB</p>
                       </>
                     )}
                   </div>

@@ -263,6 +263,8 @@ function EmailAuthPageContent() {
         </div>
 
       </div>
+      {/* セーフエリアスペーサ */}
+      <div className="h-4" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }} />
     </main>
   )
 }

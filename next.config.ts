@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
   
   // 実験的機能
   experimental: {
-    optimizePackageImports: ['@supabase/supabase-js', 'lucide-react'],
+    optimizePackageImports: ['@supabase/supabase-js'],
   },
   
   // 圧縮

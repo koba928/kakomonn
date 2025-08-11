@@ -132,18 +132,51 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('past-exams', 'past-exams', true)
 ON CONFLICT (id) DO NOTHING;
 
--- Storage policies (修正: auth.uid()::text = owner を削除)
+-- Storage policies（厳格化: ユーザー自身のUID配下のみ操作可）
+DO $$ BEGIN
+  PERFORM 1 FROM pg_policies WHERE polname = 'Anyone can view past exam files' AND schemaname = 'public';
+EXCEPTION WHEN undefined_table THEN NULL; END $$;
+
+DROP POLICY IF EXISTS "Anyone can view past exam files" ON storage.objects;
+DROP POLICY IF EXISTS "Authenticated users can upload past exam files" ON storage.objects;
+DROP POLICY IF EXISTS "Users can update their own past exam files" ON storage.objects;
+DROP POLICY IF EXISTS "Users can delete their own past exam files" ON storage.objects;
+
 CREATE POLICY "Anyone can view past exam files" ON storage.objects
   FOR SELECT USING (bucket_id = 'past-exams');
 
-CREATE POLICY "Authenticated users can upload past exam files" ON storage.objects
-  FOR INSERT WITH CHECK (bucket_id = 'past-exams' AND auth.uid() IS NOT NULL);
+-- 自分のUID（パスの先頭）に限定して操作を許可
+CREATE POLICY "Insert own past exam files" ON storage.objects
+  FOR INSERT WITH CHECK (
+    bucket_id = 'past-exams'
+    AND split_part(name, '/', 1) = auth.uid()::text
+  );
 
-CREATE POLICY "Users can update their own past exam files" ON storage.objects
-  FOR UPDATE USING (bucket_id = 'past-exams' AND auth.uid() IS NOT NULL);
+CREATE POLICY "Update own past exam files" ON storage.objects
+  FOR UPDATE USING (
+    bucket_id = 'past-exams'
+    AND split_part(name, '/', 1) = auth.uid()::text
+  );
 
-CREATE POLICY "Users can delete their own past exam files" ON storage.objects
-  FOR DELETE USING (bucket_id = 'past-exams' AND auth.uid() IS NOT NULL);
+CREATE POLICY "Delete own past exam files" ON storage.objects
+  FOR DELETE USING (
+    bucket_id = 'past-exams'
+    AND split_part(name, '/', 1) = auth.uid()::text
+  );
+
+-- ダウンロード数インクリメントの原子的更新RPC
+CREATE OR REPLACE FUNCTION increment_download_count(exam_id uuid)
+RETURNS void
+LANGUAGE sql
+SECURITY DEFINER
+AS $$
+  UPDATE past_exams
+  SET download_count = COALESCE(download_count, 0) + 1
+  WHERE id = exam_id;
+$$;
+
+REVOKE ALL ON FUNCTION increment_download_count(uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION increment_download_count(uuid) TO anon, authenticated;
 
 -- テストデータの挿入
 -- テストユーザーの挿入
