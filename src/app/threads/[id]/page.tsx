@@ -11,9 +11,9 @@ interface Thread {
   university: string
   faculty: string
   createdAt: string
-  examYear?: number
-  fileUrl?: string
-  fileName?: string
+  examYear?: number | undefined
+  fileUrl?: string | undefined
+  fileName?: string | undefined
 }
 
 interface Comment {
@@ -94,12 +94,12 @@ export default async function ThreadDetailPage({ params }: { params: { id: strin
         id: thread.id,
         title: thread.title,
         content: thread.content,
-        author: thread.users?.pen_name || thread.author_id,
+        author: thread.author_id,
         course: thread.course,
         university: thread.university,
         faculty: thread.faculty,
         createdAt: new Date(thread.created_at).toLocaleDateString('ja-JP'),
-        examYear: thread.exam_year || undefined,
+        examYear: thread.exam_year ?? undefined,
         fileUrl: undefined,
         fileName: undefined
       }
