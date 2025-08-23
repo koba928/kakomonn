@@ -19,6 +19,7 @@ function EmailAuthPageContent() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [redirectUrl, setRedirectUrl] = useState('/search')
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
 
   useEffect(() => {
     const redirect = searchParams.get('redirect')
@@ -33,6 +34,11 @@ function EmailAuthPageContent() {
     
     if (!isLogin && password !== confirmPassword) {
       setError('パスワードが一致しません')
+      return
+    }
+
+    if (!isLogin && !agreedToTerms) {
+      setError('利用規約およびプライバシーポリシーに同意してください')
       return
     }
     
@@ -259,14 +265,37 @@ function EmailAuthPageContent() {
             </div>
           )}
 
+          {/* 利用規約・プライバシーポリシー同意（新規登録時のみ） */}
+          {!isLogin && (
+            <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg">
+              <input
+                id="agree-terms"
+                type="checkbox"
+                checked={agreedToTerms}
+                onChange={(e) => setAgreedToTerms(e.target.checked)}
+                className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+              <label htmlFor="agree-terms" className="text-sm text-gray-700 leading-relaxed">
+                <Link href="/terms" className="text-indigo-600 hover:text-indigo-800 underline" target="_blank">
+                  利用規約
+                </Link>
+                および
+                <Link href="/privacy" className="text-indigo-600 hover:text-indigo-800 underline" target="_blank">
+                  プライバシーポリシー
+                </Link>
+                に同意します <span className="text-red-500">*</span>
+              </label>
+            </div>
+          )}
+
           <button
             type="submit"
             className={`w-full px-4 py-3 rounded-lg font-medium transition-colors ${
-              !isFormValid() || isLoading
+              (!isFormValid() || (!isLogin && !agreedToTerms) || isLoading)
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 : 'bg-indigo-600 text-white hover:bg-indigo-700'
             }`}
-            disabled={!isFormValid() || isLoading}
+            disabled={!isFormValid() || (!isLogin && !agreedToTerms) || isLoading}
           >
             {isLoading ? (isLogin ? 'ログイン中...' : '作成中...') : (isLogin ? 'ログイン' : 'アカウント作成')}
           </button>

@@ -90,6 +90,21 @@ export default function Home() {
               </Link>
             </nav>
           </header>
+
+          {/* フッター - 法的文書へのリンク */}
+          <footer className="mt-8 sm:mt-16 text-center text-xs sm:text-sm text-gray-500">
+            <nav className="flex justify-center gap-4 sm:gap-6" aria-label="法的文書">
+              <Link href="/terms" className="hover:text-gray-700 transition-colors">
+                利用規約
+              </Link>
+              <Link href="/privacy" className="hover:text-gray-700 transition-colors">
+                プライバシーポリシー
+              </Link>
+            </nav>
+            <div className="mt-2">
+              <p>&copy; 2025 MATURA. All rights reserved.</p>
+            </div>
+          </footer>
         </section>
       </div>
 
