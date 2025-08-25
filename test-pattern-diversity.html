@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Pattern Diversity Test - MATURA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .test-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 2s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .info { color: #3b82f6; }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="text-center text-white mb-8">
+            <h1 class="text-5xl font-bold mb-4">🎯 Pattern Diversity Test</h1>
+            <p class="text-xl opacity-90">
+                MATURAの業界特化パターン選択機能をテスト
+            </p>
+            <div class="text-lg opacity-70 mt-2">
+                問題: 「タスク管理アプリを毎回生成するが、どのユーザーの要求にも対応できないといけない」
+            </div>
+        </div>
+
+        <!-- Test Cases -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Test Case 1: Healthcare -->
+            <div class="test-card p-6" id="test-healthcare">
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    🏥 Healthcare Test
+                    <span id="status-healthcare" class="text-sm"></span>
+                </h3>
+                <div class="mb-4">
+                    <strong>Input:</strong> "病院の診療予約システムを作りたい"
+                </div>
+                <div id="result-healthcare" class="bg-gray-50 p-4 rounded-lg">
+                    <div class="loading"></div> Testing...
+                </div>
+            </div>
+
+            <!-- Test Case 2: Restaurant -->
+            <div class="test-card p-6" id="test-restaurant">
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    🍽️ Restaurant Test
+                    <span id="status-restaurant" class="text-sm"></span>
+                </h3>
+                <div class="mb-4">
+                    <strong>Input:</strong> "レストランのPOSシステムが必要です"
+                </div>
+                <div id="result-restaurant" class="bg-gray-50 p-4 rounded-lg">
+                    <div class="loading"></div> Testing...
+                </div>
+            </div>
+
+            <!-- Test Case 3: Hotel -->
+            <div class="test-card p-6" id="test-hotel">
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    🏨 Hotel Test
+                    <span id="status-hotel" class="text-sm"></span>
+                </h3>
+                <div class="mb-4">
+                    <strong>Input:</strong> "ホテルの予約管理システム"
+                </div>
+                <div id="result-hotel" class="bg-gray-50 p-4 rounded-lg">
+                    <div class="loading"></div> Testing...
+                </div>
+            </div>
+
+            <!-- Test Case 4: Finance -->
+            <div class="test-card p-6" id="test-finance">
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    💰 Finance Test
+                    <span id="status-finance" class="text-sm"></span>
+                </h3>
+                <div class="mb-4">
+                    <strong>Input:</strong> "家計簿アプリで経費管理したい"
+                </div>
+                <div id="result-finance" class="bg-gray-50 p-4 rounded-lg">
+                    <div class="loading"></div> Testing...
+                </div>
+            </div>
+
+            <!-- Test Case 5: E-commerce -->
+            <div class="test-card p-6" id="test-ecommerce">
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    🛒 E-commerce Test
+                    <span id="status-ecommerce" class="text-sm"></span>
+                </h3>
+                <div class="mb-4">
+                    <strong>Input:</strong> "オンラインショップを作りたい"
+                </div>
+                <div id="result-ecommerce" class="bg-gray-50 p-4 rounded-lg">
+                    <div class="loading"></div> Testing...
+                </div>
+            </div>
+
+            <!-- Test Case 6: General Task -->
+            <div class="test-card p-6" id="test-general">
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    📋 General Test
+                    <span id="status-general" class="text-sm"></span>
+                </h3>
+                <div class="mb-4">
+                    <strong>Input:</strong> "タスク管理アプリが欲しい"
+                </div>
+                <div id="result-general" class="bg-gray-50 p-4 rounded-lg">
+                    <div class="loading"></div> Testing...
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Summary -->
+        <div class="test-card p-6">
+            <h2 class="text-2xl font-bold mb-4">📊 Test Results Summary</h2>
+            <div id="summary" class="space-y-2">
+                <div>🔄 Running tests...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const testCases = [
+            {
+                id: 'healthcare',
+                input: '病院の診療予約システムを作りたい',
+                expectedIndustry: 'healthcare',
+                expectedPattern: 'medical-appointment'
+            },
+            {
+                id: 'restaurant',
+                input: 'レストランのPOSシステムが必要です',
+                expectedIndustry: 'hospitality',
+                expectedPattern: 'restaurant-pos'
+            },
+            {
+                id: 'hotel',
+                input: 'ホテルの予約管理システム',
+                expectedIndustry: 'hospitality',
+                expectedPattern: 'hotel-reservation'
+            },
+            {
+                id: 'finance',
+                input: '家計簿アプリで経費管理したい',
+                expectedIndustry: 'finance',
+                expectedPattern: 'expense-tracker'
+            },
+            {
+                id: 'ecommerce',
+                input: 'オンラインショップを作りたい',
+                expectedIndustry: 'ecommerce',
+                expectedPattern: 'marketplace-platform'
+            },
+            {
+                id: 'general',
+                input: 'タスク管理アプリが欲しい',
+                expectedIndustry: 'productivity',
+                expectedPattern: null // Should fallback to general productivity
+            }
+        ];
+
+        let completedTests = 0;
+        const results = {};
+
+        async function runTest(testCase) {
+            const { id, input, expectedIndustry, expectedPattern } = testCase;
+            
+            try {
+                const response = await fetch('/api/intelligent-generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userInput: input,
+                        generateSchema: true
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    const selection = data.data.intelligentSelection;
+                    const industryMatch = selection.industryMatch;
+                    const industryPattern = selection.industryPattern;
+                    const selectedPattern = selection.selectedPattern;
+                    
+                    let success = true;
+                    let message = '';
+                    
+                    if (expectedPattern && industryPattern) {
+                        if (industryPattern.id === expectedPattern) {
+                            message = `✅ Perfect match: ${industryPattern.name}`;
+                        } else {
+                            message = `⚠️ Industry match but different pattern: ${industryPattern.name}`;
+                            success = false;
+                        }
+                    } else if (!expectedPattern && !industryMatch) {
+                        message = `✅ Correctly using general pattern: ${selectedPattern.name}`;
+                    } else if (expectedPattern && !industryPattern) {
+                        message = `❌ Should have matched industry pattern but didn't`;
+                        success = false;
+                    } else {
+                        message = `❓ Unexpected result`;
+                        success = false;
+                    }
+                    
+                    const resultHtml = `
+                        <div class="space-y-2">
+                            <div><strong>Industry Match:</strong> ${industryMatch ? '✅' : '❌'}</div>
+                            <div><strong>Pattern:</strong> ${industryPattern ? industryPattern.name : selectedPattern.name}</div>
+                            <div><strong>Category:</strong> ${industryPattern ? industryPattern.industry : selectedPattern.category}</div>
+                            <div><strong>Design Reasoning:</strong> ${selection.designReasoning}</div>
+                            <div class="${success ? 'success' : 'error'}">${message}</div>
+                        </div>
+                    `;
+                    
+                    document.getElementById(`result-${id}`).innerHTML = resultHtml;
+                    document.getElementById(`status-${id}`).innerHTML = success ? '✅' : '❌';
+                    
+                    results[id] = { success, data, message };
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+            } catch (error) {
+                console.error(`Test ${id} failed:`, error);
+                document.getElementById(`result-${id}`).innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                document.getElementById(`status-${id}`).innerHTML = '❌';
+                results[id] = { success: false, error: error.message };
+            }
+            
+            completedTests++;
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const totalTests = testCases.length;
+            const successCount = Object.values(results).filter(r => r.success).length;
+            const failureCount = completedTests - successCount;
+            
+            let summaryHtml = `
+                <div>📈 Progress: ${completedTests}/${totalTests} tests completed</div>
+                <div class="success">✅ Successful: ${successCount}</div>
+                <div class="error">❌ Failed: ${failureCount}</div>
+            `;
+            
+            if (completedTests === totalTests) {
+                const overallSuccess = successCount === totalTests;
+                summaryHtml += `
+                    <div class="mt-4 p-4 rounded-lg ${overallSuccess ? 'bg-green-100' : 'bg-red-100'}">
+                        <strong class="${overallSuccess ? 'success' : 'error'}">
+                            ${overallSuccess ? '🎉 All tests passed! Pattern diversity is working correctly.' : '⚠️ Some tests failed. Pattern diversity needs adjustment.'}
+                        </strong>
+                    </div>
+                `;
+                
+                if (overallSuccess) {
+                    summaryHtml += `
+                        <div class="mt-4 p-4 bg-blue-50 rounded-lg">
+                            <div class="info font-bold">✨ Key Improvements Achieved:</div>
+                            <ul class="list-disc list-inside mt-2 space-y-1 text-sm">
+                                <li>Hospital systems no longer generate as task management apps</li>
+                                <li>Restaurant POS systems have appropriate hospitality design</li>
+                                <li>Financial apps use finance-optimized patterns</li>
+                                <li>E-commerce sites get commerce-specific templates</li>
+                                <li>General requests still work with fallback patterns</li>
+                            </ul>
+                        </div>
+                    `;
+                }
+            }
+            
+            document.getElementById('summary').innerHTML = summaryHtml;
+        }
+
+        // Run all tests
+        async function runAllTests() {
+            console.log('🚀 Starting pattern diversity tests...');
+            
+            for (const testCase of testCases) {
+                await runTest(testCase);
+                // Small delay between tests
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            
+            console.log('✅ All tests completed');
+        }
+
+        // Start tests when page loads
+        runAllTests();
+    </script>
+</body>
+</html>

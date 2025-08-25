@@ -1,0 +1,143 @@
+// 学部・学科名の読み仮名マッピング
+export const facultyReadings: Record<string, string[]> = {
+  // 一般的な学部名
+  '法学部': ['ほうがくぶ', 'ほう', 'law', 'hogaku'],
+  '法学科': ['ほうがっか', 'law'],
+  '政治学科': ['せいじがっか', 'politics', 'seiji'],
+  '経済学部': ['けいざいがくぶ', 'けいざい', 'economics', 'keizai', 'kei'],
+  '経済学科': ['けいざいがっか', 'economics', 'keizai', 'kei'],
+  '経営学科': ['けいえいがっか', 'management', 'keiei', 'kei'],
+  '商学部': ['しょうがくぶ', 'しょう', 'commerce', 'shogaku', 'sho'],
+  '商学科': ['しょうがっか', 'commerce', 'shogaku', 'sho'],
+  '文学部': ['ぶんがくぶ', 'ぶん', 'literature', 'bungaku'],
+  '文学科': ['ぶんがっか', 'literature'],
+  '史学科': ['しがっか', 'history', 'shigaku'],
+  '哲学科': ['てつがっか', 'philosophy', 'tetsugaku'],
+  '心理学科': ['しんりがっか', 'psychology', 'shinri'],
+  '社会学部': ['しゃかいがくぶ', 'しゃかい', 'sociology', 'shakai', 'sha'],
+  '社会学科': ['しゃかいがっか', 'sociology', 'shakai', 'sha'],
+  '教育学部': ['きょういくがくぶ', 'きょういく', 'education', 'kyoiku', 'kyo'],
+  '教育学科': ['きょういくがっか', 'education', 'kyoiku', 'kyo'],
+  '理学部': ['りがくぶ', 'り', 'science', 'rigaku'],
+  '理学科': ['りがっか', 'science'],
+  '数学科': ['すうがっか', 'mathematics', 'sugaku', 'math'],
+  '物理学科': ['ぶつりがっか', 'physics', 'butsuri'],
+  '化学科': ['かがっか', 'chemistry', 'kagaku'],
+  '生物学科': ['せいぶつがっか', 'biology', 'seibutsu'],
+  '地球科学科': ['ちきゅうかがっか', 'earth science', 'chikyu'],
+  '工学部': ['こうがくぶ', 'こう', 'engineering', 'kogaku', 'ko'],
+  '工学科': ['こうがっか', 'engineering', 'kogaku', 'ko'],
+  '機械工学科': ['きかいこうがっか', 'mechanical', 'kikai', 'ki'],
+  '電気工学科': ['でんきこうがっか', 'electrical', 'denki', 'den'],
+  '電子工学科': ['でんしこうがっか', 'electronics', 'denshi', 'den'],
+  '情報工学科': ['じょうほうこうがっか', 'information', 'joho', 'jo'],
+  '建築学科': ['けんちくがっか', 'architecture', 'kenchiku', 'ken'],
+  '土木工学科': ['どぼくこうがっか', 'civil', 'doboku'],
+  '環境工学科': ['かんきょうこうがっか', 'environmental', 'kankyo'],
+  '農学部': ['のうがくぶ', 'のう', 'agriculture', 'nogaku'],
+  '農学科': ['のうがっか', 'agriculture'],
+  '農業経済学科': ['のうぎょうけいざいがっか', 'agricultural economics'],
+  '獣医学部': ['じゅういがくぶ', 'じゅうい', 'veterinary', 'juui'],
+  '獣医学科': ['じゅういがっか', 'veterinary'],
+  '医学部': ['いがくぶ', 'い', 'medicine', 'igaku', 'med'],
+  '医学科': ['いがっか', 'medicine'],
+  '看護学科': ['かんごがっか', 'nursing', 'kango'],
+  '薬学部': ['やくがくぶ', 'やく', 'pharmacy', 'yakugaku'],
+  '薬学科': ['やくがっか', 'pharmacy'],
+  '歯学部': ['しがくぶ', 'し', 'dentistry', 'shigaku'],
+  '歯学科': ['しがっか', 'dentistry'],
+  
+  // 現代的な学部名
+  '情報学部': ['じょうほうがくぶ', 'じょうほう', 'information', 'joho', 'jo'],
+  '情報科学部': ['じょうほうかがくぶ', 'information science', 'joho', 'jo'],
+  '情報科学科': ['じょうほうかがっか', 'information science', 'joho', 'jo'],
+  'データサイエンス学部': ['でーたさいえんすがくぶ', 'data science', 'ds'],
+  'データサイエンス学科': ['でーたさいえんすがっか', 'data science', 'ds'],
+  '国際学部': ['こくさいがくぶ', 'こくさい', 'international', 'kokusai', 'ko'],
+  '国際関係学部': ['こくさいかんけいがくぶ', 'international relations'],
+  '国際関係学科': ['こくさいかんけいがっか', 'international relations'],
+  '外国語学部': ['がいこくごがくぶ', 'がいこくご', 'foreign languages', 'gaikokugo'],
+  '英語学科': ['えいごがっか', 'english', 'eigo'],
+  '中国語学科': ['ちゅうごくごがっか', 'chinese', 'chugokugo'],
+  'グローバル学部': ['ぐろーばるがくぶ', 'global'],
+  'メディア学部': ['めでぃあがくぶ', 'media'],
+  'メディア学科': ['めでぃあがっか', 'media'],
+  'コミュニケーション学部': ['こみゅにけーしょんがくぶ', 'communication'],
+  'デザイン学部': ['でざいんがくぶ', 'design'],
+  'デザイン学科': ['でざいんがっか', 'design'],
+  '芸術学部': ['げいじゅつがくぶ', 'げいじゅつ', 'arts', 'geijutsu'],
+  '美術学科': ['びじゅつがっか', 'fine arts', 'bijutsu'],
+  '音楽学科': ['おんがくがっか', 'music', 'ongaku'],
+  
+  // 総合・学際系
+  '総合政策学部': ['そうごうせいさくがくぶ', 'そうせい', 'policy', 'sogo'],
+  '総合科学部': ['そうごうかがくぶ', 'integrated science'],
+  '人間科学部': ['にんげんかがくぶ', 'にんげん', 'human sciences', 'ningen'],
+  '環境情報学部': ['かんきょうじょうほうがくぶ', 'environmental information'],
+  '生命科学部': ['せいめいかがくぶ', 'せいめい', 'life sciences', 'seimei'],
+  
+  // 特殊な表記
+  '政治経済学部': ['せいじけいざいがくぶ', 'せいけい', 'political economy', 'seikei'],
+  '理工学部': ['りこうがくぶ', 'りこう', 'science and engineering', 'riko'],
+  '人文学部': ['じんぶんがくぶ', 'じんぶん', 'humanities', 'jinbun'],
+  '社会科学部': ['しゃかいかがくぶ', 'social sciences', 'shakai'],
+  '自然科学部': ['しぜんかがくぶ', 'natural sciences', 'shizen'],
+  
+  // 東大の進振り用
+  '文科一類': ['ぶんかいちるい', 'ぶんいち', 'humanities 1'],
+  '文科二類': ['ぶんかにるい', 'ぶんに', 'humanities 2'],
+  '文科三類': ['ぶんかさんるい', 'ぶんさん', 'humanities 3'],
+  '理科一類': ['りかいちるい', 'りいち', 'sciences 1'],
+  '理科二類': ['りかにるい', 'りに', 'sciences 2'],
+  '理科三類': ['りかさんるい', 'りさん', 'sciences 3'],
+  
+  // 専門職系
+  '法科大学院': ['ほうかだいがくいん', 'law school', 'ls'],
+  '経営学研究科': ['けいえいがくけんきゅうか', 'business school', 'mba'],
+  '公共政策大学院': ['こうきょうせいさくだいがくいん', 'public policy'],
+  
+  // 学科の別名
+  'コンピュータサイエンス学科': ['こんぴゅーたさいえんすがっか', 'computer science', 'cs', 'comp'],
+  'ソフトウェア工学科': ['そふとうぇあこうがっか', 'software engineering', 'se', 'soft'],
+  'システム工学科': ['しすてむこうがっか', 'systems engineering', 'sys'],
+  '応用数学科': ['おうようすうがっか', 'おうすう', 'applied mathematics', 'ou', 'app'],
+  '応用物理学科': ['おうようぶつりがっか', 'おうぶつ', 'applied physics', 'ou', 'app'],
+  '応用化学科': ['おうようかがっか', 'おうか', 'applied chemistry', 'ou', 'app'],
+  '応用生命科学科': ['おうようせいめいかがっか', 'おうせい', 'applied life science', 'ou', 'app'],
+  '応用生物科学科': ['おうようせいぶつかがっか', 'おうせい', 'applied biological science', 'ou', 'app'],
+  '生物工学科': ['せいぶつこうがっか', 'biotechnology', 'biotech', 'bio', 'sei'],
+  'バイオテクノロジー学科': ['ばいおてくのろじーがっか', 'biotechnology', 'bio'],
+  '材料工学科': ['ざいりょうこうがっか', 'materials engineering'],
+  '都市工学科': ['としこうがっか', 'urban engineering'],
+  '海洋工学科': ['かいようこうがっか', 'ocean engineering'],
+  '航空宇宙工学科': ['こうくううちゅうこうがっか', 'こうう', 'aerospace', 'aero'],
+  '機械航空宇宙工学科': ['きかいこうくううちゅうこうがっか', 'きこう', 'mechanical aerospace'],
+  '機械システム工学科': ['きかいしすてむこうがっか', 'きしす', 'mechanical systems'],
+  '電気電子工学科': ['でんきでんしこうがっか', 'でんでん', 'electrical electronics'],
+  '電気電子情報工学科': ['でんきでんしじょうほうこうがっか', 'でんでんじょう', 'electrical electronics information'],
+  '情報通信工学科': ['じょうほうつうしんこうがっか', 'じょうつう', 'information communication'],
+  '環境土木工学科': ['かんきょうどぼくこうがっか', 'かんど', 'environmental civil'],
+  '建築土木工学科': ['けんちくどぼくこうがっか', 'けんど', 'architecture civil'],
+  '物質化学工学科': ['ぶっしつかがくこうがっか', 'ぶっか', 'materials chemical'],
+  '生命化学工学科': ['せいめいかがくこうがっか', 'せいか', 'biochemical'],
+  
+  // その他
+  'スポーツ科学部': ['すぽーつかがくぶ', 'sports science', 'sports'],
+  'スポーツ健康科学部': ['すぽーつけんこうかがくぶ', 'sports and health'],
+  '健康科学部': ['けんこうかがくぶ', 'health sciences', 'kenko', 'ken'],
+  '福祉学部': ['ふくしがくぶ', 'ふくし', 'welfare', 'fukushi'],
+  '観光学部': ['かんこうがくぶ', 'かんこう', 'tourism', 'kanko'],
+  '経営情報学部': ['けいえいじょうほうがくぶ', 'management information'],
+  '現代社会学部': ['げんだいしゃかいがくぶ', 'modern society'],
+  '人文社会学部': ['じんぶんしゃかいがくぶ', 'humanities and social sciences'],
+  '地域創生学部': ['ちいきそうせいがくぶ', 'regional development'],
+}
+
+// 学部・学科名検索用の関数
+export function matchFacultyName(facultyName: string, query: string): boolean {
+  const readings = facultyReadings[facultyName]
+  if (!readings) return false
+  
+  const lowerQuery = query.toLowerCase()
+  return readings.some(reading => reading.includes(lowerQuery))
+}

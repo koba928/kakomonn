@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FreeTalk UI Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        #logs {
+            background: black;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        .test-results {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 3px;
+            margin: 5px 0;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>FreeTalk UI Test</h1>
+    <div id="logs"></div>
+    <div class="test-results">
+        <h2>Test Results</h2>
+        <div id="results"></div>
+        <button onclick="runTest()">Run Test</button>
+    </div>
+
+    <script>
+        const logs = document.getElementById('logs');
+        const results = document.getElementById('results');
+
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            logs.textContent += `[${timestamp}] ${message}\n`;
+            logs.scrollTop = logs.scrollHeight;
+            console.log(message);
+        }
+
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+
+        async function runTest() {
+            results.innerHTML = '';
+            logs.textContent = '';
+            
+            log('🚀 Starting FreeTalk UI Test...');
+            addResult('Test started...', 'info');
+
+            try {
+                // 1. Test basic connectivity
+                log('🔗 Testing connectivity to localhost:3000...');
+                const healthResponse = await fetch('http://localhost:3000/api/chat', {
+                    method: 'GET'
+                });
+                
+                if (healthResponse.ok) {
+                    log('✅ Server is reachable');
+                    addResult('✅ Server connectivity: OK', 'success');
+                } else {
+                    log('❌ Server returned non-200 status');
+                    addResult('❌ Server connectivity: FAILED', 'error');
+                    return;
+                }
+
+                // 2. Test the main page
+                log('🌐 Testing main page load...');
+                const pageResponse = await fetch('http://localhost:3000');
+                if (pageResponse.ok) {
+                    const pageText = await pageResponse.text();
+                    const hasFreeTalk = pageText.includes('FreeTalk');
+                    const hasDebugPanel = pageText.includes('UI-DEBUG');
+                    
+                    log(`✅ Main page loaded (${pageText.length} chars)`);
+                    log(`🔍 Contains FreeTalk: ${hasFreeTalk}`);
+                    log(`🔍 Contains debug panel: ${hasDebugPanel}`);
+                    
+                    addResult(`✅ Main page: OK (FreeTalk: ${hasFreeTalk}, Debug: ${hasDebugPanel})`, 'success');
+                } else {
+                    log('❌ Failed to load main page');
+                    addResult('❌ Main page: FAILED', 'error');
+                    return;
+                }
+
+                // 3. Test chat API with the exact message from the user
+                log('💬 Testing chat API with "こんにちは"...');
+                
+                const chatRequest = {
+                    message: 'こんにちは',
+                    phase: 'FreeTalk',
+                    messages: []
+                };
+                
+                log(`📤 Sending request: ${JSON.stringify(chatRequest)}`);
+                
+                const chatResponse = await fetch('http://localhost:3000/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(chatRequest)
+                });
+
+                log(`📥 Response status: ${chatResponse.status}`);
+                log(`📥 Response headers: ${JSON.stringify(Object.fromEntries(chatResponse.headers.entries()))}`);
+
+                if (chatResponse.ok) {
+                    const chatData = await chatResponse.json();
+                    log(`✅ Chat API successful`);
+                    log(`📋 Response: ${JSON.stringify(chatData, null, 2)}`);
+                    
+                    const hasMessage = !!chatData.message;
+                    const messageLength = chatData.message?.length || 0;
+                    const hasPhase = chatData.phase === 'FreeTalk';
+                    
+                    addResult(`✅ Chat API: OK (Message: ${hasMessage}, Length: ${messageLength}, Phase: ${hasPhase})`, 'success');
+                    
+                    if (hasMessage && messageLength > 0) {
+                        addResult(`📝 AI Response: "${chatData.message}"`, 'info');
+                    }
+                } else {
+                    const errorText = await chatResponse.text();
+                    log(`❌ Chat API failed: ${errorText}`);
+                    addResult(`❌ Chat API: FAILED (${chatResponse.status})`, 'error');
+                    addResult(`Error: ${errorText}`, 'error');
+                }
+
+                // 4. Summary
+                log('🏁 Test completed!');
+                addResult('🏁 Test completed! Check logs above for details.', 'info');
+
+            } catch (error) {
+                log(`💥 Test failed with error: ${error.message}`);
+                addResult(`💥 Test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-run test on page load
+        window.addEventListener('load', () => {
+            setTimeout(runTest, 1000);
+        });
+    </script>
+</body>
+</html>

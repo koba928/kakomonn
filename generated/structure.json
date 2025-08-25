@@ -1,0 +1,258 @@
+{
+  "meta": {
+    "generatedAt": "2025-07-08T07:43:44.280Z",
+    "version": "1.0.0",
+    "userInput": "test app"
+  },
+  "design": {
+    "serviceType": {
+      "category": "other",
+      "confidence": 0,
+      "subcategory": "general"
+    },
+    "title": "Test App App",
+    "description": "test app",
+    "pages": [
+      {
+        "name": "Home",
+        "path": "/",
+        "purpose": "Landing page and main content display",
+        "required": true,
+        "components": [
+          "Header",
+          "Hero",
+          "MainContent",
+          "Footer"
+        ]
+      },
+      {
+        "name": "items Management",
+        "path": "/items",
+        "purpose": "Manage items",
+        "required": true,
+        "components": [
+          "Header",
+          "itemsList",
+          "itemsForm",
+          "Footer"
+        ]
+      }
+    ],
+    "features": [
+      {
+        "name": "items",
+        "description": "items management functionality",
+        "priority": "high",
+        "crud": {
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": true
+        },
+        "realtime": false,
+        "auth": false
+      }
+    ],
+    "dataModels": [
+      {
+        "name": "Item",
+        "fields": [
+          {
+            "name": "id",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "title",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "createdAt",
+            "type": "Date",
+            "required": true
+          }
+        ]
+      }
+    ],
+    "stateRequirements": {
+      "global": [
+        "loading",
+        "error",
+        "items"
+      ],
+      "local": [
+        "itemsForm"
+      ],
+      "persistence": true
+    },
+    "apiEndpoints": [
+      {
+        "path": "/items",
+        "method": "GET",
+        "purpose": "Get all items",
+        "mockData": true
+      },
+      {
+        "path": "/items",
+        "method": "POST",
+        "purpose": "Create new item",
+        "mockData": true
+      },
+      {
+        "path": "/items/[id]",
+        "method": "PUT",
+        "purpose": "Update item",
+        "mockData": true
+      },
+      {
+        "path": "/items/[id]",
+        "method": "DELETE",
+        "purpose": "Delete item",
+        "mockData": false
+      }
+    ]
+  },
+  "generationPlan": [
+    {
+      "phase": "Foundation",
+      "files": [
+        {
+          "path": "lib/types/index.ts",
+          "type": "config",
+          "dependencies": []
+        },
+        {
+          "path": "lib/stores/appStore.ts",
+          "type": "store",
+          "dependencies": [
+            "zustand",
+            "zustand/middleware"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": "API Layer",
+      "files": [
+        {
+          "path": "app/api/items/route.ts",
+          "type": "api",
+          "dependencies": [
+            "next"
+          ]
+        },
+        {
+          "path": "app/api/items/route.ts",
+          "type": "api",
+          "dependencies": [
+            "next"
+          ]
+        },
+        {
+          "path": "app/api/items/[id]/route.ts",
+          "type": "api",
+          "dependencies": [
+            "next"
+          ]
+        },
+        {
+          "path": "app/api/items/[id]/route.ts",
+          "type": "api",
+          "dependencies": [
+            "next"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": "Components",
+      "files": [
+        {
+          "path": "components/items/itemsList.tsx",
+          "type": "component",
+          "dependencies": [
+            "react",
+            "@/components/ui/*"
+          ]
+        },
+        {
+          "path": "components/items/itemsForm.tsx",
+          "type": "component",
+          "dependencies": [
+            "react",
+            "@/components/ui/*",
+            "react-hook-form"
+          ]
+        },
+        {
+          "path": "components/items/itemsCard.tsx",
+          "type": "component",
+          "dependencies": [
+            "react",
+            "@/components/ui/*"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": "Pages",
+      "files": [
+        {
+          "path": "app/page.tsx",
+          "type": "component",
+          "dependencies": [
+            "react",
+            "@/components/ui/*",
+            "@/lib/stores/appStore"
+          ]
+        },
+        {
+          "path": "app/items/page.tsx",
+          "type": "component",
+          "dependencies": [
+            "react",
+            "@/components/ui/*",
+            "@/lib/stores/appStore"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": "Handlers",
+      "files": [
+        {
+          "path": "lib/handlers/itemsHandlers.ts",
+          "type": "handler",
+          "dependencies": [
+            "@/lib/stores/appStore"
+          ]
+        }
+      ]
+    }
+  ],
+  "validation": {
+    "requiredFiles": [
+      "app/layout.tsx",
+      "app/page.tsx",
+      "components/ui/button.tsx",
+      "components/ui/card.tsx",
+      "components/ui/input.tsx",
+      "lib/stores/appStore.ts"
+    ],
+    "dependencies": [
+      "react",
+      "next",
+      "zustand",
+      "tailwindcss",
+      "@radix-ui/react-*"
+    ],
+    "checks": [
+      "TypeScript compilation",
+      "Component rendering",
+      "Store functionality",
+      "API endpoints",
+      "Responsive design"
+    ]
+  }
+}

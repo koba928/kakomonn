@@ -1,0 +1,321 @@
+{
+  "name": "Figma basics",
+  "elements": [
+    {
+      "type": "text",
+      "id": "10:9",
+      "name": "Design your own card here!",
+      "styles": {
+        "width": 480,
+        "height": 124,
+        "x": 3186,
+        "y": 149,
+        "backgroundColor": "#000000",
+        "fontSize": 48,
+        "fontWeight": 400,
+        "color": "#000000"
+      },
+      "content": "Design your own card here!"
+    },
+    {
+      "type": "frame",
+      "id": "10:10",
+      "name": "Vector 132",
+      "styles": {
+        "width": 264,
+        "height": 141,
+        "x": 3162,
+        "y": -36
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "10:11",
+      "name": "k8-0_fkPHulv-M-unsplash 1",
+      "styles": {
+        "width": 395,
+        "height": 296,
+        "x": 3240,
+        "y": 401
+      }
+    },
+    {
+      "type": "frame",
+      "id": "10:13",
+      "name": "Thumbnail",
+      "styles": {
+        "width": 1200,
+        "height": 720,
+        "x": -2993,
+        "y": -1564,
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
+      "type": "frame",
+      "id": "10:44",
+      "name": "About this file",
+      "styles": {
+        "width": 1200,
+        "height": 720,
+        "x": -1721,
+        "y": -1564,
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
+      "type": "frame",
+      "id": "10:49",
+      "name": "What's in this?",
+      "styles": {
+        "width": 1200,
+        "height": 720,
+        "x": -449,
+        "y": -1564,
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
+      "type": "frame",
+      "id": "10:55",
+      "name": "Practice designs",
+      "styles": {
+        "width": 1200,
+        "height": 720,
+        "x": -2993,
+        "y": -485,
+        "backgroundColor": "#0fa958"
+      }
+    },
+    {
+      "type": "frame",
+      "id": "10:80",
+      "name": "Homepage",
+      "styles": {
+        "width": 1440,
+        "height": 2092,
+        "x": -1593,
+        "y": -485,
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
+      "type": "frame",
+      "id": "10:97",
+      "name": "Shopping cart",
+      "styles": {
+        "width": 1440,
+        "height": 1024,
+        "x": 47,
+        "y": -485,
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
+      "type": "frame",
+      "id": "10:163",
+      "name": "Product page",
+      "styles": {
+        "width": 1440,
+        "height": 1024,
+        "x": 1687,
+        "y": -485,
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
+      "type": "frame",
+      "id": "14:11",
+      "name": "Vector 132",
+      "styles": {
+        "width": 264,
+        "height": 141,
+        "x": 3162,
+        "y": -36
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "14:12",
+      "name": "k8-0_fkPHulv-M-unsplash 1",
+      "styles": {
+        "width": 395,
+        "height": 296,
+        "x": 3240,
+        "y": 401
+      }
+    },
+    {
+      "type": "frame",
+      "id": "14:14",
+      "name": "Thumbnail",
+      "styles": {
+        "width": 1200,
+        "height": 720,
+        "x": -2993,
+        "y": -1564,
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
+      "type": "frame",
+      "id": "14:45",
+      "name": "About this file",
+      "styles": {
+        "width": 1200,
+        "height": 720,
+        "x": -1721,
+        "y": -1564,
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
+      "type": "frame",
+      "id": "14:50",
+      "name": "What's in this?",
+      "styles": {
+        "width": 1200,
+        "height": 720,
+        "x": -449,
+        "y": -1564,
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
+      "type": "frame",
+      "id": "14:56",
+      "name": "Practice designs",
+      "styles": {
+        "width": 1200,
+        "height": 720,
+        "x": -2993,
+        "y": -485,
+        "backgroundColor": "#0fa958"
+      }
+    },
+    {
+      "type": "frame",
+      "id": "14:81",
+      "name": "Homepage",
+      "styles": {
+        "width": 1440,
+        "height": 2092,
+        "x": -1593,
+        "y": -485,
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
+      "type": "frame",
+      "id": "14:98",
+      "name": "Shopping cart",
+      "styles": {
+        "width": 1440,
+        "height": 1024,
+        "x": 47,
+        "y": -485,
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
+      "type": "frame",
+      "id": "14:164",
+      "name": "Product page",
+      "styles": {
+        "width": 1440,
+        "height": 1024,
+        "x": 1687,
+        "y": -485,
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
+      "type": "text",
+      "id": "14:200",
+      "name": "Design your own card here!",
+      "styles": {
+        "width": 480,
+        "height": 124,
+        "x": 3186,
+        "y": 144,
+        "backgroundColor": "#000000",
+        "fontSize": 48,
+        "fontWeight": 400,
+        "color": "#000000"
+      },
+      "content": "ここで自分のカードをデザインしましょう。"
+    },
+    {
+      "type": "rectangle",
+      "id": "14:201",
+      "name": "k8-0_fkPHulv-M-unsplash 1",
+      "styles": {
+        "width": 395,
+        "height": 296,
+        "x": 3240,
+        "y": 401
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "14:204",
+      "name": "k8-0_fkPHulv-M-unsplash 1",
+      "styles": {
+        "width": 395,
+        "height": 296,
+        "x": 3240,
+        "y": 401
+      }
+    },
+    {
+      "type": "frame",
+      "id": "14:207",
+      "name": "Homepage",
+      "styles": {
+        "width": 1440,
+        "height": 2092,
+        "x": -1593,
+        "y": -485,
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
+      "type": "frame",
+      "id": "14:225",
+      "name": "Homepage",
+      "styles": {
+        "width": 1440,
+        "height": 2092,
+        "x": -1593,
+        "y": -485,
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
+      "type": "text",
+      "id": "16:244",
+      "name": "Use this image to complete your card",
+      "styles": {
+        "width": 399,
+        "height": 186,
+        "x": 3232,
+        "y": 741,
+        "backgroundColor": "#000000",
+        "fontSize": 48,
+        "fontWeight": 400,
+        "color": "#000000"
+      },
+      "content": "この画像を使ってカードを完成させます"
+    }
+  ],
+  "metadata": {
+    "totalElements": 25,
+    "hasText": true,
+    "hasFrames": true,
+    "dominantColors": [
+      "#000000",
+      "#ffffff",
+      "#0fa958"
+    ]
+  }
+}

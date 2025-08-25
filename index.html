@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>シンプルタスク管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        border: 'hsl(var(--border))',
+                        input: 'hsl(var(--input))',
+                        ring: 'hsl(var(--ring))',
+                        background: 'hsl(var(--background))',
+                        foreground: 'hsl(var(--foreground))',
+                        primary: {
+                            DEFAULT: 'hsl(var(--primary))',
+                            foreground: 'hsl(var(--primary-foreground))',
+                        },
+                        secondary: {
+                            DEFAULT: 'hsl(var(--secondary))',
+                            foreground: 'hsl(var(--secondary-foreground))',
+                        },
+                        destructive: {
+                            DEFAULT: 'hsl(var(--destructive))',
+                            foreground: 'hsl(var(--destructive-foreground))',
+                        },
+                        muted: {
+                            DEFAULT: 'hsl(var(--muted))',
+                            foreground: 'hsl(var(--muted-foreground))',
+                        },
+                        accent: {
+                            DEFAULT: 'hsl(var(--accent))',
+                            foreground: 'hsl(var(--accent-foreground))',
+                        },
+                        popover: {
+                            DEFAULT: 'hsl(var(--popover))',
+                            foreground: 'hsl(var(--popover-foreground))',
+                        },
+                        card: {
+                            DEFAULT: 'hsl(var(--card))',
+                            foreground: 'hsl(var(--card-foreground))',
+                        },
+                    },
+                    borderRadius: {
+                        lg: `var(--radius)`,
+                        md: `calc(var(--radius) - 2px)`,
+                        sm: 'calc(var(--radius) - 4px)',
+                    },
+                    keyframes: {
+                        "accordion-down": {
+                            from: { height: 0 },
+                            to: { height: "var(--radix-accordion-content-height)" },
+                        },
+                        "accordion-up": {
+                            from: { height: "var(--radix-accordion-content-height)" },
+                            to: { height: 0 },
+                        },
+                        "toast-in": {
+                            "0%": { transform: "translateY(100%)", opacity: 0 },
+                            "100%": { transform: "translateY(0)", opacity: 1 },
+                        },
+                        "toast-out": {
+                            "0%": { transform: "translateY(0)", opacity: 1 },
+                            "100%": { transform: "translateY(100%)", opacity: 0 },
+                        },
+                    },
+                    animation: {
+                        "accordion-down": "accordion-down 0.2s ease-out",
+                        "accordion-up": "accordion-up 0.2s ease-out",
+                        "toast-in": "toast-in 0.3s ease-out forwards",
+                        "toast-out": "toast-out 0.3s ease-in forwards",
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        :root {
+            --background: 0 0% 100%;
+            --foreground: 222.2 47.4% 11.2%;
+            --card: 0 0% 100%;
+            --card-foreground: 222.2 47.4% 11.2%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 222.2 47.4% 11.2%;
+            --primary: 221.2 83.2% 53.3%; /* #2563eb */
+            --primary-foreground: 210 40% 98%;
+            --secondary: 222.2 77.8% 44.1%; /* #1e40af */
+            --secondary-foreground: 210 40% 98%;
+            --muted: 210 40% 96.1%;
+            --muted-foreground: 215.4 16.3% 46.9%;
+            --accent: 187.2 98.2% 41.8%; /* #06b6d4 */
+            --accent-foreground: 210 40% 98%;
+            --destructive: 0 84.2% 60.2%;
+            --destructive-foreground: 210 40% 98%;
+            --border: 214.3 31.8% 91.4%;
+            --input: 214.3 31.8% 91.4%;
+            --ring: 222.2 84% 49.4%;
+            --radius: 0.5rem;
+        }
+        body {
+            background-color: hsl(var(--background));
+            color: #374151;
+        }
+        .task-card.completed {
+            opacity: 0.6;
+        }
+        .task-card.completed .task-name {
+            text-decoration: line-through;
+            color: hsl(var(--muted-foreground));
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen bg-background font-sans p-4 sm:p-6 lg:p-8">
+
+    <!-- Main Container -->
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold tracking-tight text-primary">タスク管理ツール</h1>
+            <p class="text-muted-foreground mt-2">日々のタスクを効率的に管理し、生産性を向上させましょう。</p>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column: Task Input & Actions -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Task Input Card -->
+                <div class="bg-card border rounded-lg shadow-sm p-6">
+                    <h2 class="text-2xl font-semibold text-card-foreground mb-4">新しいタスクを追加</h2>
+                    <form id="task-form" class="space-y-4">
+                        <div>
+                            <label for="task-name" class="block text-sm font-medium text-foreground mb-1">タスク名</label>
+                            <input type="text" id="task-name" placeholder="例: プロジェクトのレポートを提出" class="h-10 w-full border border-input bg-background px-3 py-2 text-sm rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" required>
+                        </div>
+                        <div>
+                            <label for="task-category" class="block text-sm font-medium text-foreground mb-1">カテゴリ</label>
+                            <input type="text" id="task-category" placeholder="例: 仕事, 学習" class="h-10 w-full border border-input bg-background px-3 py-2 text-sm rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                        </div>
+                        <button type="submit" class="w-full inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                            タスクを追加
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Actions Card -->
+                <div class="bg-card border rounded-lg shadow-sm p-6">
+                    <h3 class="text-xl font-semibold text-card-foreground mb-4">アクション</h3>
+                    <div class="space-y-3">
+                        <button id="bulk-delete-btn" class="w-full inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors" disabled>選択した項目を削除</button>
+                        <button id="bulk-complete-btn" class="w-full inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 bg-secondary text-secondary-foreground hover:bg-secondary/90 transition-colors" disabled>選択した項目を完了</button>
+                        <div class="flex gap-3 pt-2">
+                            <button id="export-btn" class="flex-1 inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 border border-input hover:bg-accent hover:text-accent-foreground transition-colors">エクスポート</button>
+                            <button id="import-btn" class="flex-1 inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 border border-input hover:bg-accent hover:text-accent-foreground transition-colors">インポート</button>
+                            <input type="file" id="import-file-input" class="hidden" accept=".json">
+                        </div>
+                    </div>
+                </div>
+                 <!-- Statistics Dashboard -->
+                <div class="bg-card border rounded-lg shadow-sm p-6">
+                    <h3 class="text-xl font-semibold text-card-foreground mb-4">統計ダッシュボード</h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between items-center">
+                            <span class="text-muted-foreground">総タスク数:</span>
+                            <span id="stats-total" class="font-bold text-lg text-primary">0</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-muted-foreground">完了済み:</span>
+                            <span id="stats-completed" class="font-bold text-lg text-green-600">0</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-muted-foreground">未完了:</span>
+                            <span id="stats-pending" class="font-bold text-lg text-yellow-600">0</span>
+                        </div>
+                        <div class="mt-4">
+                            <div class="w-full bg-muted rounded-full h-2.5">
+                                <div id="stats-progress-bar" class="bg-primary h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <p class="text-center text-xs text-muted-foreground mt-1">完了率: <span id="stats-progress-text">0%</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Task List -->
+            <div class="lg:col-span-2">
+                <!-- Search and Filter -->
+                <div class="bg-card border rounded-lg shadow-sm p-4 mb-6">
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <div class="flex-grow">
+                            <label for="search-input" class="sr-only">検索</label>
+                            <div class="relative">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                                <input type="text" id="search-input" placeholder="タスクを検索..." class="pl-10 h-10 w-full border border-input bg-background px-3 py-2 text-sm rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0">
+                             <select id="category-filter" class="h-10 border border-input bg-background px-3 py-2 text-sm rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                                <option value="all">すべてのカテゴリ</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task List -->
+                <div class="space-y-4" id="task-list">
+                    <!-- Task items will be injected here -->
+                </div>
+                <div id="no-tasks-message" class="hidden text-center py-12">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-muted-foreground opacity-50"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+                    <p class="mt-4 text-lg font-semibold text-muted-foreground">すべてのタスクが完了しています！</p>
+                    <p class="text-sm text-muted-foreground">新しいタスクを追加して始めましょう。</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 w-[350px] bg-card text-card-foreground p-4 rounded-lg shadow-lg border flex items-center gap-4 transition-transform duration-300 translate-y-[150%]">
+        <div id="toast-icon"></div>
+        <p id="toast-message" class="flex-grow text-sm font-medium"></p>
+        <button id="toast-close" class="text-muted-foreground hover:text-foreground">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="modal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+        <div class="bg-card rounded-lg shadow-lg p-6 w-full max-w-md">
+            <h3 id="modal-title" class="text-lg font-semibold text-card-foreground"></h3>
+            <p id="modal-message" class="text-sm text-muted-foreground mt-2 mb-6"></p>
+            <div class="flex justify-end gap-4">
+                <button id="modal-cancel" class="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 border border-input hover:bg-accent hover:text-accent-foreground">キャンセル</button>
+                <button id="modal-confirm" class="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 bg-destructive text-destructive-foreground hover:bg-destructive/90">確認</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            const taskForm = document.getElementById('task-form');
+            const taskNameInput = document.getElementById('task-name');
+            const taskCategoryInput = document.getElementById('task-category');
+            const taskList = document.getElementById('task-list');
+            const noTasksMessage = document.getElementById('no-tasks-message');
+            const searchInput = document.getElementById('search-input');
+            const categoryFilter = document.getElementById('category-filter');
+            
+            // Stats
+            const statsTotal = document.getElementById('stats-total');
+            const statsCompleted = document.getElementById('stats-completed');
+            const statsPending = document.getElementById('stats-pending');
+            const statsProgressBar = document.getElementById('stats-progress-bar');
+            const statsProgressText = document.getElementById('stats-progress-text');
+
+            // Bulk Actions
+            const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
+            const bulkCompleteBtn = document.getElementById('bulk-complete-btn');
+
+            // Import/Export
+            const exportBtn = document.getElementById('export-btn');
+            const importBtn = document.getElementById('import-btn');
+            const importFileInput = document.getElementById('import-file-input');
+
+            // Toast
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+            const toastClose = document.getElementById('toast-close');
+            let toastTimeout;
+
+            // Modal
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalMessage = document.getElementById('modal-message');
+            const modalCancel = document.getElementById('modal-cancel');
+            const modalConfirm = document.getElementById('modal-confirm');
+            let modalConfirmCallback = null;
+
+            // --- State ---
+            let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+            // --- Functions ---
+
+            const saveTasks = () => {
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+            };
+
+            const renderTasks = () => {
+                const searchTerm = searchInput.value.toLowerCase();
+                const selectedCategory = categoryFilter.value;
+
+                const filteredTasks = tasks.filter(task => {
+                    const matchesSearch = task.name.toLowerCase().includes(searchTerm) || task.category.toLowerCase().includes(searchTerm);
+                    const matchesCategory = selectedCategory === 'all' || task.category === selectedCategory;
+                    return matchesSearch && matchesCategory;
+                });
+
+                taskList.innerHTML = '';
+                if (filteredTasks.length === 0) {
+                    noTasksMessage.classList.remove('hidden');
+                } else {
+                    noTasksMessage.classList.add('hidden');
+                    filteredTasks.forEach(task => {
+                        const taskElement = document.createElement('div');
+                        taskElement.className = `task-card bg-card border rounded-lg p-4 flex items-start gap-4 transition-all hover:shadow-md ${task.completed ? 'completed' : ''}`;
+                        taskElement.dataset.id = task.id;
+
+                        taskElement.innerHTML = `
+                            <input type="checkbox" class="bulk-checkbox mt-1 h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer" ${task.completed ? 'checked' : ''}>
+                            <div class="flex-grow">
+                                <p class="task-name font-semibold text-card-foreground">${task.name}</p>
+                                ${task.category ? `<span class="text-xs bg-secondary text-secondary-foreground rounded-full px-2 py-0.5">${task.category}</span>` : ''}
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button class="delete-btn text-muted-foreground hover:text-destructive transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                                </button>
+                            </div>
+                        `;
+                        taskList.appendChild(taskElement);
+                    });
+                }
+                updateDashboard();
+                updateCategories();
+                updateBulkActionButtons();
+            };
+
+            const updateDashboard = () => {
+                const total = tasks.length;
+                const completed = tasks.filter(t => t.completed).length;
+                const pending = total - completed;
+                const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+                statsTotal.textContent = total;
+                statsCompleted.textContent = completed;
+                statsPending.textContent = pending;
+                statsProgressBar.style.width = `${progress}%`;
+                statsProgressText.textContent = `${progress}%`;
+            };
+            
+            const updateCategories = () => {
+                const categories = [...new Set(tasks.map(t => t.category).filter(Boolean))];
+                const currentCategory = categoryFilter.value;
+                categoryFilter.innerHTML = '<option value="all">すべてのカテゴリ</option>';
+                categories.sort().forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat;
+                    option.textContent = cat;
+                    categoryFilter.appendChild(option);
+                });
+                categoryFilter.value = currentCategory;
+            };
+
+            const updateBulkActionButtons = () => {
+                const selectedCount = document.querySelectorAll('.bulk-checkbox:checked').length;
+                if (selectedCount > 0) {
+                    bulkDeleteBtn.disabled = false;
+                    bulkCompleteBtn.disabled = false;
+                    bulkDeleteBtn.textContent = `選択した ${selectedCount} 件を削除`;
+                    bulkCompleteBtn.textContent = `選択した ${selectedCount} 件を完了`;
+                } else {
+                    bulkDeleteBtn.disabled = true;
+                    bulkCompleteBtn.disabled = true;
+                    bulkDeleteBtn.textContent = '選択した項目を削除';
+                    bulkCompleteBtn.textContent = '選択した項目を完了';
+                }
+            };
+
+            const showToast = (message, type = 'success') => {
+                clearTimeout(toastTimeout);
+                toastMessage.textContent = message;
+                
+                const icons = {
+                    success: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>`,
+                    error: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-destructive"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>`,
+                    info: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`
+                };
+                toastIcon.innerHTML = icons[type];
+
+                toast.classList.remove('translate-y-[150%]');
+                toast.classList.add('animate-toast-in');
+                
+                toastTimeout = setTimeout(() => {
+                    toast.classList.add('animate-toast-out');
+                    toast.classList.remove('animate-toast-in');
+                    // Allow animation to finish before hiding
+                    setTimeout(() => toast.classList.add('translate-y-[150%]'), 300);
+                }, 4000);
+            };
+
+            const showModal = (title, message, onConfirm) => {
+                modalTitle.textContent = title;
+                modalMessage.textContent = message;
+                modalConfirmCallback = onConfirm;
+                modal.classList.remove('hidden');
+            };
+
+            const hideModal = () => {
+                modal.classList.add('hidden');
+                modalConfirmCallback = null;
+            };
+
+            const addTask = (name, category) => {
+                if (!name.trim()) {
+                    showToast('タスク名を入力してください。', 'error');
+                    return;
+                }
+                const newTask = {
+                    id: Date.now().toString(),
+                    name: name.trim(),
+                    category: category.trim(),
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                };
+                tasks.unshift(newTask);
+                saveTasks();
+                renderTasks();
+                taskForm.reset();
+                taskNameInput.focus();
+                showToast('タスクが追加されました。');
+            };
+
+            // --- Event Listeners ---
+            taskForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                addTask(taskNameInput.value, taskCategoryInput.value);
+            });
+
+            taskList.addEventListener('click', (e) => {
+                const target = e.target;
+                const taskCard = target.closest('.task-card');
+                if (!taskCard) return;
+                const taskId = taskCard.dataset.id;
+
+                if (target.closest('.delete-btn')) {
+                    showModal('タスクの削除', 'このタスクを本当に削除しますか？この操作は元に戻せません。', () => {
+                        tasks = tasks.filter(t => t.id !== taskId);
+                        saveTasks();
+                        renderTasks();
+                        showToast('タスクが削除されました。', 'info');
+                        hideModal();
+                    });
+                } else if (target.type === 'checkbox') {
+                    const task = tasks.find(t => t.id === taskId);
+                    if (task) {
+                        task.completed = target.checked;
+                        saveTasks();
+                        renderTasks(); // Re-render to apply style changes
+                        showToast(task.completed ? 'タスクを完了しました。' : 'タスクを未完了に戻しました。');
+                    }
+                }
+            });
+            
+            taskList.addEventListener('change', (e) => {
+                if (e.target.classList.contains('bulk-checkbox')) {
+                    updateBulkActionButtons();
+                }
+            });
+
+            searchInput.addEventListener('input', renderTasks);
+            categoryFilter.addEventListener('change', renderTasks);
+
+            toastClose.addEventListener('click', () => {
+                clearTimeout(toastTimeout);
+                toast.classList.add('translate-y-[150%]');
+            });
+
+            modalCancel.addEventListener('click', hideModal);
+            modalConfirm.addEventListener('click', () => {
+                if (modalConfirmCallback) {
+                    modalConfirmCallback();
+                }
+            });
+
+            // Bulk Actions
+            bulkDeleteBtn.addEventListener('click', () => {
+                const selectedIds = [...document.querySelectorAll('.bulk-checkbox:checked')].map(cb => cb.closest('.task-card').dataset.id);
+                if (selectedIds.length === 0) return;
+
+                showModal('一括削除', `${selectedIds.length}件のタスクを本当に削除しますか？`, () => {
+                    tasks = tasks.filter(t => !selectedIds.includes(t.id));
+                    saveTasks();
+                    renderTasks();
+                    showToast(`${selectedIds.length}件のタスクが削除されました。`, 'info');
+                    hideModal();
+                });
+            });
+
+            bulkCompleteBtn.addEventListener('click', () => {
+                const selectedIds = [...document.querySelectorAll('.bulk-checkbox:checked')].map(cb => cb.closest('.task-card').dataset.id);
+                if (selectedIds.length === 0) return;
+                
+                tasks.forEach(task => {
+                    if (selectedIds.includes(task.id)) {
+                        task.completed = true;
+                    }
+                });
+                saveTasks();
+                renderTasks();
+                showToast(`${selectedIds.length}件のタスクを完了しました。`);
+            });
+
+            // Import/Export
+            exportBtn.addEventListener('click', () => {
+                if (tasks.length === 0) {
+                    showToast('エクスポートするタスクがありません。', 'error');
+                    return;
+                }
+                const dataStr = JSON.stringify(tasks, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `tasks_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('タスクがエクスポートされました。');
+            });
+
+            importBtn.addEventListener('click', () => importFileInput.click());
+            importFileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const importedTasks = JSON.parse(event.target.result);
+                        if (!Array.isArray(importedTasks) || !importedTasks.every(t => t.id && t.name)) {
+                           throw new Error('Invalid file format');
+                        }
+                        showModal('タスクのインポート', '現在のタスクをインポートしたデータで上書きしますか？この操作は元に戻せません。', () => {
+                            tasks = importedTasks;
+                            saveTasks();
+                            renderTasks();
+                            showToast('タスクが正常にインポートされました。');
+                            hideModal();
+                        });
+                    } catch (error) {
+                        showToast('無効なファイル形式です。JSONファイルを選択してください。', 'error');
+                    } finally {
+                        importFileInput.value = ''; // Reset file input
+                    }
+                };
+                reader.readAsText(file);
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                // Ctrl+S or Cmd+S to save (submit form)
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    if (document.activeElement === taskNameInput || document.activeElement === taskCategoryInput) {
+                        taskForm.requestSubmit();
+                    }
+                }
+                // Escape to close modal
+                if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                    hideModal();
+                }
+            });
+
+            // --- Initial Render ---
+            renderTasks();
+        });
+    </script>
+</body>
+</html>

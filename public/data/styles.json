@@ -1,0 +1,50 @@
+[
+  {
+    "id": "pop",
+    "name": "ポップ",
+    "description": "カラフルで遊び心あるデザイン",
+    "thumbnail": "/thumbnails/pop.png"
+  },
+  {
+    "id": "minimal",
+    "name": "ミニマル",
+    "description": "シンプルで洗練されたスタイル",
+    "thumbnail": "/thumbnails/minimal.png"
+  },
+  {
+    "id": "modern",
+    "name": "モダン",
+    "description": "最新トレンドを取り入れた現代的デザイン",
+    "thumbnail": "/thumbnails/modern.png"
+  },
+  {
+    "id": "elegant",
+    "name": "エレガント",
+    "description": "上品で高級感のある佇まい",
+    "thumbnail": "/thumbnails/elegant.png"
+  },
+  {
+    "id": "natural",
+    "name": "ナチュラル",
+    "description": "自然で温かみのあるテイスト",
+    "thumbnail": "/thumbnails/natural.png"
+  },
+  {
+    "id": "tech",
+    "name": "テック",
+    "description": "先進的で未来感のあるスタイル",
+    "thumbnail": "/thumbnails/tech.png"
+  },
+  {
+    "id": "retro",
+    "name": "レトロ",
+    "description": "懐かしさと新しさの融合",
+    "thumbnail": "/thumbnails/retro.png"
+  },
+  {
+    "id": "business",
+    "name": "ビジネス",
+    "description": "信頼感のあるプロフェッショナル",
+    "thumbnail": "/thumbnails/business.png"
+  }
+]

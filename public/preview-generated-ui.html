@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MATURA生成UI プレビュー</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .button {
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .button-danger {
+            background: #e53e3e;
+        }
+        .button-danger:hover {
+            background: #c53030;
+        }
+        .input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        .input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .item-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+        .item-card:hover {
+            background: #f7fafc;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto max-w-4xl">
+        <!-- ヘッダー -->
+        <div class="text-center mb-8 fade-in">
+            <h1 class="text-4xl font-bold text-white mb-4">
+                ✨ MATURA生成アプリのUI
+            </h1>
+            <p class="text-white/80">実際に生成されたUIがこちらです</p>
+        </div>
+
+        <!-- メインコンテナ -->
+        <div class="card p-6 mb-6 fade-in">
+            <h1 class="text-3xl font-bold mb-8 text-center text-gray-800">
+                美しいタスク管理アプリ - 管理システム
+            </h1>
+            
+            <!-- 新規作成フォーム -->
+            <div class="card p-6 mb-8" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                <div class="mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">新規作成</h2>
+                </div>
+                <form class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-gray-700">名前</label>
+                        <input
+                            type="text"
+                            class="input"
+                            placeholder="名前を入力してください"
+                            id="taskName"
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-gray-700">説明</label>
+                        <input
+                            type="text"
+                            class="input"
+                            placeholder="説明を入力してください（任意）"
+                            id="taskDescription"
+                        />
+                    </div>
+                    <button type="button" class="button w-full" onclick="addTask()">
+                        作成
+                    </button>
+                </form>
+            </div>
+
+            <!-- データ一覧 -->
+            <div class="card p-6" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                <div class="mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">データ一覧 (<span id="itemCount">2</span>件)</h2>
+                </div>
+                
+                <div id="taskList">
+                    <!-- サンプルタスク1 -->
+                    <div class="item-card">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">プロジェクトの企画書作成</h3>
+                                <p class="text-gray-600 text-sm">来週のプレゼン用資料を準備する</p>
+                                <p class="text-xs text-gray-400 mt-1">
+                                    作成日: 2025/01/20
+                                </p>
+                            </div>
+                            <button class="button button-danger" onclick="deleteTask(this)">
+                                削除
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- サンプルタスク2 -->
+                    <div class="item-card">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">API仕様書の更新</h3>
+                                <p class="text-gray-600 text-sm">新機能追加に伴う仕様書の改訂</p>
+                                <p class="text-xs text-gray-400 mt-1">
+                                    作成日: 2025/01/19
+                                </p>
+                            </div>
+                            <button class="button button-danger" onclick="deleteTask(this)">
+                                削除
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 空の状態（初期は非表示） -->
+                    <div id="emptyState" class="text-center py-8" style="display: none;">
+                        <p class="text-gray-500">
+                            まだデータがありません。上のフォームから作成してください。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API情報 -->
+            <div class="mt-8 p-4 bg-gray-100 rounded-lg">
+                <h3 class="font-semibold mb-2 text-gray-800">使用可能なAPI:</h3>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>📡 GET /api/crud/tasks - 全データ取得</li>
+                    <li>✏️ POST /api/crud/tasks - 新規作成</li>
+                    <li>🗑️ DELETE /api/crud/tasks?id=xxx - 削除</li>
+                </ul>
+                <p class="text-xs text-gray-500 mt-2">
+                    テーブル名: tasks
+                </p>
+            </div>
+        </div>
+
+        <!-- 品質指標 -->
+        <div class="card p-6 fade-in">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">🎨 UI品質指標</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="text-center p-4 bg-green-50 rounded-lg">
+                    <div class="text-2xl font-bold text-green-600">95%</div>
+                    <div class="text-sm text-green-700">レスポンシブ対応</div>
+                </div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg">
+                    <div class="text-2xl font-bold text-blue-600">92%</div>
+                    <div class="text-sm text-blue-700">アクセシビリティ</div>
+                </div>
+                <div class="text-center p-4 bg-purple-50 rounded-lg">
+                    <div class="text-2xl font-bold text-purple-600">88%</div>
+                    <div class="text-sm text-purple-700">デザイン品質</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let taskCounter = 2;
+
+        function addTask() {
+            const name = document.getElementById('taskName').value;
+            const description = document.getElementById('taskDescription').value;
+            
+            if (!name.trim()) {
+                alert('名前を入力してください');
+                return;
+            }
+
+            const taskList = document.getElementById('taskList');
+            const emptyState = document.getElementById('emptyState');
+            
+            // 空の状態を非表示
+            emptyState.style.display = 'none';
+            
+            // 新しいタスクを作成
+            const taskDiv = document.createElement('div');
+            taskDiv.className = 'item-card fade-in';
+            taskDiv.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <h3 class="font-semibold text-gray-800">${name}</h3>
+                        ${description ? `<p class="text-gray-600 text-sm">${description}</p>` : ''}
+                        <p class="text-xs text-gray-400 mt-1">
+                            作成日: ${new Date().toLocaleDateString()}
+                        </p>
+                    </div>
+                    <button class="button button-danger" onclick="deleteTask(this)">
+                        削除
+                    </button>
+                </div>
+            `;
+            
+            // 空の状態の前に挿入
+            taskList.insertBefore(taskDiv, emptyState);
+            
+            // フォームをクリア
+            document.getElementById('taskName').value = '';
+            document.getElementById('taskDescription').value = '';
+            
+            // カウンターを更新
+            taskCounter++;
+            updateItemCount();
+        }
+
+        function deleteTask(button) {
+            const taskDiv = button.closest('.item-card');
+            taskDiv.style.animation = 'fadeOut 0.3s ease-out';
+            
+            setTimeout(() => {
+                taskDiv.remove();
+                taskCounter--;
+                updateItemCount();
+                checkEmpty();
+            }, 300);
+        }
+
+        function updateItemCount() {
+            document.getElementById('itemCount').textContent = taskCounter;
+        }
+
+        function checkEmpty() {
+            const taskList = document.getElementById('taskList');
+            const emptyState = document.getElementById('emptyState');
+            const tasks = taskList.querySelectorAll('.item-card');
+            
+            if (tasks.length === 0) {
+                emptyState.style.display = 'block';
+            }
+        }
+
+        // CSS animation for fade out
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                from { opacity: 1; transform: translateX(0); }
+                to { opacity: 0; transform: translateX(100px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

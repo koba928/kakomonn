@@ -1,0 +1,439 @@
+'use client'
+
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { Lightbulb, Target, Star, Heart, ArrowRight, RefreshCw, X } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import PreviewButton from '@/components/shared/PreviewButton'
+import { ProcessingSpinner } from '@/components/shared/LoadingSpinner'
+import { useMatura } from '@/components/providers/MaturaProvider'
+import { useChatOptimized } from '@/hooks/useChatOptimized'
+import { Insight } from '@/lib/types'
+
+export default function InsightNewPage() {
+  console.log('🎊🎊🎊 FRESH NEW PAGE - NO CACHE POSSIBLE! 🎊🎊🎊')
+  
+  const { state, actions } = useMatura()
+  const chatOptimized = useChatOptimized()
+  const [insights, setInsights] = useState<Insight | null>(null)
+  const hasTriedGenerationRef = useRef(false)
+  const isGeneratingRef = useRef(false)
+
+  // シンプルで確実な洞察生成関数
+  const generateInsights = useCallback(async () => {
+    console.log('🚀 generateInsights実行開始!')
+    
+    // 重複実行防止
+    if (isGeneratingRef.current || chatOptimized.isLoading) {
+      console.log('❌ 既に処理中のためスキップ')
+      return
+    }
+    
+    // 会話データ検証
+    const conversations = state.conversations || []
+    const validConversations = conversations.filter(conv => 
+      conv && conv.content && conv.content.trim().length > 0
+    )
+    
+    if (validConversations.length === 0) {
+      console.log('❌ 有効な会話データなし')
+      return
+    }
+    
+    console.log('✅ 条件クリア、API呼び出し開始')
+    
+    isGeneratingRef.current = true
+    hasTriedGenerationRef.current = true
+    
+    try {
+      const conversationText = validConversations
+        .map(conv => `${conv.role}: ${conv.content.trim()}`)
+        .join('\n\n')
+      
+      const prompt = `以下の対話から、ユーザーのアイデアを分析し、JSON形式で洞察を抽出してください。
+
+【対話内容】
+${conversationText}
+
+【要求】
+以下のJSON形式で出力してください：
+{
+  "vision": "実現したいビジョン",
+  "target": "ターゲットユーザー", 
+  "features": ["機能1", "機能2", "機能3"],
+  "value": "提供価値",
+  "motivation": "動機・背景"
+}
+
+※必ずJSON形式で回答してください。`
+
+      const result = await chatOptimized.sendMessage(
+        prompt,
+        [],
+        'InsightRefine',
+        {
+          timeout: 30000,
+          onError: (error) => {
+            console.error('❌ API呼び出しエラー:', error)
+            isGeneratingRef.current = false
+            hasTriedGenerationRef.current = false
+          }
+        }
+      )
+      
+      console.log('📨 API応答:', { hasResult: !!result, resultLength: result?.length })
+      
+      if (result && typeof result === 'string' && result.trim().length > 0) {
+        try {
+          // JSONの抽出
+          let jsonString = result.trim()
+          const jsonMatch = jsonString.match(/\{[^]*\}/)
+          if (jsonMatch) {
+            jsonString = jsonMatch[0]
+          }
+          
+          const parsedInsights = JSON.parse(jsonString)
+          
+          console.log('✅ 洞察データ解析成功:', parsedInsights)
+          
+          setInsights(parsedInsights)
+          actions.setInsights(parsedInsights)
+          
+        } catch (parseError) {
+          console.error('❌ JSON解析エラー:', parseError)
+          hasTriedGenerationRef.current = false
+        }
+      } else {
+        console.error('❌ 無効なAPI応答')
+        hasTriedGenerationRef.current = false
+      }
+      
+    } catch (error) {
+      console.error('❌ 洞察生成エラー:', error)
+      hasTriedGenerationRef.current = false
+    } finally {
+      isGeneratingRef.current = false
+    }
+  }, [state.conversations, chatOptimized, actions])
+
+  // 自動実行Effect - シンプル版
+  useEffect(() => {
+    console.log('🔍 useEffect実行 - 自動生成チェック')
+    
+    const hasValidConversations = state.conversations && 
+                                  state.conversations.length > 0 &&
+                                  state.conversations.some(conv => conv.content && conv.content.trim().length > 0)
+    
+    const shouldGenerate = hasValidConversations && 
+                          !insights && 
+                          !hasTriedGenerationRef.current && 
+                          !isGeneratingRef.current &&
+                          !chatOptimized.isLoading
+    
+    console.log('🎯 自動生成判定:', {
+      hasValidConversations,
+      hasInsights: !!insights,
+      hasTriedGeneration: hasTriedGenerationRef.current,
+      isGenerating: isGeneratingRef.current,
+      isLoading: chatOptimized.isLoading,
+      shouldGenerate
+    })
+    
+    if (shouldGenerate) {
+      console.log('🚀 自動生成を実行します!')
+      // 小さな遅延で確実に実行
+      setTimeout(() => generateInsights(), 100)
+    }
+  }, [state.conversations, insights, chatOptimized.isLoading, generateInsights])
+
+  // 手動再生成
+  const handleRegenerate = useCallback(() => {
+    console.log('🔄 手動再生成開始')
+    
+    // フラグリセット
+    hasTriedGenerationRef.current = false
+    isGeneratingRef.current = false
+    setInsights(null)
+    chatOptimized.clearError?.()
+    
+    // 直接実行
+    setTimeout(() => generateInsights(), 100)
+  }, [generateInsights, chatOptimized])
+
+  // クリーンアップ
+  useEffect(() => {
+    return () => chatOptimized.cleanup()
+  }, [chatOptimized])
+
+  const handleNext = () => {
+    if (insights) {
+      actions.setInsights(insights)
+      actions.nextPhase()
+    }
+  }
+
+  const handleBack = () => {
+    // 元のページに戻る
+    window.location.href = '/'
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="max-w-4xl mx-auto"
+    >
+      <div className="bg-white rounded-lg shadow-lg border border-gray-100 overflow-hidden">
+        {/* ヘッダー */}
+        <div className="bg-gradient-to-r from-yellow-500 to-orange-500 p-6 text-white">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <Lightbulb className="w-8 h-8" />
+              <div>
+                <h2 className="text-2xl font-bold mb-2">InsightRefine - 洞察の精製 🆕新ページ版</h2>
+                <p className="text-white/90">
+                  あなたの対話から重要な洞察を抽出します
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              {/* 戻るボタン */}
+              <button
+                onClick={handleBack}
+                className="px-3 py-2 bg-gray-500/20 hover:bg-gray-500/30 rounded-lg transition-colors text-white text-sm"
+              >
+                ← 戻る
+              </button>
+              
+              {/* 手動実行ボタン */}
+              <button
+                onClick={() => {
+                  console.log('🔧 手動実行ボタンクリック')
+                  generateInsights()
+                }}
+                className="px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg transition-colors text-white text-sm"
+              >
+                🚀 今すぐ実行
+              </button>
+              
+              {chatOptimized.isLoading && (
+                <button
+                  onClick={chatOptimized.cancelRequest}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg transition-colors text-white"
+                >
+                  <X className="w-4 h-4" />
+                  キャンセル
+                </button>
+              )}
+              {insights && !chatOptimized.isLoading && (
+                <button
+                  onClick={handleRegenerate}
+                  className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  再生成
+                </button>
+              )}
+              <PreviewButton 
+                data={insights} 
+                title="洞察データ"
+                className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* コンテンツ */}
+        <div className="p-8">
+          {/* エラー表示 */}
+          {chatOptimized.error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex justify-between items-center">
+                <p className="text-red-600">{chatOptimized.error}</p>
+                <button
+                  onClick={chatOptimized.clearError}
+                  className="text-red-400 hover:text-red-600"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+          
+          {chatOptimized.isLoading ? (
+            <div className="text-center py-16">
+              <ProcessingSpinner />
+              <div className="mt-8 space-y-2">
+                <motion.p 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="text-gray-600"
+                >
+                  対話内容を分析しています...
+                </motion.p>
+                <motion.p 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.5 }}
+                  className="text-gray-500 text-sm"
+                >
+                  ビジョンとターゲットを特定中
+                </motion.p>
+              </div>
+            </div>
+          ) : insights ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="space-y-6"
+            >
+              {/* ビジョン */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.1 }}
+                className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-100"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                    <Star className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-blue-900">ビジョン</h3>
+                </div>
+                <p className="text-blue-800 text-lg leading-relaxed">
+                  {insights.vision}
+                </p>
+              </motion.div>
+
+              {/* ターゲットユーザー */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-lg border border-green-100"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                    <Target className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-green-900">ターゲットユーザー</h3>
+                </div>
+                <p className="text-green-800 text-lg leading-relaxed">
+                  {insights.target}
+                </p>
+              </motion.div>
+
+              {/* 主要機能 */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-lg border border-purple-100"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
+                    <Lightbulb className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-purple-900">主要機能</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {insights.features?.map((feature, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.4 + index * 0.1 }}
+                      className="bg-white p-3 rounded-lg border border-purple-200 text-purple-800"
+                    >
+                      • {feature}
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* 提供価値 */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="bg-gradient-to-r from-red-50 to-pink-50 p-6 rounded-lg border border-red-100"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
+                    <Heart className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-red-900">提供価値</h3>
+                </div>
+                <p className="text-red-800 text-lg leading-relaxed">
+                  {insights.value}
+                </p>
+              </motion.div>
+
+              {/* 動機 */}
+              {insights.motivation && (
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="bg-gradient-to-r from-gray-50 to-slate-50 p-6 rounded-lg border border-gray-100"
+                >
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">作りたい理由</h3>
+                  <p className="text-gray-800 text-lg leading-relaxed">
+                    {insights.motivation}
+                  </p>
+                </motion.div>
+              )}
+
+              {/* 次へボタン */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="text-center pt-4"
+              >
+                <button
+                  onClick={handleNext}
+                  className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-matura-primary to-matura-secondary text-white rounded-lg font-medium transition-all hover:shadow-lg transform hover:scale-105"
+                >
+                  UIデザインを選択する
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+              </motion.div>
+            </motion.div>
+          ) : (
+            <div className="text-center py-16">
+              <div>
+                <p className="text-red-600 mb-4">洞察の生成に失敗しました</p>
+                <p className="text-gray-500 text-sm mb-4">
+                  「🚀 今すぐ実行」ボタンをクリックして手動で実行してください
+                </p>
+                <div className="flex gap-3 justify-center">
+                  <button
+                    onClick={handleRegenerate}
+                    className="px-6 py-2 bg-matura-primary text-white rounded-lg hover:bg-matura-secondary transition-colors"
+                  >
+                    再試行
+                  </button>
+                  <button
+                    onClick={() => {
+                      console.log('🔧 デバッグ情報:', {
+                        conversations: state.conversations,
+                        hasTriedGeneration: hasTriedGenerationRef.current,
+                        isGenerating: isGeneratingRef.current,
+                        isLoading: chatOptimized.isLoading,
+                        error: chatOptimized.error
+                      })
+                    }}
+                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm"
+                  >
+                    デバッグ情報
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  )
+}

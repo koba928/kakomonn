@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>MATURA UI テスト</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .loading { background: #fff3cd; color: #856404; }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover { background: #5a67d8; }
+        button:disabled { background: #cbd5e0; cursor: not-allowed; }
+        pre { background: #f7fafc; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 MATURA UI テストパネル</h1>
+    
+    <div class="test-section">
+        <h2>1. 基本的なアプリ生成テスト</h2>
+        <input type="text" id="simpleIdea" placeholder="アプリのアイデアを入力" style="width: 100%; padding: 10px; margin-bottom: 10px;">
+        <button onclick="testSimpleGeneration()">Simple Generationテスト</button>
+        <div id="simpleResult" style="margin-top: 10px;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. インテリジェント生成テスト</h2>
+        <input type="text" id="intelligentIdea" placeholder="詳細なアプリ要件" style="width: 100%; padding: 10px; margin-bottom: 10px;">
+        <button onclick="testIntelligentGeneration()">Intelligent Generationテスト</button>
+        <div id="intelligentResult" style="margin-top: 10px;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. 品質チェックテスト</h2>
+        <button onclick="testQualityCheck()">最後に生成されたコードの品質をチェック</button>
+        <div id="qualityResult" style="margin-top: 10px;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. システムステータス</h2>
+        <button onclick="checkSystemStatus()">全APIステータス確認</button>
+        <div id="statusResult" style="margin-top: 10px;"></div>
+    </div>
+
+    <script>
+        let lastGeneratedCode = null;
+
+        async function testSimpleGeneration() {
+            const idea = document.getElementById('simpleIdea').value || 'タスク管理アプリ';
+            const resultDiv = document.getElementById('simpleResult');
+            
+            resultDiv.innerHTML = '<span class="status loading">生成中...</span>';
+            
+            try {
+                const response = await fetch('/api/generate-simple', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idea })
+                });
+                
+                const result = await response.json();
+                lastGeneratedCode = result.code;
+                
+                if (result.code) {
+                    resultDiv.innerHTML = `
+                        <span class="status success">成功</span>
+                        <p>テーブル名: ${result.tableName}</p>
+                        <p>スキーマ: ${result.schema?.columns?.length}カラム</p>
+                        <details>
+                            <summary>生成されたコード（クリックで展開）</summary>
+                            <pre>${result.code.substring(0, 500)}...</pre>
+                        </details>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<span class="status error">エラー: ${result.error || '生成に失敗しました'}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="status error">エラー: ${error.message}</span>`;
+            }
+        }
+
+        async function testIntelligentGeneration() {
+            const userInput = document.getElementById('intelligentIdea').value || 'レストラン予約システム';
+            const resultDiv = document.getElementById('intelligentResult');
+            
+            resultDiv.innerHTML = '<span class="status loading">インテリジェント生成中...</span>';
+            
+            try {
+                const response = await fetch('/api/intelligent-generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userInput,
+                        targetAudience: 'business',
+                        industry: 'food-service'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    lastGeneratedCode = result.generatedCode;
+                    resultDiv.innerHTML = `
+                        <span class="status success">成功</span>
+                        <p>選択されたテンプレート: ${result.selectedTemplate?.name || 'N/A'}</p>
+                        <p>カラーパレット: ${result.selectedTemplate?.colors?.join(', ') || 'N/A'}</p>
+                        <p>設計分析: ${result.designAnalysis ? '完了' : '未実施'}</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<span class="status error">エラー: ${result.error || '生成に失敗しました'}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="status error">エラー: ${error.message}</span>`;
+            }
+        }
+
+        async function testQualityCheck() {
+            const resultDiv = document.getElementById('qualityResult');
+            
+            if (!lastGeneratedCode) {
+                resultDiv.innerHTML = '<span class="status error">先にコードを生成してください</span>';
+                return;
+            }
+            
+            resultDiv.innerHTML = '<span class="status loading">品質チェック中...</span>';
+            
+            try {
+                const response = await fetch('/api/quality-check', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ generatedCode: lastGeneratedCode })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    const summary = result.summary;
+                    resultDiv.innerHTML = `
+                        <span class="status success">品質チェック完了</span>
+                        <p>総合スコア: <strong>${summary.overallScore}/100</strong></p>
+                        <p>プロダクション対応度: <strong>${summary.productionReadiness}%</strong></p>
+                        <p>コード品質: ${summary.codeQualityScore}/100</p>
+                        <p>UI品質: ${summary.uiQualityScore}/100</p>
+                        <p>機能性: ${summary.functionalityScore}/100</p>
+                        <p>推奨事項: ${summary.recommendationCount}件</p>
+                        <p>課題: ${summary.issueCount}件</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<span class="status error">エラー: ${result.error}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="status error">エラー: ${error.message}</span>`;
+            }
+        }
+
+        async function checkSystemStatus() {
+            const resultDiv = document.getElementById('statusResult');
+            resultDiv.innerHTML = '<span class="status loading">ステータス確認中...</span>';
+            
+            const apis = [
+                '/api/generate-simple',
+                '/api/intelligent-generate',
+                '/api/quality-check',
+                '/api/premium-design',
+                '/api/premium-generate',
+                '/api/infer-schema'
+            ];
+            
+            const results = [];
+            
+            for (const api of apis) {
+                try {
+                    const response = await fetch(api);
+                    const data = await response.json();
+                    results.push({
+                        api,
+                        status: response.ok ? '✅ 正常' : '❌ エラー',
+                        service: data.service || 'Unknown'
+                    });
+                } catch (error) {
+                    results.push({
+                        api,
+                        status: '❌ エラー',
+                        service: error.message
+                    });
+                }
+            }
+            
+            resultDiv.innerHTML = `
+                <span class="status success">ステータス確認完了</span>
+                <table style="width: 100%; margin-top: 10px;">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left;">API</th>
+                            <th style="text-align: left;">ステータス</th>
+                            <th style="text-align: left;">サービス</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${results.map(r => `
+                            <tr>
+                                <td>${r.api}</td>
+                                <td>${r.status}</td>
+                                <td>${r.service}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // ページ読み込み時にステータスチェック
+        window.onload = () => {
+            checkSystemStatus();
+        };
+    </script>
+</body>
+</html>

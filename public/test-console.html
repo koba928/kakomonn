@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FreeTalk Console Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            height: 90vh;
+        }
+        .app-frame {
+            flex: 1;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+        .console-panel {
+            width: 500px;
+            background: #000;
+            color: #00ff00;
+            border-radius: 5px;
+            padding: 10px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 12px;
+        }
+        .controls {
+            margin-bottom: 10px;
+        }
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        button:hover {
+            background: #005999;
+        }
+        .status {
+            margin-bottom: 10px;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>FreeTalk UI Console Test</h1>
+    <div class="controls">
+        <button onclick="startTest()">Start Auto Test</button>
+        <button onclick="clearConsole()">Clear Console</button>
+        <button onclick="injectMessage()">Inject Test Message</button>
+    </div>
+    <div id="status" class="status info">Ready to test. Click "Start Auto Test" to begin.</div>
+    
+    <div class="container">
+        <iframe id="appFrame" class="app-frame" src="http://localhost:3000"></iframe>
+        <div id="console" class="console-panel">Console logs will appear here...\n</div>
+    </div>
+
+    <script>
+        const consoleDiv = document.getElementById('console');
+        const statusDiv = document.getElementById('status');
+        const appFrame = document.getElementById('appFrame');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            consoleDiv.textContent += `[${timestamp}] ${message}\n`;
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+        
+        function setStatus(message, type = 'info') {
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+        
+        function clearConsole() {
+            consoleDiv.textContent = 'Console cleared...\n';
+        }
+        
+        // Listen to iframe console messages
+        appFrame.onload = function() {
+            log('🌐 App iframe loaded');
+            setStatus('App loaded. Ready for testing.', 'success');
+            
+            try {
+                // Try to access iframe console (might be blocked by CORS)
+                const iframeWindow = appFrame.contentWindow;
+                const originalConsoleLog = iframeWindow.console.log;
+                const originalConsoleError = iframeWindow.console.error;
+                const originalConsoleWarn = iframeWindow.console.warn;
+                
+                iframeWindow.console.log = function(...args) {
+                    log('📺 LOG: ' + args.join(' '));
+                    originalConsoleLog.apply(iframeWindow.console, args);
+                };
+                
+                iframeWindow.console.error = function(...args) {
+                    log('❌ ERROR: ' + args.join(' '));
+                    originalConsoleError.apply(iframeWindow.console, args);
+                };
+                
+                iframeWindow.console.warn = function(...args) {
+                    log('⚠️  WARN: ' + args.join(' '));
+                    originalConsoleWarn.apply(iframeWindow.console, args);
+                };
+                
+                log('✅ Console monitoring enabled');
+                
+            } catch (e) {
+                log('❌ Cannot access iframe console (CORS): ' + e.message);
+            }
+        };
+        
+        async function startTest() {
+            log('🚀 Starting automated test...');
+            setStatus('Running automated test...', 'info');
+            
+            try {
+                // Wait for app to load
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Try to access the iframe document
+                const iframeDoc = appFrame.contentDocument || appFrame.contentWindow.document;
+                
+                if (!iframeDoc) {
+                    throw new Error('Cannot access iframe document');
+                }
+                
+                log('📄 Iframe document accessible');
+                
+                // Look for textarea
+                const textarea = iframeDoc.querySelector('textarea[placeholder*="アイデア"]');
+                if (!textarea) {
+                    throw new Error('Textarea not found');
+                }
+                
+                log('⌨️  Found textarea element');
+                
+                // Focus and type
+                textarea.focus();
+                textarea.value = 'こんにちは';
+                
+                // Trigger input event
+                const inputEvent = new iframeDoc.defaultView.Event('input', { bubbles: true });
+                textarea.dispatchEvent(inputEvent);
+                
+                log('📝 Text entered: こんにちは');
+                
+                // Find send button
+                const sendButton = iframeDoc.querySelector('button[type="submit"], button:has(svg)') || 
+                                   Array.from(iframeDoc.querySelectorAll('button')).find(btn => 
+                                       btn.textContent.includes('送信') || btn.querySelector('svg'));
+                
+                if (!sendButton) {
+                    throw new Error('Send button not found');
+                }
+                
+                log('🖱️  Found send button');
+                
+                // Click send button
+                sendButton.click();
+                
+                log('✅ Send button clicked');
+                setStatus('Message sent. Waiting for response...', 'info');
+                
+                // Monitor for changes
+                let checkCount = 0;
+                const maxChecks = 30; // 30 seconds
+                
+                const checkForResponse = () => {
+                    checkCount++;
+                    
+                    const messages = iframeDoc.querySelectorAll('[data-role]');
+                    const debugPanel = iframeDoc.querySelector('.bg-yellow-100');
+                    const errorMsg = iframeDoc.querySelector('.text-red-600');
+                    const loadingSpinner = iframeDoc.querySelector('.animate-spin');
+                    
+                    log(`🔍 Check ${checkCount}: Messages=${messages.length}, Loading=${!!loadingSpinner}, Error=${!!errorMsg}`);
+                    
+                    if (debugPanel) {
+                        log(`🔍 Debug: ${debugPanel.textContent.trim()}`);
+                    }
+                    
+                    if (messages.length >= 2) {
+                        log('✅ Response received!');
+                        setStatus('Test completed successfully!', 'success');
+                        return;
+                    }
+                    
+                    if (errorMsg) {
+                        log('❌ Error detected: ' + errorMsg.textContent);
+                        setStatus('Test failed with error', 'error');
+                        return;
+                    }
+                    
+                    if (checkCount >= maxChecks) {
+                        log('⏰ Timeout waiting for response');
+                        setStatus('Test timed out waiting for response', 'error');
+                        return;
+                    }
+                    
+                    setTimeout(checkForResponse, 1000);
+                };
+                
+                setTimeout(checkForResponse, 1000);
+                
+            } catch (error) {
+                log('❌ Test failed: ' + error.message);
+                setStatus('Test failed: ' + error.message, 'error');
+            }
+        }
+        
+        async function injectMessage() {
+            log('💉 Injecting test message...');
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: 'こんにちは',
+                        phase: 'FreeTalk',
+                        messages: []
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('✅ API Response: ' + data.message);
+                    setStatus('API test successful', 'success');
+                } else {
+                    const error = await response.text();
+                    log('❌ API Error: ' + error);
+                    setStatus('API test failed', 'error');
+                }
+                
+            } catch (error) {
+                log('❌ Injection failed: ' + error.message);
+                setStatus('Injection failed', 'error');
+            }
+        }
+        
+        // Auto-start monitoring when page loads
+        log('🎯 Console monitoring ready');
+        setStatus('Loading app...', 'info');
+    </script>
+</body>
+</html>

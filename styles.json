@@ -1,0 +1,94 @@
+{
+  "themes": [
+    {
+      "id": "modern-dark",
+      "name": "Modern Dark",
+      "description": "洗練されたダークテーマ。集中しやすい環境を提供します。",
+      "colorPalette": {
+        "primary": "#6366f1",
+        "secondary": "#8b5cf6",
+        "accent": "#ec4899",
+        "background": "#0f172a",
+        "surface": "#1e293b",
+        "text": "#f1f5f9",
+        "textSecondary": "#94a3b8"
+      },
+      "styleTags": ["ダーク", "モダン", "集中"]
+    },
+    {
+      "id": "warm-light",
+      "name": "Warm Light",
+      "description": "温かみのあるライトテーマ。親しみやすく優しい印象を与えます。",
+      "colorPalette": {
+        "primary": "#f59e0b",
+        "secondary": "#f97316",
+        "accent": "#ef4444",
+        "background": "#fefce8",
+        "surface": "#ffffff",
+        "text": "#374151",
+        "textSecondary": "#6b7280"
+      },
+      "styleTags": ["ライト", "温かい", "親しみやすい"]
+    },
+    {
+      "id": "ocean-blue",
+      "name": "Ocean Blue",
+      "description": "海を連想させる青系テーマ。落ち着いた雰囲気で作業に集中できます。",
+      "colorPalette": {
+        "primary": "#0ea5e9",
+        "secondary": "#06b6d4",
+        "accent": "#8b5cf6",
+        "background": "#f0f9ff",
+        "surface": "#ffffff",
+        "text": "#0f172a",
+        "textSecondary": "#475569"
+      },
+      "styleTags": ["ブルー", "落ち着いた", "クリーン"]
+    },
+    {
+      "id": "forest-green",
+      "name": "Forest Green",
+      "description": "自然を感じる緑系テーマ。リラックスした環境で創造性を高めます。",
+      "colorPalette": {
+        "primary": "#10b981",
+        "secondary": "#059669",
+        "accent": "#f59e0b",
+        "background": "#f0fdf4",
+        "surface": "#ffffff",
+        "text": "#064e3b",
+        "textSecondary": "#6b7280"
+      },
+      "styleTags": ["グリーン", "自然", "リラックス"]
+    },
+    {
+      "id": "sunset-gradient",
+      "name": "Sunset Gradient",
+      "description": "夕日のような美しいグラデーション。クリエイティブな作業に最適です。",
+      "colorPalette": {
+        "primary": "#f59e0b",
+        "secondary": "#f97316",
+        "accent": "#ec4899",
+        "background": "#fef3c7",
+        "surface": "#ffffff",
+        "text": "#92400e",
+        "textSecondary": "#a3a3a3"
+      },
+      "styleTags": ["グラデーション", "クリエイティブ", "華やか"]
+    },
+    {
+      "id": "minimalist-mono",
+      "name": "Minimalist Mono",
+      "description": "シンプルなモノクロテーマ。気が散ることなく作業に集中できます。",
+      "colorPalette": {
+        "primary": "#374151",
+        "secondary": "#6b7280",
+        "accent": "#9ca3af",
+        "background": "#ffffff",
+        "surface": "#f9fafb",
+        "text": "#111827",
+        "textSecondary": "#6b7280"
+      },
+      "styleTags": ["モノクロ", "ミニマル", "シンプル"]
+    }
+  ]
+}
