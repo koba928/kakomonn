@@ -64,7 +64,7 @@ const EXAM_TYPE_OPTIONS = [
 
 
 export default function UploadPage() {
-  const { user, loading, isLoggedIn } = useAuth()
+  const { user, loading, isLoggedIn, updateProfile } = useAuth()
   const formErrorHandler = useFormErrorHandler()
   
   // All hooks must be called before any conditional returns
