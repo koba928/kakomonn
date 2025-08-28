@@ -28,8 +28,8 @@ export default function PhoneAuthPage() {
     // デモ用：認証コード検証をシミュレート
     setTimeout(() => {
       setIsLoading(false)
-      // 大学情報入力ページに遷移
-      window.location.href = '/auth/university-info'
+      // 新規登録ページに遷移
+      window.location.href = '/register/step-by-step'
     }, 1500)
   }
 
@@ -154,7 +154,7 @@ export default function PhoneAuthPage() {
         <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <h4 className="text-sm font-medium text-yellow-800 mb-2">🚧 デモモード</h4>
           <p className="text-xs text-yellow-700">
-            現在はデモ版です。実際のSMSは送信されません。任意の6桁の数字を入力して続行してください。
+            現在はデモ版です。実際のSMSは送信されません。任意の6桁の数字を入力して新規登録ページに進んでください。
           </p>
         </div>
       </div>

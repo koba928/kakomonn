@@ -9,11 +9,12 @@ export const APP_CONFIG = {
 export const UI_CONFIG = {
   stepIndicator: {
     steps: [
-      { key: 'university', number: 1, label: '大学' },
-      { key: 'faculty', number: 2, label: '学部' },
-      { key: 'department', number: 3, label: '学科' },
-      { key: 'year', number: 4, label: '学年' },
-      { key: 'name', number: 5, label: '名前' }
+      { key: 'email', number: 1, label: 'アカウント' },
+      { key: 'university', number: 2, label: '大学' },
+      { key: 'faculty', number: 3, label: '学部' },
+      { key: 'department', number: 4, label: '学科' },
+      { key: 'year', number: 5, label: '学年' },
+      { key: 'name', number: 6, label: '名前' }
     ]
   },
   yearOptions: [

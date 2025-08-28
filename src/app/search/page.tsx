@@ -260,23 +260,19 @@ function SearchPageClient() {
           // LocalStorageにも保存
           localStorage.setItem('kakomonn_user', JSON.stringify(userInfoData))
           
-          // 大学情報が設定されていればモーダルを非表示にする
-          if (profile.university && profile.university !== '未設定' && 
-              profile.faculty && profile.faculty !== '未設定') {
-            console.log('大学情報が完全に設定されているため、モーダルを非表示にします')
-            setShowUniversityModal(false)
-          } else {
-            console.log('大学情報が不完全なため、モーダルを表示します')
-            setShowUniversityModal(true)
-          }
+          // ログインユーザーは常にモーダルを非表示にする（重複入力防止）
+          console.log('ログインユーザーのため、大学情報モーダルを非表示にします')
+          setShowUniversityModal(false)
         } else {
-          console.log('プロファイルが見つからないため、モーダルを表示します')
-          setShowUniversityModal(true)
+          // プロファイルがない場合でもログインユーザーはモーダルを表示しない
+          console.log('プロファイルなしでもログインユーザーのためモーダル非表示')
+          setShowUniversityModal(false)
         }
       } catch (error) {
         console.error('Failed to load user profile:', error)
-        console.log('プロファイル読み込みエラーのため、モーダルを表示します')
-        setShowUniversityModal(true)
+        // エラーがあってもログインユーザーはモーダルを表示しない
+        console.log('エラーでもログインユーザーのためモーダル非表示')
+        setShowUniversityModal(false)
       } finally {
         setIsLoadingProfile(false)
       }
@@ -294,9 +290,10 @@ function SearchPageClient() {
   }, [searchParams, handleSearch])
 
   useEffect(() => {
-    // ログインユーザーの場合は、プロファイルロード完了まで待つ
+    // ログインユーザーの場合はモーダルを非表示にしてプロファイルロード完了まで待つ
     if (isLoggedIn) {
-      console.log('ログインユーザーのためプロファイルロード完了まで待機')
+      console.log('ログインユーザーのためモーダル非表示＆プロファイルロード完了まで待機')
+      setShowUniversityModal(false)
       return
     }
     

@@ -13,8 +13,8 @@ export default function GoogleAuthPage() {
     // デモ用：Google認証をシミュレート
     setTimeout(() => {
       setIsLoading(false)
-      // 大学情報入力ページに遷移
-      window.location.href = '/auth/university-info'
+      // 新規登録ページに遷移
+      window.location.href = '/register/step-by-step'
     }, 2000)
   }
 
@@ -102,7 +102,7 @@ export default function GoogleAuthPage() {
           <h4 className="text-sm font-medium text-yellow-800 mb-2">🚧 デモモード</h4>
           <p className="text-xs text-yellow-700">
             現在はデモ版です。実際のGoogle認証は行われません。
-            ボタンを押すと自動的に大学情報入力ページに進みます。
+            ボタンを押すと自動的に新規登録ページに進みます。
           </p>
         </div>
       </div>

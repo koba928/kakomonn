@@ -8,18 +8,15 @@ import { useSearchParams } from 'next/navigation'
 import LoginLoadingScreen, { LoginMessages } from '@/components/auth/LoginLoadingScreen'
 
 function EmailAuthPageContent() {
-  const { signIn, signUp, isAuthenticating, authStep } = useAuth()
+  const { signIn, isAuthenticating, authStep } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [isLogin, setIsLogin] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [redirectUrl, setRedirectUrl] = useState('/search')
-  const [agreedToTerms, setAgreedToTerms] = useState(false)
 
   useEffect(() => {
     const redirect = searchParams.get('redirect')
@@ -32,79 +29,25 @@ function EmailAuthPageContent() {
     e.preventDefault()
     setError('')
     
-    if (!isLogin && password !== confirmPassword) {
-      setError('パスワードが一致しません')
-      return
-    }
-
-    if (!isLogin && !agreedToTerms) {
-      setError('利用規約およびプライバシーポリシーに同意してください')
-      return
-    }
     
     setIsLoading(true)
     
     try {
-      if (isLogin) {
-        const result = await signIn(email, password)
-        if (result.error) {
-          console.error('ログインエラー:', result.error)
-          setError((result.error as any).message || 'ログインに失敗しました')
-          setIsLoading(false)
-        } else {
-          // ユーザー情報を確認
-          const userInfo = result.user
-          console.log('ログイン成功 - ユーザー情報:', userInfo)
-          
-          // プロフィールが正常に取得され、大学情報が設定されている場合は指定されたページへ
-          if (userInfo && 
-              userInfo.university && 
-              userInfo.university !== '未設定' && 
-              userInfo.faculty && 
-              userInfo.faculty !== '未設定') {
-            console.log('大学情報登録済み - 指定されたページへリダイレクト:', redirectUrl)
-            // 認証状態の反映を待つため十分な遅延を設ける
-            setTimeout(() => {
-              router.push(redirectUrl)
-            }, 1500)
-          } else {
-            console.log('大学情報未登録 - 大学情報入力ページへリダイレクト')
-            // 大学情報が未登録なら入力ページへ（リダイレクト先を保持）
-            const universityInfoUrl = redirectUrl === '/search' 
-              ? '/auth/university-info'
-              : `/auth/university-info?redirect=${encodeURIComponent(redirectUrl)}`
-            setTimeout(() => {
-              router.push(universityInfoUrl)
-            }, 1500)
-          }
-        }
+      const result = await signIn(email, password)
+      if (result.error) {
+        console.error('ログインエラー:', result.error)
+        setError((result.error as any).message || 'ログインに失敗しました')
+        setIsLoading(false)
       } else {
-        // 新規登録の場合は大学情報も必要
-        const emailName = email.split('@')[0] || 'user'
-        const userData = {
-          email,
-          name: emailName,
-          university: '未設定',
-          faculty: '未設定',
-          department: '未設定',
-          year: 1,
-          pen_name: emailName
-        }
+        // ユーザー情報を確認
+        const userInfo = result.user
+        console.log('ログイン成功 - ユーザー情報:', userInfo)
         
-        const result = await signUp(email, password, userData)
-        
-        if (result.error) {
-          console.error('新規登録エラー:', result.error)
-          setError((result.error as any).message || '新規登録に失敗しました')
-        } else {
-          // 新規登録時もリダイレクト先を保持
-          const universityInfoUrl = redirectUrl === '/search' 
-            ? '/auth/university-info'
-            : `/auth/university-info?redirect=${encodeURIComponent(redirectUrl)}`
-          setTimeout(() => {
-            router.push(universityInfoUrl)
-          }, 1500)
-        }
+        // ログイン成功後は直接指定されたページへリダイレクト
+        console.log('ログイン成功 - 指定されたページへリダイレクト:', redirectUrl)
+        setTimeout(() => {
+          router.push(redirectUrl)
+        }, 1500)
       }
     } catch (err: any) {
       console.error('認証エラー:', err)
@@ -116,7 +59,6 @@ function EmailAuthPageContent() {
 
   const isFormValid = () => {
     if (!email || !password) return false
-    if (!isLogin && (!confirmPassword || password !== confirmPassword)) return false
     return email.includes('@') && password.length >= 6
   }
 
@@ -150,38 +92,13 @@ function EmailAuthPageContent() {
             KakoMoNN
           </Link>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            {isLogin ? 'ログイン' : 'アカウント作成'}
+            ログイン
           </h1>
           <p className="text-gray-600">
-            {isLogin ? 'メールアドレスとパスワードでログイン' : '新しいアカウントを作成します'}
+            メールアドレスとパスワードでログイン
           </p>
         </div>
 
-        {/* ログイン/登録切り替え */}
-        <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
-          <button
-            type="button"
-            onClick={() => setIsLogin(true)}
-            className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
-              isLogin
-                ? 'bg-white text-indigo-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-800'
-            }`}
-          >
-            ログイン
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsLogin(false)}
-            className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
-              !isLogin
-                ? 'bg-white text-indigo-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-800'
-            }`}
-          >
-            新規登録
-          </button>
-        </div>
 
         {/* エラーメッセージ */}
         {error && (
@@ -241,63 +158,17 @@ function EmailAuthPageContent() {
             </div>
           </div>
 
-          {!isLogin && (
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                パスワード確認 <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="パスワードを再入力"
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                  confirmPassword && password !== confirmPassword
-                    ? 'border-red-300 bg-red-50'
-                    : 'border-gray-300'
-                }`}
-                required
-              />
-              {confirmPassword && password !== confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">パスワードが一致しません</p>
-              )}
-            </div>
-          )}
-
-          {/* 利用規約・プライバシーポリシー同意（新規登録時のみ） */}
-          {!isLogin && (
-            <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg">
-              <input
-                id="agree-terms"
-                type="checkbox"
-                checked={agreedToTerms}
-                onChange={(e) => setAgreedToTerms(e.target.checked)}
-                className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              <label htmlFor="agree-terms" className="text-sm text-gray-700 leading-relaxed">
-                <Link href="/terms" className="text-indigo-600 hover:text-indigo-800 underline" target="_blank">
-                  利用規約
-                </Link>
-                および
-                <Link href="/privacy" className="text-indigo-600 hover:text-indigo-800 underline" target="_blank">
-                  プライバシーポリシー
-                </Link>
-                に同意します <span className="text-red-500">*</span>
-              </label>
-            </div>
-          )}
 
           <button
             type="submit"
             className={`w-full px-4 py-3 rounded-lg font-medium transition-colors ${
-              (!isFormValid() || (!isLogin && !agreedToTerms) || isLoading)
+              (!isFormValid() || isLoading)
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 : 'bg-indigo-600 text-white hover:bg-indigo-700'
             }`}
-            disabled={!isFormValid() || (!isLogin && !agreedToTerms) || isLoading}
+            disabled={!isFormValid() || isLoading}
           >
-            {isLoading ? (isLogin ? 'ログイン中...' : '作成中...') : (isLogin ? 'ログイン' : 'アカウント作成')}
+            {isLoading ? 'ログイン中...' : 'ログイン'}
           </button>
         </form>
 

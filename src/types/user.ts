@@ -16,5 +16,7 @@ export interface UserRegistrationData {
   faculty: string
   department: string
   year: number
-  email?: string
+  email: string
+  password?: string
+  pen_name?: string
 }

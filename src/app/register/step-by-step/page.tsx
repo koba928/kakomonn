@@ -6,21 +6,25 @@ import { UserRegistrationData } from '@/types/user'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
 import Link from 'next/link'
 import { ArrowRightIcon, CheckIcon } from '@/components/icons/IconSystem'
-import { APP_CONFIG, UI_CONFIG, MESSAGES, STORAGE_KEYS } from '@/constants/app'
+import { APP_CONFIG, UI_CONFIG, MESSAGES } from '@/constants/app'
 import { useFormErrorHandler } from '@/hooks/useErrorHandler'
+import { useAuth } from '@/hooks/useAuth'
 
-type Step = 'university' | 'faculty' | 'department' | 'year' | 'name' | 'complete'
+type Step = 'email' | 'university' | 'faculty' | 'department' | 'year' | 'name' | 'complete'
 
 export default function StepByStepRegisterPage() {
   const formErrorHandler = useFormErrorHandler()
-  const [currentStep, setCurrentStep] = useState<Step>('university')
+  const { signUp } = useAuth()
+  const [currentStep, setCurrentStep] = useState<Step>('email')
   const [formData, setFormData] = useState<UserRegistrationData>({
     name: '',
     university: '',
     faculty: '',
     department: '',
     year: 1,
-    email: ''
+    email: '',
+    password: '',
+    pen_name: ''
   })
   
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -81,6 +85,9 @@ export default function StepByStepRegisterPage() {
 
   const goToNextStep = () => {
     switch (currentStep) {
+      case 'email':
+        setCurrentStep('university')
+        break
       case 'university':
         setCurrentStep('faculty')
         break
@@ -101,6 +108,9 @@ export default function StepByStepRegisterPage() {
 
   const goToPrevStep = () => {
     switch (currentStep) {
+      case 'university':
+        setCurrentStep('email')
+        break
       case 'faculty':
         setCurrentStep('university')
         break
@@ -121,6 +131,12 @@ export default function StepByStepRegisterPage() {
       // Validate all required fields before submission
       const validationErrors = []
       
+      if (!formData.email.trim()) {
+        validationErrors.push('メールアドレスが入力されていません')
+      }
+      if (!formData.password?.trim()) {
+        validationErrors.push('パスワードが入力されていません')
+      }
       if (!formData.university.trim()) {
         validationErrors.push('大学が選択されていません')
       }
@@ -146,31 +162,29 @@ export default function StepByStepRegisterPage() {
 
       setIsSubmitting(true)
 
-      // Use error handler's withLoading method for registration
-      const result = await formErrorHandler.withLoading(async () => {
-        const userProfile = {
-          id: Date.now().toString(),
-          ...formData,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+      // Supabase認証でユーザー登録
+      const result = await signUp(
+        formData.email,
+        formData.password!,
+        {
+          email: formData.email,
+          name: formData.name,
+          university: formData.university,
+          faculty: formData.faculty,
+          department: formData.department,
+          year: formData.year,
+          pen_name: formData.pen_name || formData.name
         }
-        
-        // Save to localStorage with error handling
-        try {
-          localStorage.setItem(STORAGE_KEYS.userProfile, JSON.stringify(userProfile))
-        } catch (storageError) {
-          throw new Error('ユーザー情報の保存に失敗しました。ブラウザの設定をご確認ください')
-        }
-        
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
-        return { success: true }
-      }, 'ユーザー登録に失敗しました')
+      )
 
-      if (result?.success) {
-        setCurrentStep('complete')
+      if (result.error) {
+        formErrorHandler.handleSubmissionError(
+          result.error instanceof Error ? result.error : new Error('登録に失敗しました')
+        )
+        return
       }
+
+      setCurrentStep('complete')
 
     } catch (error) {
       formErrorHandler.handleSubmissionError(
@@ -183,6 +197,8 @@ export default function StepByStepRegisterPage() {
 
   const isStepValid = () => {
     switch (currentStep) {
+      case 'email':
+        return formData.email.trim() !== '' && formData.password?.trim() !== ''
       case 'university':
         return formData.university !== ''
       case 'faculty':
@@ -202,7 +218,7 @@ export default function StepByStepRegisterPage() {
     const steps = UI_CONFIG.stepIndicator.steps
 
     const getCurrentStepNumber = () => {
-      const stepMap = { university: 1, faculty: 2, department: 3, year: 4, name: 5, complete: 6 }
+      const stepMap = { email: 1, university: 2, faculty: 3, department: 4, year: 5, name: 6, complete: 7 }
       return stepMap[currentStep] || 1
     }
 
@@ -247,6 +263,53 @@ export default function StepByStepRegisterPage() {
 
   const renderStepContent = () => {
     switch (currentStep) {
+      case 'email':
+        return (
+          <fieldset>
+            <legend className="sr-only">メールアドレスとパスワード入力</legend>
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2" id="email-heading">メールアドレスとパスワードを入力してください</h2>
+              <p className="text-gray-600 mb-8">アカウント作成のために必要な情報です</p>
+            </div>
+            
+            <div className="max-w-md mx-auto space-y-6">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  メールアドレス
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleSelection('email', e.target.value)}
+                  placeholder="example@university.ac.jp"
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white text-lg"
+                  autoComplete="email"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                  パスワード
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={formData.password || ''}
+                  onChange={(e) => handleSelection('password', e.target.value)}
+                  placeholder="8文字以上のパスワード"
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white text-lg"
+                  autoComplete="new-password"
+                  minLength={8}
+                  required
+                />
+                <p className="text-sm text-gray-500 mt-2">8文字以上で入力してください</p>
+              </div>
+            </div>
+          </fieldset>
+        )
+
       case 'university':
         return (
           <fieldset>
@@ -369,18 +432,39 @@ export default function StepByStepRegisterPage() {
                 {formData.university} / {formData.faculty} / {formData.department} / {formData.year}年生
               </span>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">最後にお名前を教えてください</h2>
-              <p className="text-gray-600 mb-8">ニックネームでも構いません</p>
+              <p className="text-gray-600 mb-8">本名またはニックネームを入力してください</p>
             </div>
             
-            <div className="max-w-md mx-auto">
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => handleSelection('name', e.target.value)}
-                placeholder="例：山田太郎"
-                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white text-center text-lg"
-                autoFocus
-              />
+            <div className="max-w-md mx-auto space-y-6">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                  お名前（実名）
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => handleSelection('name', e.target.value)}
+                  placeholder="例：山田太郎"
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white text-lg"
+                  autoFocus
+                  required
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="pen_name" className="block text-sm font-medium text-gray-700 mb-2">
+                  ニックネーム（任意）
+                </label>
+                <input
+                  id="pen_name"
+                  type="text"
+                  value={formData.pen_name || ''}
+                  onChange={(e) => handleSelection('pen_name', e.target.value)}
+                  placeholder="例：やまだ、太郎くん（空欄の場合は実名を使用）"
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white text-lg"
+                />
+              </div>
             </div>
           </div>
         )
@@ -392,19 +476,21 @@ export default function StepByStepRegisterPage() {
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckIcon size={40} className="text-green-600" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">{MESSAGES.success.registrationComplete}</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">登録完了！</h2>
               <p className="text-gray-600 mb-8">
                 {formData.name}さん、{APP_CONFIG.name}へようこそ！<br />
-                {formData.university} {formData.faculty}の情報を中心にパーソナライズされたコンテンツをお届けします。
+                登録したメールアドレスに確認メールを送信しました。<br />
+                メール内のリンクをクリックしてアカウントを有効化してください。
               </p>
               
               <div className="bg-gray-50 p-4 rounded-xl mb-8">
                 <h3 className="font-semibold text-gray-900 mb-2">登録情報</h3>
                 <div className="text-sm text-gray-600 space-y-1">
-                  <p>{formData.university}</p>
-                  <p>{formData.faculty}</p>
-                  <p>{formData.department}</p>
-                  <p>{formData.year}年生</p>
+                  <p>メール: {formData.email}</p>
+                  <p>大学: {formData.university}</p>
+                  <p>学部: {formData.faculty}</p>
+                  <p>学科: {formData.department}</p>
+                  <p>学年: {formData.year}年生</p>
                 </div>
               </div>
               
@@ -469,9 +555,9 @@ export default function StepByStepRegisterPage() {
               <div className="flex justify-between items-center mt-12">
                 <button
                   onClick={goToPrevStep}
-                  disabled={(currentStep as Step) === 'university'}
+                  disabled={(currentStep as Step) === 'email'}
                   className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
-                    (currentStep as Step) === 'university'
+                    (currentStep as Step) === 'email'
                       ? 'text-gray-400 cursor-not-allowed'
                       : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                   }`}

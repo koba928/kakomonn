@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { SearchIcon } from '@/components/icons/IconSystem'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
-import HomeContent from '@/components/home/HomeContent'
 import { APP_CONFIG } from '@/constants/app'
 
 export default function Home() {
@@ -108,8 +107,6 @@ export default function Home() {
         </section>
       </div>
 
-      {/* Client Component */}
-      <HomeContent />
       {/* 安全領域に配慮したフッタースペーサ（モバイル） */}
       <div className="h-[24px] sm:h-0" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }} />
     </main>
