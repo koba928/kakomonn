@@ -113,22 +113,25 @@ export default function UploadPage() {
       console.log('ログインユーザー情報を過去問投稿に反映:', user)
       setFormData(prev => ({
         ...prev,
-        university: user.university || '',
-        faculty: user.faculty || '',
-        department: user.department || '',
-        author: `${user.faculty || ''}${user.year ? user.year + '年' : ''}`
+        university: user.university && user.university !== '未設定' ? user.university : '',
+        faculty: user.faculty && user.faculty !== '未設定' ? user.faculty : '',
+        department: user.department && user.department !== '未設定' ? user.department : '',
+        author: `${user.faculty && user.faculty !== '未設定' ? user.faculty : ''}${user.year ? user.year + '年' : ''}`
       }))
       
       // ログインユーザーは大学選択をスキップして直接科目情報へ
-      if (user.university && user.faculty && user.department) {
+      if (user.university && user.faculty && user.department && 
+          user.university !== '未設定' && user.faculty !== '未設定' && user.department !== '未設定') {
         console.log('大学情報が完全なので科目情報ステップに移動')
         setCurrentStep('courseInfo')
       } else {
-        console.log('大学情報が不完全:', { 
+        console.log('大学情報が不完全または未設定:', { 
           university: user.university, 
           faculty: user.faculty, 
           department: user.department 
         })
+        // 大学情報が未設定の場合は大学選択から開始
+        setCurrentStep('university')
       }
     }
   }, [user, isLoggedIn])
