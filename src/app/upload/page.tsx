@@ -480,20 +480,20 @@ export default function UploadPage() {
       )
 
       try {
-        const { data: uploadData, error: uploadError } = await Promise.race([
+        const result = await Promise.race([
           uploadPromise,
           timeoutPromise
-        ])
+        ]) as any
 
-        if (uploadError) {
-          console.error('ファイルアップロードエラー:', uploadError)
+        if (result.error) {
+          console.error('ファイルアップロードエラー:', result.error)
           alert('ファイルのアップロードに失敗しました。ネットワーク接続を確認してください。')
           setIsSubmitting(false)
           setUploadProgress('')
           return
         }
 
-        console.log('ファイルアップロード成功:', uploadData)
+        console.log('ファイルアップロード成功:', result.data)
       } catch (timeoutError) {
         console.error('アップロードタイムアウト:', timeoutError)
         alert('ファイルアップロードがタイムアウトしました。ファイルサイズを確認するか、後でもう一度お試しください。')
