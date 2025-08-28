@@ -665,17 +665,50 @@ export default function UploadPage() {
                 </select>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  試験範囲（任意）
-                </label>
-                <textarea
-                  value={formData.examScope}
-                  onChange={(e) => setFormData(prev => ({ ...prev, examScope: e.target.value }))}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  rows={3}
-                  placeholder="例：第1章〜第5章、配布プリント"
-                />
+              <div className="border-t pt-6 mt-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">教員情報</h3>
+                
+                {formData.teachers.length > 0 && (
+                  <div className="space-y-2 mb-4">
+                    <h4 className="text-sm font-medium text-gray-700">追加済みの教員</h4>
+                    {formData.teachers.map(teacher => (
+                      <div key={teacher.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div>
+                          <span className="font-medium">{teacher.name}</span>
+                        </div>
+                        <button
+                          onClick={() => handleRemoveTeacher(teacher.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          削除
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="space-y-4 border-t pt-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      教員名 <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={teacherInput.teacherName}
+                      onChange={(e) => setTeacherInput(prev => ({ ...prev, teacherName: e.target.value }))}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="例：山田太郎"
+                    />
+                  </div>
+
+                  <AnimatedButton
+                    variant="secondary"
+                    onClick={handleAddTeacher}
+                    className="w-full"
+                  >
+                    教員を追加
+                  </AnimatedButton>
+                </div>
               </div>
 
               <div>
@@ -722,50 +755,17 @@ export default function UploadPage() {
                 </div>
               </div>
 
-              <div className="border-t pt-6 mt-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">教員情報</h3>
-                
-                {formData.teachers.length > 0 && (
-                  <div className="space-y-2 mb-4">
-                    <h4 className="text-sm font-medium text-gray-700">追加済みの教員</h4>
-                    {formData.teachers.map(teacher => (
-                      <div key={teacher.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                          <span className="font-medium">{teacher.name}</span>
-                        </div>
-                        <button
-                          onClick={() => handleRemoveTeacher(teacher.id)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          削除
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div className="space-y-4 border-t pt-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      教員名 <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={teacherInput.teacherName}
-                      onChange={(e) => setTeacherInput(prev => ({ ...prev, teacherName: e.target.value }))}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                      placeholder="例：山田太郎"
-                    />
-                  </div>
-
-                  <AnimatedButton
-                    variant="secondary"
-                    onClick={handleAddTeacher}
-                    className="w-full"
-                  >
-                    教員を追加
-                  </AnimatedButton>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  試験範囲（任意）
+                </label>
+                <textarea
+                  value={formData.examScope}
+                  onChange={(e) => setFormData(prev => ({ ...prev, examScope: e.target.value }))}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  rows={3}
+                  placeholder="例：第1章〜第5章、配布プリント"
+                />
               </div>
             </div>
           </div>
