@@ -35,6 +35,12 @@ export default function GoogleAuthPage() {
           <p className="text-gray-600">
             Googleアカウントを使って簡単にログインできます
           </p>
+          <p className="text-sm text-gray-500 mt-2">
+            アカウントをお持ちでない方は
+            <Link href="/register" className="text-indigo-600 hover:underline ml-1">
+              新規登録
+            </Link>
+          </p>
         </div>
 
         {/* Google認証ボタン */}
