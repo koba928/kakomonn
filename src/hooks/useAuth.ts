@@ -53,21 +53,7 @@ export function useAuth() {
 
   const fetchUserProfile = async (userId: string) => {
     try {
-      // まずusersテーブルからプロフィールを取得を試行
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single()
-
-      if (!error && data) {
-        setUser(data)
-        return
-      }
-
-      console.warn('usersテーブルからの取得失敗、auth.usersから取得します:', error)
-      
-      // usersテーブルが使えない場合、auth.usersのメタデータから取得
+      // 1. まず認証ユーザー情報を取得（最新の状態を保証）
       const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
       
       if (authError || !authUser) {
@@ -75,7 +61,23 @@ export function useAuth() {
         return
       }
 
-      // メタデータからユーザー情報を構築
+      // 2. usersテーブルからの取得を試行
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single()
+
+      // 3. usersテーブルに完全なデータがある場合はそれを使用
+      if (!error && data && data.university && data.university !== '未設定') {
+        console.log('✅ usersテーブルから完全なプロフィールを取得:', data)
+        setUser(data)
+        return
+      }
+
+      console.warn('usersテーブルからの完全なデータ取得失敗、認証メタデータから取得します:', error)
+      
+      // 4. 認証メタデータからユーザー情報を構築
       const userFromMetadata = {
         id: authUser.id,
         email: authUser.email || '',
@@ -87,7 +89,38 @@ export function useAuth() {
         pen_name: authUser.user_metadata?.pen_name || authUser.user_metadata?.name || 'ユーザー'
       }
 
+      console.log('📝 認証メタデータから構築したユーザー情報:', userFromMetadata)
       setUser(userFromMetadata)
+      
+      // 5. メタデータに完全な情報があるなら、usersテーブルを更新
+      if (userFromMetadata.university !== '未設定' && 
+          userFromMetadata.faculty !== '未設定' && 
+          userFromMetadata.department !== '未設定') {
+        
+        console.log('🔄 usersテーブルを認証メタデータで更新します...')
+        const { error: upsertError } = await supabase
+          .from('users')
+          .upsert({
+            id: userId,
+            email: userFromMetadata.email,
+            name: userFromMetadata.name,
+            university: userFromMetadata.university,
+            faculty: userFromMetadata.faculty,
+            department: userFromMetadata.department,
+            year: userFromMetadata.year,
+            pen_name: userFromMetadata.pen_name,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'id'
+          })
+        
+        if (!upsertError) {
+          console.log('✅ usersテーブルを認証メタデータで更新しました')
+        } else {
+          console.warn('⚠️ usersテーブル更新に失敗（問題ないです）:', upsertError)
+        }
+      }
       
     } catch (error) {
       console.error('ユーザープロフィール取得エラー:', error)

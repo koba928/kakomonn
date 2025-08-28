@@ -110,27 +110,47 @@ export default function UploadPage() {
   // ユーザーログイン情報を自動入力
   useEffect(() => {
     if (user && isLoggedIn) {
-      console.log('ログインユーザー情報を過去問投稿に反映:', user)
-      setFormData(prev => ({
-        ...prev,
+      console.log('=== 過去問投稿ページ: ユーザー情報デバッグ ===')
+      console.log('👤 User object:', user)
+      console.log('🏫 University:', user.university)
+      console.log('🏛️ Faculty:', user.faculty)
+      console.log('📚 Department:', user.department)
+      console.log('📅 Year:', user.year)
+      console.log('📧 Email:', user.email)
+      
+      // 情報の完全性チェック
+      const isComplete = user.university && user.faculty && user.department && 
+                        user.university !== '未設定' && user.faculty !== '未設定' && user.department !== '未設定'
+      
+      console.log('✅ 大学情報完全性:', isComplete)
+      console.log('===========================================')
+      
+      // フォームデータに反映
+      const newFormData = {
         university: user.university && user.university !== '未設定' ? user.university : '',
         faculty: user.faculty && user.faculty !== '未設定' ? user.faculty : '',
         department: user.department && user.department !== '未設定' ? user.department : '',
         author: `${user.faculty && user.faculty !== '未設定' ? user.faculty : ''}${user.year ? user.year + '年' : ''}`
+      }
+      
+      console.log('📝 フォームデータに設定する値:', newFormData)
+      
+      setFormData(prev => ({
+        ...prev,
+        ...newFormData
       }))
       
-      // ログインユーザーは大学選択をスキップして直接科目情報へ
-      if (user.university && user.faculty && user.department && 
-          user.university !== '未設定' && user.faculty !== '未設定' && user.department !== '未設定') {
-        console.log('大学情報が完全なので科目情報ステップに移動')
+      // ステップの決定
+      if (isComplete) {
+        console.log('✅ 大学情報が完全なので科目情報ステップに移動')
         setCurrentStep('courseInfo')
       } else {
-        console.log('大学情報が不完全または未設定:', { 
-          university: user.university, 
-          faculty: user.faculty, 
-          department: user.department 
+        console.log('⚠️ 大学情報が不完全なので大学選択から開始')
+        console.log('不完全な項目:', {
+          university: user.university === '未設定' ? '未設定' : user.university ? 'OK' : '空',
+          faculty: user.faculty === '未設定' ? '未設定' : user.faculty ? 'OK' : '空',
+          department: user.department === '未設定' ? '未設定' : user.department ? 'OK' : '空'
         })
-        // 大学情報が未設定の場合は大学選択から開始
         setCurrentStep('university')
       }
     }
