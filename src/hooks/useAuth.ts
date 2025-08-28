@@ -53,6 +53,8 @@ export function useAuth() {
 
   const fetchUserProfile = async (userId: string) => {
     try {
+      console.log('=== fetchUserProfile開始 ===', { userId: userId.substring(0, 8) + '...' })
+      
       // 1. まず認証ユーザー情報を取得（最新の状態を保証）
       const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
       
@@ -61,23 +63,15 @@ export function useAuth() {
         return
       }
 
-      // 2. usersテーブルからの取得を試行
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single()
+      console.log('🔍 認証ユーザーメタデータ:', {
+        name: authUser.user_metadata?.name,
+        university: authUser.user_metadata?.university,
+        faculty: authUser.user_metadata?.faculty,
+        department: authUser.user_metadata?.department,
+        year: authUser.user_metadata?.year
+      })
 
-      // 3. usersテーブルに完全なデータがある場合はそれを使用
-      if (!error && data && data.university && data.university !== '未設定') {
-        console.log('✅ usersテーブルから完全なプロフィールを取得:', data)
-        setUser(data)
-        return
-      }
-
-      console.warn('usersテーブルからの完全なデータ取得失敗、認証メタデータから取得します:', error)
-      
-      // 4. 認証メタデータからユーザー情報を構築
+      // 2. 認証メタデータを主要情報源として使用
       const userFromMetadata = {
         id: authUser.id,
         email: authUser.email || '',
@@ -89,38 +83,53 @@ export function useAuth() {
         pen_name: authUser.user_metadata?.pen_name || authUser.user_metadata?.name || 'ユーザー'
       }
 
-      console.log('📝 認証メタデータから構築したユーザー情報:', userFromMetadata)
+      console.log('📝 認証メタデータから構築したユーザー情報:', {
+        email: userFromMetadata.email,
+        name: userFromMetadata.name,
+        university: userFromMetadata.university,
+        faculty: userFromMetadata.faculty,
+        department: userFromMetadata.department,
+        year: userFromMetadata.year
+      })
+      
+      // 3. ユーザー情報を設定（メタデータベース）
       setUser(userFromMetadata)
       
-      // 5. メタデータに完全な情報があるなら、usersテーブルを更新
-      if (userFromMetadata.university !== '未設定' && 
-          userFromMetadata.faculty !== '未設定' && 
-          userFromMetadata.department !== '未設定') {
-        
-        console.log('🔄 usersテーブルを認証メタデータで更新します...')
-        const { error: upsertError } = await supabase
+      // 4. オプション: usersテーブルからの情報で補完を試行（失敗してもOK）
+      try {
+        const { data: tableUser, error: tableError } = await supabase
           .from('users')
-          .upsert({
-            id: userId,
-            email: userFromMetadata.email,
-            name: userFromMetadata.name,
-            university: userFromMetadata.university,
-            faculty: userFromMetadata.faculty,
-            department: userFromMetadata.department,
-            year: userFromMetadata.year,
-            pen_name: userFromMetadata.pen_name,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }, {
-            onConflict: 'id'
+          .select('university, faculty, department, year, name, pen_name')
+          .eq('id', userId)
+          .single()
+
+        if (!tableError && tableUser) {
+          console.log('📊 usersテーブルから補完情報取得:', tableUser)
+          
+          // テーブルに有効な情報がある場合のみ補完
+          const enhancedUser = {
+            ...userFromMetadata,
+            university: (tableUser.university && tableUser.university !== '未設定') ? tableUser.university : userFromMetadata.university,
+            faculty: (tableUser.faculty && tableUser.faculty !== '未設定') ? tableUser.faculty : userFromMetadata.faculty,
+            department: (tableUser.department && tableUser.department !== '未設定') ? tableUser.department : userFromMetadata.department,
+            year: tableUser.year || userFromMetadata.year,
+            name: tableUser.name || userFromMetadata.name,
+            pen_name: tableUser.pen_name || userFromMetadata.pen_name
+          }
+          
+          console.log('✨ テーブル情報で補完したユーザー情報:', {
+            university: enhancedUser.university,
+            faculty: enhancedUser.faculty,
+            department: enhancedUser.department
           })
-        
-        if (!upsertError) {
-          console.log('✅ usersテーブルを認証メタデータで更新しました')
-        } else {
-          console.warn('⚠️ usersテーブル更新に失敗（問題ないです）:', upsertError)
+          
+          setUser(enhancedUser)
         }
+      } catch (tableError) {
+        console.log('ℹ️ usersテーブル補完失敗（問題ありません）:', tableError)
       }
+      
+      console.log('=== fetchUserProfile完了 ===')
       
     } catch (error) {
       console.error('ユーザープロフィール取得エラー:', error)
@@ -149,11 +158,27 @@ export function useAuth() {
 
       console.log('Supabase認証結果:', { 
         data: data ? { 
-          user: data.user ? { id: data.user.id, email: data.user.email } : null,
+          user: data.user ? { 
+            id: data.user.id, 
+            email: data.user.email,
+            user_metadata: data.user.user_metadata 
+          } : null,
           session: data.session ? 'session-exists' : null
         } : null, 
         error: error ? { message: error.message, status: error.status } : null 
       })
+      
+      // 保存されたメタデータを詳細に確認
+      if (data.user) {
+        console.log('📋 保存されたuser_metadata詳細:', {
+          name: data.user.user_metadata?.name,
+          university: data.user.user_metadata?.university,
+          faculty: data.user.user_metadata?.faculty,
+          department: data.user.user_metadata?.department,
+          year: data.user.user_metadata?.year,
+          pen_name: data.user.user_metadata?.pen_name
+        })
+      }
 
       if (error) {
         console.error('Supabase認証エラー詳細:', {
@@ -164,14 +189,23 @@ export function useAuth() {
         throw error
       }
 
-      // ユーザープロフィールを作成（完全回避策）
+      // ユーザープロフィールを作成（メタデータベース）
       if (data.user) {
-        console.log('ユーザープロフィール作成開始:', data.user.id)
+        console.log('🎉 ユーザー登録成功:', {
+          userId: data.user.id.substring(0, 8) + '...',
+          email: userData.email,
+          name: userData.name,
+          university: userData.university,
+          faculty: userData.faculty,
+          department: userData.department
+        })
         
-        // プロフィール情報はuser_metadataに既に保存済み
-        // usersテーブルへの挿入は試行するが、失敗してもOK
+        // プロフィール情報は user_metadata に保存されているので登録完了
+        console.log('✅ プロフィール情報は認証メタデータに保存されました')
+        
+        // オプション: usersテーブルに同期を試行（失敗してもシステムは動作）
         try {
-          const { error } = await supabase
+          const { error: tableError } = await supabase
             .from('users')
             .insert({
               id: data.user.id,
@@ -186,19 +220,15 @@ export function useAuth() {
               updated_at: new Date().toISOString()
             })
           
-          if (error) {
-            console.warn('usersテーブル挿入失敗（問題なし）:', error.message)
-            console.info('✅ プロフィール情報は認証メタデータに保存されています')
+          if (!tableError) {
+            console.log('🗃️ usersテーブル同期も成功しました')
           } else {
-            console.log('✅ usersテーブルへの保存も成功しました')
+            console.log('ℹ️ usersテーブル同期失敗（システムは正常動作します）:', tableError.message)
           }
           
         } catch (insertError) {
-          console.warn('usersテーブル挿入試行中にエラー（問題なし）:', insertError)
-          console.info('✅ プロフィール情報は認証メタデータに保存されています')
+          console.log('ℹ️ usersテーブル同期試行エラー（システムは正常動作します）:', insertError)
         }
-        
-        console.log('✅ プロフィール作成完了（メタデータベース）')
       }
 
       return { data, error: null }

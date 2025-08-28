@@ -111,19 +111,26 @@ export default function UploadPage() {
   useEffect(() => {
     if (user && isLoggedIn) {
       console.log('=== 過去問投稿ページ: ユーザー情報デバッグ ===')
-      console.log('👤 User object:', user)
-      console.log('🏫 University:', user.university)
-      console.log('🏛️ Faculty:', user.faculty)
-      console.log('📚 Department:', user.department)
-      console.log('📅 Year:', user.year)
+      console.log('👤 User object full:', JSON.stringify(user, null, 2))
+      console.log('🏫 University:', user.university, '(type:', typeof user.university, ')')
+      console.log('🏛️ Faculty:', user.faculty, '(type:', typeof user.faculty, ')')
+      console.log('📚 Department:', user.department, '(type:', typeof user.department, ')')
+      console.log('📅 Year:', user.year, '(type:', typeof user.year, ')')
       console.log('📧 Email:', user.email)
+      console.log('🔗 ID:', user.id.substring(0, 8) + '...')
       
-      // フォームデータに反映（まず必ず反映）
+      // ユーザー情報の有効性チェック
+      const hasValidUniversity = user.university && user.university !== '未設定'
+      const hasValidFaculty = user.faculty && user.faculty !== '未設定'
+      const hasValidDepartment = user.department && user.department !== '未設定'
+      const isComplete = hasValidUniversity && hasValidFaculty && hasValidDepartment
+      
+      // フォームデータに反映
       const newFormData = {
-        university: user.university && user.university !== '未設定' ? user.university : '',
-        faculty: user.faculty && user.faculty !== '未設定' ? user.faculty : '',
-        department: user.department && user.department !== '未設定' ? user.department : '',
-        author: `${user.faculty && user.faculty !== '未設定' ? user.faculty : ''}${user.year ? user.year + '年' : ''}`
+        university: hasValidUniversity ? user.university : '',
+        faculty: hasValidFaculty ? user.faculty : '',
+        department: hasValidDepartment ? user.department : '',
+        author: hasValidFaculty ? `${user.faculty}${user.year ? user.year + '年' : ''}` : `${user.name || 'ユーザー'}${user.year ? user.year + '年' : ''}`
       }
       
       console.log('📝 フォームデータに設定する値:', newFormData)
@@ -133,28 +140,22 @@ export default function UploadPage() {
         ...newFormData
       }))
       
-      // 情報の完全性チェック
-      const isComplete = user.university && user.faculty && user.department && 
-                        user.university !== '未設定' && user.faculty !== '未設定' && user.department !== '未設定'
-      
-      console.log('✅ 大学情報完全性:', isComplete)
+      console.log('📊 大学情報の状況:', {
+        university: hasValidUniversity ? '✅ 設定済み' : '❌ 未設定',
+        faculty: hasValidFaculty ? '✅ 設定済み' : '❌ 未設定', 
+        department: hasValidDepartment ? '✅ 設定済み' : '❌ 未設定',
+        complete: isComplete ? '✅ 完了' : '❌ 不完全'
+      })
       console.log('===========================================')
       
-      // ステップの決定 - ログインユーザーは基本的に科目情報から開始、情報が不足している場合のみ大学選択
+      // ステップの決定
       if (isComplete) {
         console.log('✅ 大学情報が完全なので科目情報ステップに移動')
         setCurrentStep('courseInfo')
       } else {
-        console.log('⚠️ 大学情報が不完全ですが、ログインユーザーなので大学情報を自動入力してから科目情報ステップに移動')
-        console.log('不完全な項目:', {
-          university: user.university === '未設定' ? '未設定' : user.university ? 'OK' : '空',
-          faculty: user.faculty === '未設定' ? '未設定' : user.faculty ? 'OK' : '空',
-          department: user.department === '未設定' ? '未設定' : user.department ? 'OK' : '空'
-        })
-        
-        // ログインユーザーは直接科目情報ステップに進める
-        // 大学情報が不足している場合は、投稿時にプロンプトまたは別途設定画面に誘導
-        setCurrentStep('courseInfo')
+        console.log('⚠️ 大学情報が不完全です。大学選択ステップから開始します')
+        console.log('💡 ヒント: プロフィール設定で大学情報を事前に登録すると、この手順をスキップできます')
+        setCurrentStep('university')
       }
     }
   }, [user, isLoggedIn])
@@ -501,7 +502,15 @@ export default function UploadPage() {
         tags: formData.tags || []
       }
 
-      console.log('過去問データ保存開始:', pastExamData)
+      console.log('📤 過去問データ保存開始:', {
+        title: pastExamData.title,
+        course_name: pastExamData.course_name,
+        university: pastExamData.university,
+        faculty: pastExamData.faculty,
+        department: pastExamData.department,
+        uploaded_by: pastExamData.uploaded_by.substring(0, 8) + '...',
+        professor: pastExamData.professor
+      })
 
       const { data: examData, error: examError } = await supabase
         .from('past_exams')

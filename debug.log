@@ -1,0 +1,19 @@
+
+> kakomonn-hub@0.1.2 dev
+> next dev -p 5001
+
+ ⚠ Warning: Found multiple lockfiles. Selecting /home/rinta/package-lock.json.
+   Consider removing the lockfiles at:
+   * /home/rinta/kakomonn/package-lock.json
+
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::5001
+    at <unknown> (Error: listen EADDRINUSE: address already in use :::5001)
+    at new Promise (<anonymous>) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 5001
+}
+[?25h
