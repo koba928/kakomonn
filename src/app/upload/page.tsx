@@ -106,6 +106,7 @@ export default function UploadPage() {
   
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState('')
 
   // ユーザーログイン情報を自動入力
   useEffect(() => {
@@ -253,12 +254,12 @@ export default function UploadPage() {
         return formData.department !== ''
       case 'courseInfo':
         // ログインユーザーは大学情報が自動入力されるので、科目関連の必須項目のみチェック
+        // 教員情報は任意（投稿時に「不明」として処理）
         return formData.courseName !== '' && 
                formData.year > 0 && 
                formData.term !== '' &&
                formData.examType !== '' && 
-               selectedFile !== null &&
-               formData.teachers.length > 0
+               selectedFile !== null
       case 'confirm':
         return true
       default:
@@ -430,11 +431,13 @@ export default function UploadPage() {
 
       try {
         console.log('アップロード開始:', formData)
+        setUploadProgress('ファイル検証中...')
         
         // ファイルが選択されているか確認
         if (!formData.file) {
           alert('ファイルを選択してください')
           setIsSubmitting(false)
+          setUploadProgress('')
           return
         }
 
@@ -455,11 +458,13 @@ export default function UploadPage() {
         }
 
       // ファイル名を生成（ユニークな名前）
+      setUploadProgress('ファイルアップロード準備中...')
       const fileExtension = formData.file.name.split('.').pop()
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExtension}`
       const filePath = `${user?.id}/${fileName}`
 
       console.log('ファイルアップロード開始:', { fileName, filePath })
+      setUploadProgress('ファイルアップロード中...')
 
       // Supabase Storageにファイルをアップロード
       const { data: uploadData, error: uploadError } = await supabase.storage
@@ -474,6 +479,7 @@ export default function UploadPage() {
       }
 
       console.log('ファイルアップロード成功:', uploadData)
+      setUploadProgress('データベース保存中...')
 
       // ファイルの公開URLを取得
       const { data: urlData } = supabase.storage
@@ -486,7 +492,9 @@ export default function UploadPage() {
       const pastExamData = {
         title: formData.courseName || '無題',
         course_name: formData.courseName || '',
-        professor: formData.teachers.map(t => t.name).join(', '), // 教員名をカンマ区切りで保存
+        professor: formData.teachers.length > 0 
+          ? formData.teachers.map(t => t.name).join(', ')
+          : '不明', // 教員名をカンマ区切りで保存、または「不明」
         university: formData.university || user?.university || '',
         faculty: formData.faculty || user?.faculty || '',
         department: formData.department || user?.department || '',
@@ -556,6 +564,7 @@ export default function UploadPage() {
       alert('アップロード中にエラーが発生しました')
     } finally {
       setIsSubmitting(false)
+      setUploadProgress('')
     }
   }
 
@@ -714,7 +723,8 @@ export default function UploadPage() {
               </div>
 
               <div className="border-t pt-6 mt-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">教員情報</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">教員情報（任意）</h3>
+                <p className="text-sm text-gray-600 mb-4">教員名を追加すると、他の学生に有益な情報を提供できます</p>
                 
                 {formData.teachers.length > 0 && (
                   <div className="space-y-2 mb-4">
@@ -738,7 +748,7 @@ export default function UploadPage() {
                 <div className="space-y-4 border-t pt-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      教員名 <span className="text-red-500">*</span>
+                      教員名
                     </label>
                     <input
                       type="text"
@@ -894,17 +904,6 @@ export default function UploadPage() {
               </div>
             </div>
 
-            <div className="text-center">
-              <AnimatedButton
-                variant="primary"
-                size="lg"
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                className="w-full sm:w-auto"
-              >
-                {isSubmitting ? '投稿中...' : '投稿する'}
-              </AnimatedButton>
-            </div>
           </div>
         )
 
@@ -1022,7 +1021,11 @@ export default function UploadPage() {
                 onClick={currentStep === 'confirm' ? handleSubmit : goToNextStep}
                 className="flex items-center justify-center gap-2 px-6 py-3 sm:px-4 sm:py-2 min-h-[44px]"
               >
-                {currentStep === 'confirm' ? '投稿する' : '次へ'}
+                {currentStep === 'confirm' 
+                  ? (isSubmitting 
+                      ? uploadProgress || '投稿中...' 
+                      : '投稿する') 
+                  : '次へ'}
                 {currentStep !== 'confirm' && <ArrowRightIcon size={16} />}
               </AnimatedButton>
             </div>
