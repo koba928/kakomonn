@@ -33,14 +33,14 @@ type Step =
 
 
 const YEAR_OPTIONS = [
-  { value: 2024, label: '2024年度' },
-  { value: 2023, label: '2023年度' },
-  { value: 2022, label: '2022年度' },
-  { value: 2021, label: '2021年度' },
-  { value: 2020, label: '2020年度' },
-  { value: 2019, label: '2019年度' },
-  { value: 2018, label: '2018年度' },
-  { value: 2017, label: '2017年度' },
+  { value: 2024, label: '2024年度（令和6年度）' },
+  { value: 2023, label: '2023年度（令和5年度）' },
+  { value: 2022, label: '2022年度（令和4年度）' },
+  { value: 2021, label: '2021年度（令和3年度）' },
+  { value: 2020, label: '2020年度（令和2年度）' },
+  { value: 2019, label: '2019年度（令和元年度）' },
+  { value: 2018, label: '2018年度（平成30年度）' },
+  { value: 2017, label: '2017年度（平成29年度）' },
 ]
 
 const TERM_OPTIONS = [
