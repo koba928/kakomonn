@@ -2,11 +2,9 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
 
 export default function RegisterPage() {
-  const router = useRouter()
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null)
 
   const registerMethods = [
