@@ -3,9 +3,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { CheckIcon, ArrowRightIcon } from '@/components/icons/IconSystem'
-import { useAuthContext } from '@/components/providers/AuthProvider'
+import { useAuth } from '@/hooks/useAuth'
 import { VirtualizedAutocompleteSelect } from '@/components/ui/VirtualizedAutocompleteSelect'
-import { TeacherSearchModal } from '@/components/teacher/TeacherSearchModal'
 import { universityDataDetailed } from '@/data/universityDataDetailed'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
 import { useFormErrorHandler } from '@/hooks/useErrorHandler'
@@ -28,18 +27,10 @@ type Step =
   | 'university' 
   | 'faculty' 
   | 'department' 
-  | 'courseCategory'
   | 'courseInfo'
-  | 'examInfo'
-  | 'teacher'
   | 'confirm'
   | 'complete'
 
-interface TargetAudience {
-  id: string
-  name: string
-  description?: string
-}
 
 const YEAR_OPTIONS = [
   { value: 2024, label: '2024年度' },
@@ -55,8 +46,11 @@ const YEAR_OPTIONS = [
 const TERM_OPTIONS = [
   { value: 'spring', label: '春学期' },
   { value: 'fall', label: '秋学期' },
+  { value: 'spring1', label: '春1期' },
+  { value: 'spring2', label: '春2期' },
+  { value: 'fall1', label: '秋1期' },
+  { value: 'fall2', label: '秋2期' },
   { value: 'full-year', label: '通年' },
-  { value: 'intensive', label: '集中講義' },
 ]
 
 const EXAM_TYPE_OPTIONS = [
@@ -67,47 +61,24 @@ const EXAM_TYPE_OPTIONS = [
   { value: 'other', label: 'その他' },
 ]
 
-const COURSE_CATEGORIES = [
-  { 
-    value: 'specialized', 
-    label: '専門科目', 
-    description: '学部・学科の専門科目（検索時に専門科目として検索されます）' 
-  },
-  { 
-    value: 'general', 
-    label: '一般科目', 
-    description: '全学共通・教養科目（検索時に一般科目として検索されます）' 
-  },
-]
 
-const TEACHER_POSITIONS = [
-  { value: 'professor', label: '教授' },
-  { value: 'associate-professor', label: '准教授' },
-  { value: 'lecturer', label: '講師' },
-  { value: 'assistant-professor', label: '助教' },
-  { value: 'part-time', label: '非常勤講師' },
-  { value: 'unknown', label: '不明' },
-]
 
 export default function UploadPage() {
-  const { user, loading, isLoggedIn } = useAuthContext()
+  const { user, loading, isLoggedIn } = useAuth()
   const formErrorHandler = useFormErrorHandler()
   
   // All hooks must be called before any conditional returns
-  const [currentStep, setCurrentStep] = useState<Step>('courseCategory')
-  const [showTeacherSearchModal, setShowTeacherSearchModal] = useState(false)
+  const [currentStep, setCurrentStep] = useState<Step>('courseInfo')
   const [formData, setFormData] = useState({
     // 基本情報
     university: '',
     faculty: '',
     department: '',
-    courseCategory: '',
     
     // 科目情報
     courseName: '',
     year: 2024,
     term: '',
-    targetAudiences: 'all-years' as string,
     
     // 試験情報
     examType: '',
@@ -127,9 +98,6 @@ export default function UploadPage() {
   
   const [teacherInput, setTeacherInput] = useState({
     teacherName: '',
-    teacherPosition: '',
-    isMainInstructor: true,
-    teachingStyle: '',
     difficulty: 3,
     grading: '',
     attendance: false,
@@ -142,17 +110,25 @@ export default function UploadPage() {
   // ユーザーログイン情報を自動入力
   useEffect(() => {
     if (user && isLoggedIn) {
+      console.log('ログインユーザー情報を過去問投稿に反映:', user)
       setFormData(prev => ({
         ...prev,
-        university: user.university,
-        faculty: user.faculty,
-        department: user.department,
-        author: `${user.faculty}${user.year}年`
+        university: user.university || '',
+        faculty: user.faculty || '',
+        department: user.department || '',
+        author: `${user.faculty || ''}${user.year ? user.year + '年' : ''}`
       }))
       
-      // ログインユーザーは大学選択をスキップ
+      // ログインユーザーは大学選択をスキップして直接科目情報へ
       if (user.university && user.faculty && user.department) {
-        setCurrentStep('courseCategory')
+        console.log('大学情報が完全なので科目情報ステップに移動')
+        setCurrentStep('courseInfo')
+      } else {
+        console.log('大学情報が不完全:', { 
+          university: user.university, 
+          faculty: user.faculty, 
+          department: user.department 
+        })
       }
     }
   }, [user, isLoggedIn])
@@ -173,17 +149,6 @@ export default function UploadPage() {
   //   return faculty?.departments || []
   // }, [formData.university, formData.faculty])
 
-  // 対象者のオプション（学年ベース）
-  const availableTargetAudiences = useMemo((): TargetAudience[] => {
-    return [
-      { id: 'all-years', name: '学年問わず', description: 'すべての学年' },
-      { id: '1st-year', name: '1年生', description: '1年生向け' },
-      { id: '2nd-year', name: '2年生', description: '2年生向け' },
-      { id: '3rd-year', name: '3年生', description: '3年生向け' },
-      { id: '4th-year', name: '4年生', description: '4年生向け' },
-      { id: 'graduate', name: '大学院生', description: '大学院生向け' }
-    ]
-  }, [])
 
   // Get university options for autocomplete
   const universityOptions = useMemo(() => {
@@ -220,10 +185,7 @@ export default function UploadPage() {
       'university',
       'faculty',
       'department',
-      'courseCategory',
       'courseInfo',
-      'examInfo',
-      'teacher',
       'confirm'
     ]
     
@@ -241,10 +203,7 @@ export default function UploadPage() {
       'university',
       'faculty',
       'department',
-      'courseCategory',
       'courseInfo',
-      'examInfo',
-      'teacher',
       'confirm'
     ]
     
@@ -265,17 +224,13 @@ export default function UploadPage() {
         return formData.faculty !== ''
       case 'department':
         return formData.department !== ''
-      case 'courseCategory':
-        return formData.courseCategory !== ''
       case 'courseInfo':
         return formData.courseName !== '' && 
                formData.year > 0 && 
                formData.term !== '' &&
-               formData.targetAudiences !== ''
-      case 'examInfo':
-        return formData.examType !== '' && selectedFile !== null
-      case 'teacher':
-        return formData.teachers.length > 0
+               formData.examType !== '' && 
+               selectedFile !== null &&
+               formData.teachers.length > 0
       case 'confirm':
         return true
       default:
@@ -289,11 +244,8 @@ export default function UploadPage() {
       { key: 'university', label: '大学', number: 1 },
       { key: 'faculty', label: '学部', number: 2 },
       { key: 'department', label: '学科', number: 3 },
-      { key: 'courseCategory', label: '科目分類', number: 1 },
-      { key: 'courseInfo', label: '科目情報', number: 2 },
-      { key: 'examInfo', label: '試験情報', number: 3 },
-      { key: 'teacher', label: '教員情報', number: 4 },
-      { key: 'confirm', label: '確認', number: 5 },
+      { key: 'courseInfo', label: '科目・試験・教員情報', number: 1 },
+      { key: 'confirm', label: '確認', number: 2 },
     ]
 
     // Always skip university steps since login is required
@@ -411,9 +363,6 @@ export default function UploadPage() {
     const newTeacher: CourseTeacher = {
       id: Date.now().toString(),
       name: teacherInput.teacherName,
-      position: teacherInput.teacherPosition,
-      isMainInstructor: teacherInput.isMainInstructor,
-      teachingStyle: teacherInput.teachingStyle,
       difficulty: teacherInput.difficulty,
       grading: teacherInput.grading,
       attendance: teacherInput.attendance,
@@ -428,9 +377,6 @@ export default function UploadPage() {
     // Reset teacher input
     setTeacherInput({
       teacherName: '',
-      teacherPosition: '',
-      isMainInstructor: false,
-      teachingStyle: '',
       difficulty: 3,
       grading: '',
       attendance: false,
@@ -445,18 +391,6 @@ export default function UploadPage() {
     }))
   }
 
-  const handleTeacherSelect = (teacher: any) => {
-    const courseTeacher: CourseTeacher = {
-      id: teacher.id || Date.now().toString(),
-      name: teacher.name,
-      kana: teacher.kana,
-      position: teacher.position
-    }
-    setFormData(prev => ({
-      ...prev,
-      teachers: [...prev.teachers, courseTeacher]
-    }))
-  }
 
   const handleSubmit = async () => {
           if (!isLoggedIn) {
@@ -626,39 +560,13 @@ export default function UploadPage() {
           </div>
         )
 
-      case 'courseCategory':
-        return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">科目タイプを選択してください</h2>
-              <p className="text-gray-600">検索ページと同じ分類で、どちらのタイプか選んでください</p>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {COURSE_CATEGORIES.map(category => (
-                <button
-                  key={category.value}
-                  onClick={() => setFormData(prev => ({ ...prev, courseCategory: category.value }))}
-                  className={`p-4 rounded-xl border-2 transition-all duration-200 text-left ${
-                    formData.courseCategory === category.value
-                      ? 'border-indigo-500 bg-indigo-50'
-                      : 'border-gray-200 bg-white hover:border-indigo-300'
-                  }`}
-                >
-                  <h3 className="font-semibold text-gray-900 mb-1">{category.label}</h3>
-                  <p className="text-sm text-gray-600">{category.description}</p>
-                </button>
-              ))}
-            </div>
-          </div>
-        )
 
       case 'courseInfo':
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">科目情報を入力してください</h2>
-              <p className="text-gray-600">科目の詳細情報を入力してください</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">科目・試験・教員情報を入力してください</h2>
+              <p className="text-gray-600">過去問に関する情報をまとめて入力してください</p>
             </div>
             
             <div className="space-y-4">
@@ -714,35 +622,6 @@ export default function UploadPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  対象者 <span className="text-red-500">*</span>
-                </label>
-                <select
-                  value={formData.targetAudiences}
-                  onChange={(e) => setFormData(prev => ({ ...prev, targetAudiences: e.target.value }))}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                >
-                  {availableTargetAudiences.map(target => (
-                    <option key={target.id} value={target.id}>
-                      {target.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-        )
-
-      case 'examInfo':
-        return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">試験情報を入力してください</h2>
-              <p className="text-gray-600">試験の詳細とファイルをアップロードしてください</p>
-            </div>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
                   試験の種類 <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -757,18 +636,6 @@ export default function UploadPage() {
                     </option>
                   ))}
                 </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  試験日（任意）
-                </label>
-                <input
-                  type="date"
-                  value={formData.examDate}
-                  onChange={(e) => setFormData(prev => ({ ...prev, examDate: e.target.value }))}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                />
               </div>
 
               <div>
@@ -827,133 +694,51 @@ export default function UploadPage() {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        )
 
-      case 'teacher':
-        return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">教員情報を入力してください</h2>
-              <p className="text-gray-600">担当教員の情報を追加してください（最低1人）</p>
-            </div>
-            
-            {formData.teachers.length > 0 && (
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium text-gray-700">追加済みの教員</h3>
-                {formData.teachers.map(teacher => (
-                  <div key={teacher.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div>
-                      <span className="font-medium">{teacher.name}</span>
-                      {teacher.position && <span className="text-sm text-gray-600 ml-2">({teacher.position})</span>}
-                      {teacher.isMainInstructor && <span className="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded ml-2">主担当</span>}
-                    </div>
-                    <button
-                      onClick={() => handleRemoveTeacher(teacher.id)}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      削除
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="space-y-4 border-t pt-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    教員名 <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={teacherInput.teacherName}
-                    onChange={(e) => setTeacherInput(prev => ({ ...prev, teacherName: e.target.value }))}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    placeholder="例：山田太郎"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    職位
-                  </label>
-                  <select
-                    value={teacherInput.teacherPosition}
-                    onChange={(e) => setTeacherInput(prev => ({ ...prev, teacherPosition: e.target.value }))}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  >
-                    <option value="">選択してください</option>
-                    {TEACHER_POSITIONS.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
+              <div className="border-t pt-6 mt-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">教員情報</h3>
+                
+                {formData.teachers.length > 0 && (
+                  <div className="space-y-2 mb-4">
+                    <h4 className="text-sm font-medium text-gray-700">追加済みの教員</h4>
+                    {formData.teachers.map(teacher => (
+                      <div key={teacher.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div>
+                          <span className="font-medium">{teacher.name}</span>
+                        </div>
+                        <button
+                          onClick={() => handleRemoveTeacher(teacher.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          削除
+                        </button>
+                      </div>
                     ))}
-                  </select>
+                  </div>
+                )}
+
+                <div className="space-y-4 border-t pt-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      教員名 <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={teacherInput.teacherName}
+                      onChange={(e) => setTeacherInput(prev => ({ ...prev, teacherName: e.target.value }))}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="例：山田太郎"
+                    />
+                  </div>
+
+                  <AnimatedButton
+                    variant="secondary"
+                    onClick={handleAddTeacher}
+                    className="w-full"
+                  >
+                    教員を追加
+                  </AnimatedButton>
                 </div>
-              </div>
-
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="isMainInstructor"
-                  checked={teacherInput.isMainInstructor}
-                  onChange={(e) => setTeacherInput(prev => ({ ...prev, isMainInstructor: e.target.checked }))}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                />
-                <label htmlFor="isMainInstructor" className="ml-2 text-sm text-gray-700">
-                  主担当教員
-                </label>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  授業スタイル
-                </label>
-                <textarea
-                  value={teacherInput.teachingStyle}
-                  onChange={(e) => setTeacherInput(prev => ({ ...prev, teachingStyle: e.target.value }))}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  rows={2}
-                  placeholder="例：板書中心、スライド使用、演習重視など"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  難易度（1-5）
-                </label>
-                <input
-                  type="range"
-                  min="1"
-                  max="5"
-                  value={teacherInput.difficulty}
-                  onChange={(e) => setTeacherInput(prev => ({ ...prev, difficulty: parseInt(e.target.value) }))}
-                  className="w-full"
-                />
-                <div className="flex justify-between text-xs text-gray-600 mt-1">
-                  <span>易しい</span>
-                  <span>普通</span>
-                  <span>難しい</span>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <AnimatedButton
-                  variant="secondary"
-                  onClick={() => setShowTeacherSearchModal(true)}
-                  className="flex-1"
-                >
-                  教員を検索
-                </AnimatedButton>
-                <AnimatedButton
-                  variant="primary"
-                  onClick={handleAddTeacher}
-                  className="flex-1"
-                >
-                  教員を追加
-                </AnimatedButton>
               </div>
             </div>
           </div>
@@ -973,21 +758,15 @@ export default function UploadPage() {
                 <dl className="space-y-1 text-sm">
                   <div className="flex">
                     <dt className="font-medium text-gray-600 w-24">大学:</dt>
-                    <dd className="text-gray-900">{formData.university}</dd>
+                    <dd className="text-gray-900">{formData.university || '未設定'}</dd>
                   </div>
                   <div className="flex">
                     <dt className="font-medium text-gray-600 w-24">学部:</dt>
-                    <dd className="text-gray-900">{formData.faculty}</dd>
+                    <dd className="text-gray-900">{formData.faculty || '未設定'}</dd>
                   </div>
                   <div className="flex">
                     <dt className="font-medium text-gray-600 w-24">学科:</dt>
-                    <dd className="text-gray-900">{formData.department}</dd>
-                  </div>
-                  <div className="flex">
-                    <dt className="font-medium text-gray-600 w-24">科目分類:</dt>
-                    <dd className="text-gray-900">
-                      {COURSE_CATEGORIES.find(c => c.value === formData.courseCategory)?.label}
-                    </dd>
+                    <dd className="text-gray-900">{formData.department || '未設定'}</dd>
                   </div>
                 </dl>
               </div>
@@ -1034,8 +813,6 @@ export default function UploadPage() {
                   {formData.teachers.map(teacher => (
                     <li key={teacher.id} className="text-gray-900">
                       {teacher.name}
-                      {teacher.position && ` (${teacher.position})`}
-                      {teacher.isMainInstructor && ' - 主担当'}
                     </li>
                   ))}
                 </ul>
@@ -1152,9 +929,9 @@ export default function UploadPage() {
             <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mt-6 sm:mt-8 gap-3 sm:gap-0">
               <button
                 onClick={goToPrevStep}
-                disabled={currentStep === 'courseCategory'}
+                disabled={currentStep === 'courseInfo'}
                 className={`flex items-center justify-center gap-2 px-6 py-3 sm:px-4 sm:py-2 rounded-lg font-medium transition-all min-h-[44px] ${
-                  currentStep === 'courseCategory'
+                  currentStep === 'courseInfo'
                     ? 'text-gray-400 cursor-not-allowed'
                     : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                 }`}
@@ -1178,12 +955,6 @@ export default function UploadPage() {
         </div>
       </div>
 
-      {/* Teacher Search Modal */}
-      <TeacherSearchModal
-        isOpen={showTeacherSearchModal}
-        onClose={() => setShowTeacherSearchModal(false)}
-        onSelect={handleTeacherSelect}
-      />
     </main>
   )
 }
