@@ -118,14 +118,7 @@ export default function UploadPage() {
       console.log('📅 Year:', user.year)
       console.log('📧 Email:', user.email)
       
-      // 情報の完全性チェック
-      const isComplete = user.university && user.faculty && user.department && 
-                        user.university !== '未設定' && user.faculty !== '未設定' && user.department !== '未設定'
-      
-      console.log('✅ 大学情報完全性:', isComplete)
-      console.log('===========================================')
-      
-      // フォームデータに反映
+      // フォームデータに反映（まず必ず反映）
       const newFormData = {
         university: user.university && user.university !== '未設定' ? user.university : '',
         faculty: user.faculty && user.faculty !== '未設定' ? user.faculty : '',
@@ -140,18 +133,28 @@ export default function UploadPage() {
         ...newFormData
       }))
       
-      // ステップの決定
+      // 情報の完全性チェック
+      const isComplete = user.university && user.faculty && user.department && 
+                        user.university !== '未設定' && user.faculty !== '未設定' && user.department !== '未設定'
+      
+      console.log('✅ 大学情報完全性:', isComplete)
+      console.log('===========================================')
+      
+      // ステップの決定 - ログインユーザーは基本的に科目情報から開始、情報が不足している場合のみ大学選択
       if (isComplete) {
         console.log('✅ 大学情報が完全なので科目情報ステップに移動')
         setCurrentStep('courseInfo')
       } else {
-        console.log('⚠️ 大学情報が不完全なので大学選択から開始')
+        console.log('⚠️ 大学情報が不完全ですが、ログインユーザーなので大学情報を自動入力してから科目情報ステップに移動')
         console.log('不完全な項目:', {
           university: user.university === '未設定' ? '未設定' : user.university ? 'OK' : '空',
           faculty: user.faculty === '未設定' ? '未設定' : user.faculty ? 'OK' : '空',
           department: user.department === '未設定' ? '未設定' : user.department ? 'OK' : '空'
         })
-        setCurrentStep('university')
+        
+        // ログインユーザーは直接科目情報ステップに進める
+        // 大学情報が不足している場合は、投稿時にプロンプトまたは別途設定画面に誘導
+        setCurrentStep('courseInfo')
       }
     }
   }, [user, isLoggedIn])
@@ -248,6 +251,7 @@ export default function UploadPage() {
       case 'department':
         return formData.department !== ''
       case 'courseInfo':
+        // ログインユーザーは大学情報が自動入力されるので、科目関連の必須項目のみチェック
         return formData.courseName !== '' && 
                formData.year > 0 && 
                formData.term !== '' &&
@@ -477,14 +481,14 @@ export default function UploadPage() {
 
       const fileUrl = urlData.publicUrl
 
-      // データベースに過去問情報を保存
+      // データベースに過去問情報を保存（ユーザー情報を確実に適用）
       const pastExamData = {
         title: formData.courseName || '無題',
         course_name: formData.courseName || '',
         professor: formData.teachers.map(t => t.name).join(', '), // 教員名をカンマ区切りで保存
-        university: formData.university || '',
-        faculty: formData.faculty || '',
-        department: formData.department || '',
+        university: formData.university || user?.university || '',
+        faculty: formData.faculty || user?.faculty || '',
+        department: formData.department || user?.department || '',
         year: formData.year || new Date().getFullYear(),
         semester: formData.term || 'spring',
         exam_type: formData.examType || 'final',
