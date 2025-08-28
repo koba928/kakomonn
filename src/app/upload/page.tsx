@@ -466,19 +466,42 @@ export default function UploadPage() {
       console.log('ファイルアップロード開始:', { fileName, filePath })
       setUploadProgress('ファイルアップロード中...')
 
-      // Supabase Storageにファイルをアップロード
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      // Supabase Storageにファイルをアップロード（タイムアウト付き）
+      const uploadPromise = supabase.storage
         .from('past-exams')
-        .upload(filePath, formData.file)
+        .upload(filePath, formData.file, {
+          cacheControl: '3600',
+          upsert: false
+        })
 
-      if (uploadError) {
-        console.error('ファイルアップロードエラー:', uploadError)
-        alert('ファイルのアップロードに失敗しました')
+      // 30秒のタイムアウトを設定
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('アップロードがタイムアウトしました（30秒）')), 30000)
+      )
+
+      try {
+        const { data: uploadData, error: uploadError } = await Promise.race([
+          uploadPromise,
+          timeoutPromise
+        ])
+
+        if (uploadError) {
+          console.error('ファイルアップロードエラー:', uploadError)
+          alert('ファイルのアップロードに失敗しました。ネットワーク接続を確認してください。')
+          setIsSubmitting(false)
+          setUploadProgress('')
+          return
+        }
+
+        console.log('ファイルアップロード成功:', uploadData)
+      } catch (timeoutError) {
+        console.error('アップロードタイムアウト:', timeoutError)
+        alert('ファイルアップロードがタイムアウトしました。ファイルサイズを確認するか、後でもう一度お試しください。')
         setIsSubmitting(false)
+        setUploadProgress('')
         return
       }
 
-      console.log('ファイルアップロード成功:', uploadData)
       setUploadProgress('データベース保存中...')
 
       // ファイルの公開URLを取得
@@ -842,16 +865,16 @@ export default function UploadPage() {
                 <h3 className="font-semibold text-gray-700 mb-2">基本情報</h3>
                 <dl className="space-y-1 text-sm">
                   <div className="flex">
-                    <dt className="font-medium text-gray-600 w-24">大学:</dt>
-                    <dd className="text-gray-900">{formData.university || '未設定'}</dd>
+                    <dt className="font-medium text-gray-600 w-24 flex-shrink-0">大学:</dt>
+                    <dd className="text-gray-900 truncate">{formData.university || '未設定'}</dd>
                   </div>
                   <div className="flex">
-                    <dt className="font-medium text-gray-600 w-24">学部:</dt>
-                    <dd className="text-gray-900">{formData.faculty || '未設定'}</dd>
+                    <dt className="font-medium text-gray-600 w-24 flex-shrink-0">学部:</dt>
+                    <dd className="text-gray-900 truncate">{formData.faculty || '未設定'}</dd>
                   </div>
                   <div className="flex">
-                    <dt className="font-medium text-gray-600 w-24">学科:</dt>
-                    <dd className="text-gray-900">{formData.department || '未設定'}</dd>
+                    <dt className="font-medium text-gray-600 w-24 flex-shrink-0">学科:</dt>
+                    <dd className="text-gray-900 truncate">{formData.department || '未設定'}</dd>
                   </div>
                 </dl>
               </div>
@@ -894,13 +917,17 @@ export default function UploadPage() {
 
               <div>
                 <h3 className="font-semibold text-gray-700 mb-2">教員情報</h3>
-                <ul className="space-y-1 text-sm">
-                  {formData.teachers.map(teacher => (
-                    <li key={teacher.id} className="text-gray-900">
-                      {teacher.name}
-                    </li>
-                  ))}
-                </ul>
+                {formData.teachers.length > 0 ? (
+                  <ul className="space-y-1 text-sm">
+                    {formData.teachers.map(teacher => (
+                      <li key={teacher.id} className="text-gray-900 truncate">
+                        {teacher.name}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-gray-900">不明</p>
+                )}
               </div>
             </div>
 
@@ -1023,7 +1050,12 @@ export default function UploadPage() {
               >
                 {currentStep === 'confirm' 
                   ? (isSubmitting 
-                      ? uploadProgress || '投稿中...' 
+                      ? (
+                          <div className="flex items-center">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            {uploadProgress || '投稿中...'}
+                          </div>
+                        )
                       : '投稿する') 
                   : '次へ'}
                 {currentStep !== 'confirm' && <ArrowRightIcon size={16} />}
