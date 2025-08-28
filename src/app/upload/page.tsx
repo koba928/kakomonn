@@ -356,10 +356,10 @@ export default function UploadPage() {
         return
       }
       
-      // ファイルサイズチェック（50MB制限）
-      const maxSize = 50 * 1024 * 1024 // 50MB
+      // ファイルサイズチェック（25MB制限）
+      const maxSize = 25 * 1024 * 1024 // 25MB
       if (file.size > maxSize) {
-        alert('ファイルサイズは50MB以下にしてください')
+        alert('ファイルサイズは25MB以下にしてください')
         return
       }
 
@@ -437,10 +437,10 @@ export default function UploadPage() {
           return
         }
 
-        // ファイルサイズチェック（50MB制限）
-        const maxSize = 50 * 1024 * 1024 // 50MB
+        // ファイルサイズチェック（25MB制限）
+        const maxSize = 25 * 1024 * 1024 // 25MB
         if (formData.file.size > maxSize) {
-          alert('ファイルサイズは50MB以下にしてください')
+          alert('ファイルサイズは25MB以下にしてください')
           setIsSubmitting(false)
           return
         }
@@ -748,7 +748,7 @@ export default function UploadPage() {
                           </label>
                           <p className="pl-1">またはドラッグ＆ドロップ</p>
                         </div>
-                    <p className="text-xs text-gray-500">PDF, JPG, PNG 最大50MB</p>
+                    <p className="text-xs text-gray-500">PDF, JPG, PNG 最大25MB</p>
                       </>
                     )}
                   </div>
