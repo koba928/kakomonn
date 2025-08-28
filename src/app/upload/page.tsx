@@ -349,7 +349,53 @@ export default function UploadPage() {
   }
 
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // 画像圧縮関数
+  const compressImage = async (file: File): Promise<File> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const img = new Image()
+        img.onload = () => {
+          const canvas = document.createElement('canvas')
+          const ctx = canvas.getContext('2d')!
+          
+          // 最大幅1920px、高さ1080pxに制限（フルHDサイズ）
+          const maxWidth = 1920
+          const maxHeight = 1080
+          let width = img.width
+          let height = img.height
+          
+          // アスペクト比を保ちながらリサイズ
+          if (width > maxWidth || height > maxHeight) {
+            const ratio = Math.min(maxWidth / width, maxHeight / height)
+            width *= ratio
+            height *= ratio
+          }
+          
+          canvas.width = width
+          canvas.height = height
+          ctx.drawImage(img, 0, 0, width, height)
+          
+          // 圧縮品質0.8でJPEGに変換
+          canvas.toBlob(
+            (blob) => {
+              const compressedFile = new File([blob!], file.name, {
+                type: 'image/jpeg',
+                lastModified: Date.now(),
+              })
+              resolve(compressedFile)
+            },
+            'image/jpeg',
+            0.8
+          )
+        }
+        img.src = e.target?.result as string
+      }
+      reader.readAsDataURL(file)
+    })
+  }
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
       // Validate file
@@ -358,13 +404,6 @@ export default function UploadPage() {
         return
       }
       
-      // ファイルサイズチェック（25MB制限）
-      const maxSize = 25 * 1024 * 1024 // 25MB
-      if (file.size > maxSize) {
-        alert('ファイルサイズは25MB以下にしてください')
-        return
-      }
-
       // ファイル形式チェック
       const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg']
       if (!allowedTypes.includes(file.type)) {
@@ -372,14 +411,44 @@ export default function UploadPage() {
         return
       }
 
+      let processedFile = file
+
+      // 画像の場合は圧縮処理
+      if (file.type.startsWith('image/')) {
+        // 2MB以上の画像は圧縮
+        if (file.size > 2 * 1024 * 1024) {
+          console.log('画像圧縮開始:', { 
+            元のサイズ: `${(file.size / 1024 / 1024).toFixed(2)}MB` 
+          })
+          
+          processedFile = await compressImage(file)
+          
+          console.log('画像圧縮完了:', { 
+            圧縮後: `${(processedFile.size / 1024 / 1024).toFixed(2)}MB`,
+            削減率: `${Math.round((1 - processedFile.size / file.size) * 100)}%`
+          })
+        }
+      }
+      
+      // ファイルサイズチェック（25MB制限）
+      const maxSize = 25 * 1024 * 1024 // 25MB
+      if (processedFile.size > maxSize) {
+        alert('ファイルサイズは25MB以下にしてください')
+        return
+      }
+
       // UI表示用と送信用の両方を更新
-      setSelectedFile(file)
+      setSelectedFile(processedFile)
       setFormData(prev => ({
         ...prev,
-        file
+        file: processedFile
       }))
       
-      console.log('ファイル選択:', { name: file.name, size: file.size, type: file.type })
+      console.log('ファイル選択:', { 
+        name: processedFile.name, 
+        size: processedFile.size, 
+        type: processedFile.type 
+      })
     }
   }
 
@@ -799,37 +868,110 @@ export default function UploadPage() {
                 <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-indigo-400 transition-colors">
                   <div className="space-y-1 text-center">
                     {selectedFile ? (
-                      <div className="text-sm text-gray-900">
-                        <p className="font-medium">{selectedFile.name}</p>
-                        <p className="text-gray-500">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
-                        <button
-                          type="button"
-                          onClick={() => setSelectedFile(null)}
-                          className="mt-2 text-indigo-600 hover:text-indigo-500"
-                        >
-                          別のファイルを選択
-                        </button>
+                      <div className="space-y-3">
+                        {/* ファイルプレビュー */}
+                        {selectedFile.type.startsWith('image/') ? (
+                          <div className="relative">
+                            <img
+                              src={URL.createObjectURL(selectedFile)}
+                              alt="Preview"
+                              className="max-h-48 mx-auto rounded-lg shadow-md"
+                            />
+                            <div className="absolute top-2 right-2">
+                              <button
+                                type="button"
+                                onClick={() => setSelectedFile(null)}
+                                className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center">
+                            <svg className="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                          </div>
+                        )}
+                        
+                        <div className="text-center">
+                          <p className="font-medium text-gray-900 truncate max-w-xs mx-auto">
+                            {selectedFile.name}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedFile(null);
+                              setFormData(prev => ({ ...prev, file: null as any }));
+                            }}
+                            className="mt-2 inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500"
+                          >
+                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            別のファイルを選択
+                          </button>
+                        </div>
                       </div>
                     ) : (
                       <>
-                        <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                        <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
                           <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
-                    <div className="flex text-sm text-gray-600">
-                          <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
-                            <span>ファイルを選択</span>
-                            <input 
-                              id="file-upload" 
-                              name="file-upload" 
-                              type="file" 
-                              className="sr-only" 
-                              onChange={handleFileChange}
-                          accept=".pdf,.jpg,.jpeg,.png"
-                            />
-                          </label>
-                          <p className="pl-1">またはドラッグ＆ドロップ</p>
+                        
+                        <div className="space-y-4">
+                          {/* スマホで使いやすい大きなボタン */}
+                          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                            <label htmlFor="camera-upload" className="cursor-pointer">
+                              <span className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-lg transition-all transform hover:scale-105">
+                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                写真を撮る
+                              </span>
+                              <input 
+                                id="camera-upload" 
+                                type="file" 
+                                className="sr-only" 
+                                accept="image/*"
+                                capture="environment"
+                                onChange={handleFileChange}
+                              />
+                            </label>
+                            
+                            <label htmlFor="file-upload" className="cursor-pointer">
+                              <span className="inline-flex items-center px-6 py-3 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 shadow-lg transition-all transform hover:scale-105">
+                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                ファイル選択
+                              </span>
+                              <input 
+                                id="file-upload" 
+                                type="file" 
+                                className="sr-only" 
+                                accept=".pdf,.jpg,.jpeg,.png,image/*"
+                                onChange={handleFileChange}
+                              />
+                            </label>
+                          </div>
+                          
+                          <div className="text-center">
+                            <p className="text-xs text-gray-500">
+                              PDF、JPG、PNG（最大25MB）
+                            </p>
+                            <p className="text-xs text-gray-400 hidden sm:block mt-1">
+                              パソコンの場合はドラッグ&ドロップも可能
+                            </p>
+                          </div>
                         </div>
-                    <p className="text-xs text-gray-500">PDF, JPG, PNG 最大25MB</p>
                       </>
                     )}
                   </div>
