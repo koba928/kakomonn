@@ -300,18 +300,62 @@ export function useAuth() {
     if (!user) return { error: new Error('ユーザーがログインしていません') }
 
     try {
-      const { error } = await supabase
-        .from('users')
-        .update(updates)
-        .eq('id', user.id)
+      console.log('🔄 プロフィール更新開始:', updates)
 
-      if (error) throw error
+      // 1. 認証メタデータを更新（最重要）
+      const { error: metadataError } = await supabase.auth.updateUser({
+        data: {
+          name: updates.name || user.name,
+          university: updates.university || user.university,
+          faculty: updates.faculty || user.faculty,
+          department: updates.department || user.department,
+          year: updates.year || user.year,
+          pen_name: updates.pen_name || user.pen_name
+        }
+      })
 
-      // ローカル状態を更新
-      setUser(prev => prev ? { ...prev, ...updates } : null)
+      if (metadataError) {
+        console.error('❌ メタデータ更新エラー:', metadataError)
+        throw metadataError
+      }
+
+      console.log('✅ 認証メタデータ更新成功')
+
+      // 2. usersテーブルも更新（補完的）
+      try {
+        const { error: tableError } = await supabase
+          .from('users')
+          .upsert({
+            id: user.id,
+            email: user.email,
+            name: updates.name || user.name,
+            university: updates.university || user.university,
+            faculty: updates.faculty || user.faculty,
+            department: updates.department || user.department,
+            year: updates.year || user.year,
+            pen_name: updates.pen_name || user.pen_name,
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'id'
+          })
+
+        if (!tableError) {
+          console.log('✅ usersテーブル更新成功')
+        } else {
+          console.warn('⚠️ usersテーブル更新失敗（問題なし）:', tableError)
+        }
+      } catch (tableError) {
+        console.warn('⚠️ usersテーブル更新エラー（問題なし）:', tableError)
+      }
+
+      // 3. ローカル状態を更新
+      const updatedUser = { ...user, ...updates }
+      setUser(updatedUser)
+      console.log('✅ ローカル状態更新完了:', updatedUser)
 
       return { error: null }
     } catch (error) {
+      console.error('❌ プロフィール更新全体エラー:', error)
       return { error }
     }
   }

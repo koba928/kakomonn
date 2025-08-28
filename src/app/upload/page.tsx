@@ -527,6 +527,27 @@ export default function UploadPage() {
 
       console.log('過去問データ保存成功:', examData)
       
+      // ユーザーの大学情報が「未設定」の場合、今回入力した情報で更新
+      if (user && (user.university === '未設定' || user.faculty === '未設定' || user.department === '未設定') &&
+          formData.university && formData.faculty && formData.department) {
+        
+        console.log('🔄 ユーザープロフィールを投稿情報で更新中...')
+        const profileUpdates = {
+          university: formData.university,
+          faculty: formData.faculty,
+          department: formData.department
+        }
+        
+        try {
+          const result = await updateProfile(profileUpdates)
+          if (!result.error) {
+            console.log('✅ プロフィール更新成功！次回投稿時から自動入力されます')
+          }
+        } catch (error) {
+          console.warn('⚠️ プロフィール更新失敗（投稿は成功済み）:', error)
+        }
+      }
+      
       // 成功メッセージを表示
       setCurrentStep('complete')
       
@@ -548,6 +569,24 @@ export default function UploadPage() {
               <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-2">大学を選択してください</h2>
               <p className="text-sm sm:text-base text-gray-600">過去問を投稿する大学を選んでください</p>
             </div>
+            
+            {user && user.university === '未設定' && (
+              <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-blue-800">便利な機能</h3>
+                    <p className="mt-1 text-sm text-blue-700">
+                      ここで選択した大学・学部・学科情報は自動保存され、次回の投稿時から入力が不要になります！
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
             
             <VirtualizedAutocompleteSelect
               options={universityOptions}
