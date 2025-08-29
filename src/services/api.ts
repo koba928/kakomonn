@@ -151,34 +151,21 @@ export const api = {
     },
 
     async update(id: string, updates: Partial<PastExam>): Promise<PastExam> {
-      console.log('API update開始:', { id, updates })
-      
       // 現在のユーザー情報を確認
       const { data: { user }, error: authError } = await supabase.auth.getUser()
-      console.log('現在のユーザー:', { userId: user?.id, authError })
       
       if (!user) {
         throw new Error('認証されていません')
       }
 
-      // 既存データチェック（通常クライアント）
+      // 既存データと権限をチェック
       const { data: existingData, error: checkError } = await supabase
         .from('past_exams')
         .select('*')
         .eq('id', id)
         .single()
       
-      console.log('既存データチェック:', { 
-        existingData: existingData ? {
-          id: existingData.id,
-          uploaded_by: existingData.uploaded_by,
-          title: existingData.title
-        } : null, 
-        checkError 
-      })
-      
       if (checkError) {
-        console.error('データ確認エラー:', checkError)
         throw checkError
       }
       
@@ -191,13 +178,11 @@ export const api = {
         throw new Error('この過去問を編集する権限がありません')
       }
       
-      // RLSポリシーを回避するため、selectを削除して更新のみ実行
+      // 更新実行
       const { error } = await supabase
         .from('past_exams')
         .update(updates)
         .eq('id', id)
-      
-      console.log('更新実行結果:', { error })
       
       if (error) throw error
       
@@ -207,8 +192,6 @@ export const api = {
         .select('*')
         .eq('id', id)
         .single()
-      
-      console.log('更新後データ取得:', { updatedData, fetchError })
       
       if (fetchError) throw fetchError
       if (!updatedData) throw new Error('更新されたデータの取得に失敗しました')
