@@ -40,7 +40,7 @@ interface PastExam {
 }
 
 export default function ProfilePage() {
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [editedInfo, setEditedInfo] = useState<UserInfo | null>(null)
@@ -118,16 +118,46 @@ export default function ProfilePage() {
     setIsEditing(false)
   }
 
-  // Redirect to home if not logged in
-  if (!userInfo && typeof window !== 'undefined') {
+  // ローディング中の表示
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">認証状態を確認中...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // 認証チェック - userInfoまたはuseAuthのユーザー情報があればOK
+  if (!userInfo && !user && typeof window !== 'undefined') {
+    console.log('🚫 プロフィールページ: 認証なし - ホームへリダイレクト')
     window.location.href = '/'
     return null
   }
 
-  if (!userInfo) {
+  // userInfoが存在しない場合の対処
+  if (!userInfo && user) {
+    console.log('📝 プロフィールページ: useAuthから userInfo 生成')
+    const userInfoFromAuth = {
+      university: user.university,
+      faculty: user.faculty,
+      department: user.department,
+      year: user.year.toString(),
+      penName: user.pen_name,
+      isLoggedIn: true,
+      completedAt: new Date().toISOString()
+    }
+    setUserInfo(userInfoFromAuth)
+    localStorage.setItem('kakomonn_user', JSON.stringify(userInfoFromAuth))
+    
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">ユーザー情報を準備中...</p>
+        </div>
       </div>
     )
   }
@@ -253,30 +283,30 @@ export default function ProfilePage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">表示名</label>
-                      <p className="text-base sm:text-lg text-gray-900">{userInfo.penName || '匿名ユーザー'}</p>
+                      <p className="text-base sm:text-lg text-gray-900">{userInfo?.penName || '匿名ユーザー'}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">学年</label>
-                      <p className="text-base sm:text-lg text-gray-900">{userInfo.year}</p>
+                      <p className="text-base sm:text-lg text-gray-900">{userInfo?.year}</p>
                     </div>
                     <div className="sm:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1">大学</label>
-                      <p className="text-base sm:text-lg text-gray-900">{userInfo.university}</p>
+                      <p className="text-base sm:text-lg text-gray-900">{userInfo?.university}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">学部</label>
-                      <p className="text-base sm:text-lg text-gray-900">{userInfo.faculty}</p>
+                      <p className="text-base sm:text-lg text-gray-900">{userInfo?.faculty}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">学科</label>
-                      <p className="text-base sm:text-lg text-gray-900">{userInfo.department}</p>
+                      <p className="text-base sm:text-lg text-gray-900">{userInfo?.department}</p>
                     </div>
                   </div>
 
                   <div className="pt-4 border-t border-gray-200">
                     <div className="flex items-center justify-between text-sm text-gray-500">
-                      <span>アカウント作成日: {new Date(userInfo.completedAt).toLocaleDateString('ja-JP')}</span>
-                      <span>ID: {userInfo.completedAt.slice(-8)}</span>
+                      <span>アカウント作成日: {userInfo?.completedAt ? new Date(userInfo.completedAt).toLocaleDateString('ja-JP') : '未設定'}</span>
+                      <span>ID: {userInfo?.completedAt?.slice(-8) || '未設定'}</span>
                     </div>
                   </div>
                 </div>
