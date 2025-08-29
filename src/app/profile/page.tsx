@@ -385,22 +385,32 @@ export default function ProfilePage() {
             ) : (
               <div className="grid gap-4">
                 {myUploads.map((exam) => (
-                  <Link
+                  <div
                     key={exam.id}
-                    href={`/exams/${exam.id}`}
-                    className="block bg-gray-50 rounded-lg border border-gray-200 p-4 hover:bg-gray-100 hover:border-indigo-300 transition-all group"
+                    className="bg-gray-50 rounded-lg border border-gray-200 p-4 hover:bg-gray-100 hover:border-indigo-300 transition-all"
                   >
                     <div className="flex items-start justify-between mb-2">
-                      <h4 className="font-medium text-gray-900 group-hover:text-indigo-700 transition-colors">
+                      <Link
+                        href={`/exams/${exam.id}`}
+                        className="font-medium text-gray-900 hover:text-indigo-700 transition-colors flex-1"
+                      >
                         {exam.title}
-                      </h4>
-                      <span className="text-sm text-gray-500 bg-white px-2 py-1 rounded">
-                        {exam.year}年
-                      </span>
+                      </Link>
+                      <div className="flex items-center space-x-2 ml-4">
+                        <span className="text-sm text-gray-500 bg-white px-2 py-1 rounded">
+                          {exam.year}年
+                        </span>
+                        <Link
+                          href={`/exams/${exam.id}/edit`}
+                          className="text-sm text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-2 py-1 rounded transition-colors"
+                        >
+                          編集
+                        </Link>
+                      </div>
                     </div>
                     <div className="text-sm text-gray-600 space-y-1">
                       <p>📚 {exam.course_name}</p>
-                      <p>👨‍🏫 {exam.professor}</p>
+                      <p>👨‍🏫 {exam.professor || <span className="text-red-500">未設定</span>}</p>
                       <p>{exam.university} {exam.faculty} {exam.department}</p>
                     </div>
                     <div className="flex items-center justify-between mt-3 text-sm">
@@ -412,7 +422,7 @@ export default function ProfilePage() {
                         {new Date(exam.created_at).toLocaleDateString('ja-JP')}
                       </span>
                     </div>
-                  </Link>
+                  </div>
                 ))}
               </div>
             )}
