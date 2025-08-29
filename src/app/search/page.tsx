@@ -170,54 +170,71 @@ function SearchPageClient() {
   const [selectedProfessor, setSelectedProfessor] = useState<string | null>(null)
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null)
   
+  // デバウンス用のタイマー
+  const [searchTimer, setSearchTimer] = useState<NodeJS.Timeout | null>(null)
+  
   // 検索機能の状態管理
   const [searchResults, setSearchResults] = useState<PastExam[]>([])
   const [searchFilters] = useState<SearchFilters>({})
   const [isSearching, setIsSearching] = useState(false)
 
-  const handleSearch = useCallback(async (searchQuery: string) => {
+  const handleSearch = useCallback(async (searchQuery: string, immediate: boolean = false) => {
     if (!searchQuery.trim()) {
       setSearchResults([])
       return
     }
 
-    try {
-      setIsSearching(true)
-      console.log('検索開始:', searchQuery)
-      
-      // 検索フィルターを構築
-      const filters: SearchFilters = {
-        ...searchFilters
-      }
+    const executeSearch = async () => {
+      try {
+        setIsSearching(true)
+        console.log('検索開始:', searchQuery)
+        
+        // 検索フィルターを構築
+        const filters: SearchFilters = {
+          ...searchFilters
+        }
 
-      // 現在のセクションに応じて検索パラメータを設定
-      if (activeSection === 'professor') {
-        filters.professor = searchQuery
-      } else if (activeSection === 'subject') {
-        filters.course = searchQuery
-      } else {
-        // デフォルトは授業名検索
-        filters.course = searchQuery
-      }
+        // 現在のセクションに応じて検索パラメータを設定
+        if (activeSection === 'professor') {
+          filters.professor = searchQuery
+        } else if (activeSection === 'subject') {
+          filters.course = searchQuery
+        } else {
+          // デフォルトは授業名検索
+          filters.course = searchQuery
+        }
 
-      // ユーザー情報があれば大学・学部でフィルタリング
-      if (userInfo) {
-        filters.university = userInfo.university
-        filters.faculty = userInfo.faculty
+        // ユーザー情報があれば大学・学部でフィルタリング
+        if (userInfo) {
+          filters.university = userInfo.university
+          filters.faculty = userInfo.faculty
+        }
+        
+        // APIを使用して過去問を検索
+        const results = await api.pastExams.getAll(filters)
+        setSearchResults(results)
+        
+        console.log('検索結果:', results)
+      } catch (error) {
+        console.error('検索エラー:', error)
+        setSearchResults([])
+      } finally {
+        setIsSearching(false)
       }
-      
-      // APIを使用して過去問を検索
-      const results = await api.pastExams.getAll(filters)
-      setSearchResults(results)
-      
-      console.log('検索結果:', results)
-    } catch (error) {
-      console.error('検索エラー:', error)
-      setSearchResults([])
-    } finally {
-      setIsSearching(false)
     }
-  }, [searchFilters, activeSection, userInfo])
+
+    if (immediate) {
+      // 即座に実行（エンターキー押下時など）
+      executeSearch()
+    } else {
+      // デバウンス実行（文字入力中）
+      if (searchTimer) {
+        clearTimeout(searchTimer)
+      }
+      const timer = setTimeout(executeSearch, 800) // 800ms後に実行
+      setSearchTimer(timer)
+    }
+  }, [searchFilters, activeSection, userInfo, searchTimer])
 
   // ログインユーザーのプロファイル情報を読み込む
   useEffect(() => {
@@ -1001,6 +1018,12 @@ function SearchPageClient() {
                               type="text"
                               value={professorQuery}
                               onChange={(e) => setProfessorQuery(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' && professorQuery.trim()) {
+                                  setQuery(professorQuery)
+                                  handleSearch(professorQuery, true) // 即座に実行
+                                }
+                              }}
                               placeholder="教授名を入力... (例: 田中)"
                               className="w-full px-4 py-3 pl-12 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent shadow-sm"
                               autoFocus
@@ -1017,7 +1040,7 @@ function SearchPageClient() {
                             <button
                               onClick={() => {
                                 setQuery(professorQuery)
-                                handleSearch(professorQuery)
+                                handleSearch(professorQuery, true) // 即座に実行
                               }}
                               className="w-full p-4 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl hover:from-orange-600 hover:to-red-600 transition-all shadow-lg hover:shadow-xl"
                             >
@@ -1113,7 +1136,7 @@ function SearchPageClient() {
                                 key={index}
                                 onClick={() => {
                                   setQuery(`${selectedCourse} ${selectedProfessor} ${year}年`)
-                                  handleSearch(`${selectedCourse} ${selectedProfessor} ${year}年`)
+                                  handleSearch(`${selectedCourse} ${selectedProfessor} ${year}年`, true) // 即座に実行
                                   resetFlow() // Close modal after search
                                 }}
                                 className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl hover:from-green-100 hover:to-emerald-100 hover:shadow-lg transition-all text-center"
@@ -1145,10 +1168,10 @@ function SearchPageClient() {
                               placeholder="例: 線形代数学、マクロ経済学、英語、体育"
                               className="w-full px-4 py-3 pl-12 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm"
                               autoFocus
-                              onKeyPress={(e) => {
+                              onKeyDown={(e) => {
                                 if (e.key === 'Enter' && subjectQuery.trim()) {
                                   setQuery(subjectQuery)
-                                  handleSearch(subjectQuery)
+                                  handleSearch(subjectQuery, true) // 即座に実行
                                 }
                               }}
                             />
@@ -1163,7 +1186,7 @@ function SearchPageClient() {
                             <button
                               onClick={() => {
                                 setQuery(subjectQuery)
-                                handleSearch(subjectQuery)
+                                handleSearch(subjectQuery, true) // 即座に実行
                                 resetFlow() // Close modal after search
                               }}
                               className="w-full p-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl hover:from-indigo-600 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl"
