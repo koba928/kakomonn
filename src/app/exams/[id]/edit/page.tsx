@@ -122,7 +122,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
         updated_at: new Date().toISOString()
       }
 
-      const result = await api.pastExams.update(exam.id, updateData)
+      await api.pastExams.update(exam.id, updateData)
       
       // 成功メッセージを表示してリダイレクト
       alert('過去問を更新しました')
