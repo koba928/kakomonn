@@ -102,8 +102,6 @@ interface Course {
 
 type MainSection = 'subject' | 'professor'
 type UniversityStep = 'university' | 'faculty' | 'department' | 'year' | 'penname'
-type SubjectStep = 'type' | 'search'
-type SubjectType = 'specialized' | 'general'
 type ProfessorStep = 'search' | 'courses' | 'years'
 
 
@@ -163,9 +161,8 @@ function SearchPageClient() {
   const [isCompletingSetup, setIsCompletingSetup] = useState(false)
   const [isLoadingProfile, setIsLoadingProfile] = useState(true)
   
-  // New state for step-by-step flow
-  const [subjectStep, setSubjectStep] = useState<SubjectStep>('type')
-  const [subjectType, setSubjectType] = useState<SubjectType | null>(null)
+  // Subject search state (simplified)
+  const [subjectQuery, setSubjectQuery] = useState('')
   
   // Professor search flow state
   const [professorStep, setProfessorStep] = useState<ProfessorStep>('search')
@@ -477,30 +474,23 @@ function SearchPageClient() {
 
   const resetFlow = () => {
     setActiveSection(null)
-    setSubjectStep('type')
-    setSubjectType(null)
     setProfessorStep('search')
     setProfessorQuery('')
     setSelectedProfessor(null)
     setSelectedCourse(null)
+    setSubjectQuery('')
   }
 
   const handleSectionSelect = (section: MainSection) => {
     setActiveSection(section)
     if (section === 'subject') {
-      setSubjectStep('type')
-      setSubjectType(null)
+      setSubjectQuery('')
     } else if (section === 'professor') {
       setProfessorStep('search')
       setProfessorQuery('')
       setSelectedProfessor(null)
       setSelectedCourse(null)
     }
-  }
-
-  const handleSubjectTypeSelect = (type: SubjectType) => {
-    setSubjectType(type)
-    setSubjectStep('search')
   }
 
 
@@ -983,8 +973,7 @@ function SearchPageClient() {
                           {activeSection === 'professor' && professorStep === 'search' && '教授名を入力'}
                           {activeSection === 'professor' && professorStep === 'courses' && '授業を選択'}
                           {activeSection === 'professor' && professorStep === 'years' && '年度を選択'}
-                          {activeSection === 'subject' && subjectStep === 'type' && '科目タイプを選択'}
-                          {activeSection === 'subject' && subjectStep === 'search' && '検索を実行'}
+                          {activeSection === 'subject' && '授業名を入力'}
                         </h2>
                         
                         {activeSection === 'professor' && professorStep === 'search' && userInfo && (
@@ -1138,66 +1127,28 @@ function SearchPageClient() {
                         </div>
                       )}
 
-                      {/* Subject Type Selection */}
-                      {activeSection === 'subject' && subjectStep === 'type' && (
-                        <div className="grid gap-4">
-                          <button
-                            onClick={() => handleSubjectTypeSelect('specialized')}
-                            className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl hover:from-blue-100 hover:to-indigo-100 hover:shadow-lg transition-all text-left group"
-                          >
-                            <div className="flex items-center space-x-4">
-                              <div className="text-3xl">🎓</div>
-                              <div>
-                                <h3 className="text-lg font-bold text-gray-900 mb-1">専門科目</h3>
-                                <p className="text-gray-600">学部・学科の専門科目を検索</p>
-                              </div>
-                            </div>
-                          </button>
-                          
-                          <button
-                            onClick={() => handleSubjectTypeSelect('general')}
-                            className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl hover:from-green-100 hover:to-emerald-100 hover:shadow-lg transition-all text-left group"
-                          >
-                            <div className="flex items-center space-x-4">
-                              <div className="text-3xl">🌍</div>
-                              <div>
-                                <h3 className="text-lg font-bold text-gray-900 mb-1">一般科目</h3>
-                                <p className="text-gray-600">全学共通・教養科目を検索</p>
-                              </div>
-                            </div>
-                          </button>
-                        </div>
-                      )}
 
                       {/* Subject Search Input */}
-                      {activeSection === 'subject' && subjectStep === 'search' && (
+                      {activeSection === 'subject' && (
                         <div className="space-y-6">
                           <div className="text-center mb-6">
-                            <div className="inline-flex items-center px-3 py-1 bg-indigo-100 text-indigo-800 text-sm rounded-full mb-3">
-                              {subjectType === 'specialized' ? '🎓 専門科目' : '🌍 一般科目'}
-                            </div>
                             <p className="text-gray-600">
-                              {subjectType === 'specialized' 
-                                ? '学部・学科の専門科目名を入力してください' 
-                                : '全学共通・教養科目名を入力してください'
-                              }
+                              授業名を入力してください
                             </p>
                           </div>
                           
                           <div className="relative">
                             <input
                               type="text"
-                              value={query}
-                              onChange={(e) => setQuery(e.target.value)}
-                              placeholder={subjectType === 'specialized' 
-                                ? "例: 線形代数学、マクロ経済学、データ構造とアルゴリズム" 
-                                : "例: 英語、体育、情報リテラシー"
-                              }
+                              value={subjectQuery}
+                              onChange={(e) => setSubjectQuery(e.target.value)}
+                              placeholder="例: 線形代数学、マクロ経済学、英語、体育"
                               className="w-full px-4 py-3 pl-12 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm"
                               autoFocus
                               onKeyPress={(e) => {
-                                if (e.key === 'Enter' && query.trim()) {
-                                  handleSearch(query)
+                                if (e.key === 'Enter' && subjectQuery.trim()) {
+                                  setQuery(subjectQuery)
+                                  handleSearch(subjectQuery)
                                 }
                               }}
                             />
@@ -1208,10 +1159,11 @@ function SearchPageClient() {
                             </div>
                           </div>
 
-                          {query.trim() && (
+                          {subjectQuery.trim() && (
                             <button
                               onClick={() => {
-                                handleSearch(query)
+                                setQuery(subjectQuery)
+                                handleSearch(subjectQuery)
                                 resetFlow() // Close modal after search
                               }}
                               className="w-full p-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl hover:from-indigo-600 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl"
@@ -1220,7 +1172,7 @@ function SearchPageClient() {
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
-                                <span className="font-semibold">「{query}」を検索</span>
+                                <span className="font-semibold">「{subjectQuery}」を検索</span>
                               </div>
                             </button>
                           )}
@@ -1230,30 +1182,9 @@ function SearchPageClient() {
                               <h4 className="text-sm font-medium text-gray-900 mb-2">検索範囲</h4>
                               <div className="text-sm text-gray-600">
                                 <p>{userInfo.university} {userInfo.faculty} {userInfo.department}</p>
-                                <p className="text-xs mt-1">
-                                  {subjectType === 'specialized' 
-                                    ? '専門科目として検索します' 
-                                    : '一般科目として検索します'
-                                  }
-                                </p>
                               </div>
                             </div>
                           )}
-                        </div>
-                      )}
-
-                      {/* Navigation Buttons */}
-                      {activeSection === 'subject' && subjectStep === 'search' && (
-                        <div className="flex justify-between pt-6 border-t border-gray-200">
-                          <button
-                            onClick={() => setSubjectStep('type')}
-                            className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors flex items-center space-x-2"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                            </svg>
-                            <span>戻る</span>
-                          </button>
                         </div>
                       )}
 
