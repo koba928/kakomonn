@@ -152,7 +152,7 @@ export const api = {
 
     async update(id: string, updates: Partial<PastExam>): Promise<PastExam> {
       // 現在のユーザー情報を確認
-      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      const { data: { user } } = await supabase.auth.getUser()
       
       if (!user) {
         throw new Error('認証されていません')
