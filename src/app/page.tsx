@@ -5,30 +5,30 @@ import { useEffect, useState } from 'react'
 import { SearchIcon } from '@/components/icons/IconSystem'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
 import { APP_CONFIG } from '@/constants/app'
+import { useAuth } from '@/hooks/useAuth'
 
 export default function Home() {
+  const { user, isLoggedIn, loading } = useAuth()
   const [mainButtonHref, setMainButtonHref] = useState('/auth/email')
 
   useEffect(() => {
-    // ログイン済みかつ大学情報が登録済みかチェック
-    const checkExistingUser = () => {
-      const savedUserInfo = localStorage.getItem('kakomonn_user')
-      
-      if (savedUserInfo) {
-        try {
-          const parsed = JSON.parse(savedUserInfo)
-          // 大学情報が完全に登録済みの場合、直接検索ページへ
-          if (parsed.university && parsed.faculty && parsed.department && parsed.isLoggedIn) {
-            setMainButtonHref('/search')
-          }
-        } catch (error) {
-          console.error('Failed to parse user info:', error)
-        }
-      }
+    if (loading) {
+      // 認証状態読み込み中は待機
+      return
     }
 
-    checkExistingUser()
-  }, [])
+    console.log('🏠 ホーム画面認証状態チェック:', { isLoggedIn, hasUser: !!user })
+
+    if (isLoggedIn && user) {
+      // ログイン済みユーザーは直接検索画面へ
+      console.log('✅ ログイン済みユーザー - 検索画面に誘導')
+      setMainButtonHref('/search')
+    } else {
+      // 未ログインユーザーはログイン画面へ
+      console.log('❌ 未ログインユーザー - ログイン画面に誘導')
+      setMainButtonHref('/auth/email')
+    }
+  }, [isLoggedIn, user, loading])
 
   return (
     <main id="main-content" className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 relative overflow-hidden transition-colors duration-300">
