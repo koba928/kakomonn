@@ -3,6 +3,9 @@ import ExamDetailClient from './ExamDetailClient'
 import { api } from '@/services/api'
 import ExamDetailHeader from './ExamDetailHeader'
 
+// キャッシュ無効化
+export const revalidate = 0
+
 export default async function ExamDetailPage({ params }: { params: { id: string } }) {
   const { id } = params
   
@@ -14,6 +17,12 @@ export default async function ExamDetailPage({ params }: { params: { id: string 
     const exam = await api.pastExams.getById(id)
     if (exam) {
       examData = exam
+      console.log('📋 過去問詳細ページ - データ確認:', {
+        id: exam.id,
+        title: exam.title,
+        professor: exam.professor,
+        updated_at: exam.updated_at
+      })
       
       // コメント取得
       const comments = await api.pastExamComments.getByPastExamId(id)
