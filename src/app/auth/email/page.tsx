@@ -33,26 +33,30 @@ function EmailAuthPageContent() {
     setIsLoading(true)
     
     try {
+      console.log('🔐 ログインフォーム送信開始')
       const result = await signIn(email, password)
+      
+      console.log('🔐 signIn結果:', { 
+        hasError: !!result.error,
+        errorMessage: result.error?.message,
+        hasUser: !!result.user 
+      })
+      
       if (result.error) {
-        console.error('ログインエラー:', result.error)
+        console.error('❌ ログインエラー:', result.error)
         setError((result.error as any).message || 'ログインに失敗しました')
         setIsLoading(false)
       } else {
-        // ユーザー情報を確認
-        const userInfo = result.user
-        console.log('ログイン成功 - ユーザー情報:', userInfo)
+        console.log('✅ ログイン成功!')
+        setIsLoading(false) // すぐにローディングを終了
         
-        // ログイン成功後は直接指定されたページへリダイレクト
-        console.log('ログイン成功 - 指定されたページへリダイレクト:', redirectUrl)
-        setTimeout(() => {
-          router.push(redirectUrl)
-        }, 1500)
+        // 成功メッセージを表示してからリダイレクト
+        console.log('🔄 リダイレクト開始:', redirectUrl)
+        router.push(redirectUrl)
       }
     } catch (err: any) {
-      console.error('認証エラー:', err)
+      console.error('❌ 認証キャッチエラー:', err)
       setError(err.message || '認証に失敗しました')
-    } finally {
       setIsLoading(false)
     }
   }

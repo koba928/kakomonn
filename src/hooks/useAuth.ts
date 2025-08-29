@@ -240,6 +240,7 @@ export function useAuth() {
 
   const signIn = async (email: string, password: string) => {
     try {
+      console.log('🔐 signIn開始:', { email })
       setIsAuthenticating(true)
       setAuthStep('signing-in')
 
@@ -248,34 +249,44 @@ export function useAuth() {
         password
       })
 
+      console.log('🔐 認証結果:', { 
+        success: !error,
+        error: error?.message,
+        userId: data.user?.id?.substring(0, 8) + '...' 
+      })
+
       if (error) {
+        console.error('❌ 認証エラー:', error)
         // エラー時は即座に認証状態をリセット
         setIsAuthenticating(false)
         setAuthStep('idle')
         throw error
       }
 
+      console.log('👤 プロフィール取得開始')
       setAuthStep('profile-loading')
       
       // セッション情報を手動で設定
       setSession(data.session)
 
-      let userProfile = null
       if (data.user) {
         // fetchUserProfile を使用（既存のロジックを活用）
         await fetchUserProfile(data.user.id)
+        console.log('✅ プロフィール取得完了')
       }
 
+      console.log('🔄 認証状態リセット開始')
       setAuthStep('redirecting')
       
-      // 少し待ってからリセット
-      setTimeout(() => {
-        setIsAuthenticating(false)
-        setAuthStep('idle')
-      }, 1000)
-
-      return { data, error: null, user: userProfile }
+      // 認証状態を確実にリセット
+      setIsAuthenticating(false)
+      setAuthStep('idle')
+      
+      console.log('✅ signIn完了')
+      return { data, error: null, user: data.user }
+      
     } catch (error) {
+      console.error('❌ signIn全体エラー:', error)
       // エラー時も確実に認証状態をリセット
       setIsAuthenticating(false)
       setAuthStep('idle')
