@@ -117,6 +117,17 @@ export const api = {
       return data
     },
 
+    async getByUserId(userId: string): Promise<PastExam[]> {
+      const { data, error } = await supabase
+        .from('past_exams')
+        .select('*')
+        .eq('uploaded_by', userId)
+        .order('created_at', { ascending: false })
+      
+      if (error) throw error
+      return data
+    },
+
     async getById(id: string): Promise<PastExam | null> {
       const { data, error } = await supabase
         .from('past_exams')

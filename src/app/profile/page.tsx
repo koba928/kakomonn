@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
 import { AcademicInfoSelector, AcademicInfo } from '@/components/ui/AcademicInfoSelector'
+import { api } from '@/services/api'
+import { useAuth } from '@/hooks/useAuth'
 
 interface UserInfo {
   university: string
@@ -15,11 +17,36 @@ interface UserInfo {
   completedAt: string
 }
 
+interface PastExam {
+  id: string
+  title: string
+  course_name: string
+  professor: string
+  university: string
+  faculty: string
+  department: string
+  year: number
+  semester: string
+  exam_type: string
+  file_url: string
+  file_name: string
+  uploaded_by: string
+  download_count: number
+  difficulty: number
+  helpful_count: number
+  tags: string[]
+  created_at: string
+  updated_at: string
+}
+
 export default function ProfilePage() {
+  const { user } = useAuth()
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [editedInfo, setEditedInfo] = useState<UserInfo | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [myUploads, setMyUploads] = useState<PastExam[]>([])
+  const [isLoadingUploads, setIsLoadingUploads] = useState(true)
 
   useEffect(() => {
     // Load user information from localStorage
@@ -34,6 +61,27 @@ export default function ProfilePage() {
       }
     }
   }, [])
+
+  useEffect(() => {
+    // Load uploaded exams
+    const loadMyUploads = async () => {
+      if (!user?.id) {
+        setIsLoadingUploads(false)
+        return
+      }
+      try {
+        setIsLoadingUploads(true)
+        const exams = await api.pastExams.getByUserId(user.id)
+        setMyUploads(exams)
+      } catch (error) {
+        console.error('Failed to load uploads:', error)
+      } finally {
+        setIsLoadingUploads(false)
+      }
+    }
+
+    loadMyUploads()
+  }, [user])
 
   const handleAcademicInfoChange = (newInfo: AcademicInfo) => {
     if (editedInfo) {
@@ -247,6 +295,11 @@ export default function ProfilePage() {
                     🔍 検索ページ
                   </AnimatedButton>
                 </Link>
+                <Link href="/upload">
+                  <AnimatedButton variant="secondary" size="sm" className="w-full">
+                    📤 過去問を投稿
+                  </AnimatedButton>
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="w-full px-4 py-3 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors min-h-[44px]"
@@ -276,6 +329,63 @@ export default function ProfilePage() {
                 実際のサービスでは安全なサーバーで管理されます。
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* 投稿した過去問一覧 */}
+        <div className="mt-8">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-5 md:p-6">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-5 md:mb-6">投稿した過去問</h2>
+            
+            {isLoadingUploads ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mr-3"></div>
+                <span className="text-gray-600">読み込み中...</span>
+              </div>
+            ) : myUploads.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="text-5xl mb-3">📝</div>
+                <p className="text-gray-600 mb-4">まだ過去問を投稿していません</p>
+                <Link href="/upload">
+                  <AnimatedButton variant="primary" size="sm">
+                    過去問を投稿する
+                  </AnimatedButton>
+                </Link>
+              </div>
+            ) : (
+              <div className="grid gap-4">
+                {myUploads.map((exam) => (
+                  <Link
+                    key={exam.id}
+                    href={`/exams/${exam.id}`}
+                    className="block bg-gray-50 rounded-lg border border-gray-200 p-4 hover:bg-gray-100 hover:border-indigo-300 transition-all group"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-medium text-gray-900 group-hover:text-indigo-700 transition-colors">
+                        {exam.title}
+                      </h4>
+                      <span className="text-sm text-gray-500 bg-white px-2 py-1 rounded">
+                        {exam.year}年
+                      </span>
+                    </div>
+                    <div className="text-sm text-gray-600 space-y-1">
+                      <p>📚 {exam.course_name}</p>
+                      <p>👨‍🏫 {exam.professor}</p>
+                      <p>{exam.university} {exam.faculty} {exam.department}</p>
+                    </div>
+                    <div className="flex items-center justify-between mt-3 text-sm">
+                      <div className="flex items-center space-x-4 text-gray-500">
+                        <span>📥 {exam.download_count || 0} ダウンロード</span>
+                        <span>💭 {exam.helpful_count || 0} コメント</span>
+                      </div>
+                      <span className="text-gray-400">
+                        {new Date(exam.created_at).toLocaleDateString('ja-JP')}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
