@@ -157,7 +157,11 @@ export const api = {
       const { data: { user }, error: authError } = await supabase.auth.getUser()
       console.log('現在のユーザー:', { userId: user?.id, authError })
       
-      // まず更新可能かチェック
+      if (!user) {
+        throw new Error('認証されていません')
+      }
+
+      // 既存データチェック（通常クライアント）
       const { data: existingData, error: checkError } = await supabase
         .from('past_exams')
         .select('*')
@@ -183,22 +187,33 @@ export const api = {
       }
       
       // 権限チェック
-      if (existingData.uploaded_by !== user?.id) {
+      if (existingData.uploaded_by !== user.id) {
         throw new Error('この過去問を編集する権限がありません')
       }
       
-      // 更新を実行
-      const { data, error } = await supabase
+      // RLSポリシーを回避するため、selectを削除して更新のみ実行
+      const { error } = await supabase
         .from('past_exams')
         .update(updates)
         .eq('id', id)
-        .select()
-        .single()
       
-      console.log('更新結果:', { data, error })
+      console.log('更新実行結果:', { error })
       
       if (error) throw error
-      return data
+      
+      // 更新後にデータを再取得
+      const { data: updatedData, error: fetchError } = await supabase
+        .from('past_exams')
+        .select('*')
+        .eq('id', id)
+        .single()
+      
+      console.log('更新後データ取得:', { updatedData, fetchError })
+      
+      if (fetchError) throw fetchError
+      if (!updatedData) throw new Error('更新されたデータの取得に失敗しました')
+      
+      return updatedData
     },
 
     async delete(id: string): Promise<void> {
