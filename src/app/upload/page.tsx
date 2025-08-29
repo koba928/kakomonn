@@ -254,12 +254,13 @@ export default function UploadPage() {
         return formData.department !== ''
       case 'courseInfo':
         // ログインユーザーは大学情報が自動入力されるので、科目関連の必須項目のみチェック
-        // 教員情報は任意（投稿時に「不明」として処理）
+        // 教員情報は必須
         return formData.courseName !== '' && 
                formData.year > 0 && 
                formData.term !== '' &&
                formData.examType !== '' && 
-               selectedFile !== null
+               selectedFile !== null &&
+               formData.teachers.length > 0
       case 'confirm':
         return true
       default:
@@ -455,6 +456,12 @@ export default function UploadPage() {
   const handleAddTeacher = () => {
     if (!teacherInput.teacherName.trim()) {
       formErrorHandler.handleValidationError('教員名を入力してください', 'teacherName')
+      return
+    }
+
+    // 既に教員が1人入力済みの場合は追加できない
+    if (formData.teachers.length >= 1) {
+      alert('教員は1名のみ入力可能です')
       return
     }
 
@@ -815,12 +822,12 @@ export default function UploadPage() {
               </div>
 
               <div className="border-t pt-6 mt-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">教員情報（任意）</h3>
-                <p className="text-sm text-gray-600 mb-4">教員名を追加すると、他の学生に有益な情報を提供できます</p>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">教員情報 <span className="text-red-500">*</span></h3>
+                <p className="text-sm text-gray-600 mb-4">教員名を入力してください（1名のみ）</p>
                 
                 {formData.teachers.length > 0 && (
                   <div className="space-y-2 mb-4">
-                    <h4 className="text-sm font-medium text-gray-700">追加済みの教員</h4>
+                    <h4 className="text-sm font-medium text-gray-700">入力済みの教員</h4>
                     {formData.teachers.map(teacher => (
                       <div key={teacher.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div>
@@ -840,7 +847,7 @@ export default function UploadPage() {
                 <div className="space-y-4 border-t pt-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      教員名
+                      教員名 <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -849,23 +856,28 @@ export default function UploadPage() {
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           e.preventDefault()
-                          handleAddTeacher()
+                          if (formData.teachers.length === 0) {
+                            handleAddTeacher()
+                          }
                         }
                       }}
                       onBlur={() => {
-                        if (teacherInput.teacherName.trim()) {
+                        if (teacherInput.teacherName.trim() && formData.teachers.length === 0) {
                           handleAddTeacher()
                         }
                       }}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                      placeholder="例：山田太郎（Enter押下または入力完了で追加）"
+                      disabled={formData.teachers.length >= 1}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      placeholder={formData.teachers.length >= 1 ? "教員は1名のみ入力可能です" : "例：山田太郎（Enter押下または入力完了で追加）"}
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      教員名を入力してEnterを押すか、他の場所をクリックすると自動的に追加されます
+                      {formData.teachers.length >= 1 
+                        ? "教員は1名のみ入力可能です。変更する場合は上記の削除ボタンを押してください。"
+                        : "教員名を入力してEnterを押すか、他の場所をクリックすると自動的に追加されます"}
                     </p>
                   </div>
 
-                  {teacherInput.teacherName.trim() && (
+                  {teacherInput.teacherName.trim() && formData.teachers.length === 0 && (
                     <AnimatedButton
                       variant="secondary"
                       onClick={handleAddTeacher}
