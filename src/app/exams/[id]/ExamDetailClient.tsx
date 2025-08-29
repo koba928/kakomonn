@@ -58,7 +58,7 @@ export default function ExamDetailClient({ examData, initialComments }: ExamDeta
   const handleDownload = async () => {
     try {
       // ダウンロード数を更新
-      setDownloadCount(prev => prev + 1)
+      setDownloadCount((prev: number) => prev + 1)
       
       // バックエンドに通知（オプション）
       // await api.pastExams.incrementDownloadCount(examData.id)
