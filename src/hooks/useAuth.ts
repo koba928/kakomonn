@@ -87,20 +87,36 @@ export function useAuth() {
       console.log('=== fetchUserProfile開始 ===', { userId: userId.substring(0, 8) + '...' })
       
       // 1. まず認証ユーザー情報を取得（最新の状態を保証）
-      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
+      console.log('🔄 getUser()を呼び出し中...')
       
-      if (authError || !authUser) {
-        console.error('認証ユーザー取得エラー:', authError)
-        return
-      }
+      // タイムアウトを設定
+      const getUserPromise = supabase.auth.getUser()
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('getUser timeout')), 5000)
+      )
+      
+      try {
+        const result = await Promise.race([getUserPromise, timeoutPromise]) as { data: { user: any }, error: any }
+        const { data: { user: authUser }, error: authError } = result
+        
+        console.log('✅ getUser()完了:', { 
+          hasUser: !!authUser, 
+          hasError: !!authError,
+          error: authError 
+        })
+        
+        if (authError || !authUser) {
+          console.error('認証ユーザー取得エラー:', authError)
+          return
+        }
 
-      console.log('🔍 認証ユーザーメタデータ:', {
-        name: authUser.user_metadata?.name,
-        university: authUser.user_metadata?.university,
-        faculty: authUser.user_metadata?.faculty,
-        department: authUser.user_metadata?.department,
-        year: authUser.user_metadata?.year
-      })
+        console.log('🔍 認証ユーザーメタデータ:', {
+          name: authUser.user_metadata?.name,
+          university: authUser.user_metadata?.university,
+          faculty: authUser.user_metadata?.faculty,
+          department: authUser.user_metadata?.department,
+          year: authUser.user_metadata?.year
+        })
 
       // 2. 認証メタデータを主要情報源として使用
       const userFromMetadata = {
@@ -160,7 +176,22 @@ export function useAuth() {
         console.log('ℹ️ usersテーブル補完失敗（問題ありません）:', tableError)
       }
       
-      console.log('=== fetchUserProfile完了 ===')
+        console.log('=== fetchUserProfile完了 ===')
+        
+      } catch (timeoutError) {
+        console.error('⏱️ getUser()タイムアウト:', timeoutError)
+        // タイムアウトの場合は基本情報だけ設定
+        setUser({
+          id: userId,
+          email: '',
+          name: 'ユーザー',
+          university: '未設定',
+          faculty: '未設定', 
+          department: '未設定',
+          year: 1,
+          pen_name: 'ユーザー'
+        })
+      }
       
     } catch (error) {
       console.error('ユーザープロフィール取得エラー:', error)
