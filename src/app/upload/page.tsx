@@ -658,6 +658,33 @@ export default function UploadPage() {
       // 成功メッセージを表示
       setCurrentStep('complete')
       
+      // フォームをリセット
+      setFormData({
+        university: '名古屋大学',
+        faculty: user?.faculty || '',
+        department: user?.department || '',
+        courseName: '',
+        year: 2024,
+        term: '',
+        examType: '',
+        examDate: '',
+        examScope: '',
+        examFormat: '',
+        author: '',
+        description: '',
+        teachers: [],
+        file: null,
+        tags: []
+      })
+      setSelectedFile(null)
+      setTeacherInput({
+        teacherName: '',
+        difficulty: 3,
+        grading: '',
+        attendance: false,
+        notes: ''
+      })
+      
     } catch (error) {
       console.error('アップロード全体エラー:', error)
       alert('アップロード中にエラーが発生しました')
@@ -1114,14 +1141,14 @@ export default function UploadPage() {
               あなたの貢献が他の学生の学習に役立ちます。
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/threads">
+              <Link href="/profile">
                 <AnimatedButton variant="secondary">
                   投稿一覧を見る
                 </AnimatedButton>
               </Link>
-              <Link href="/">
+              <Link href="/search">
                 <AnimatedButton variant="primary">
-                  ホームに戻る
+                  過去問を探す
                 </AnimatedButton>
               </Link>
             </div>
