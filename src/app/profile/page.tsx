@@ -340,16 +340,6 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Tips */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
-              <h4 className="text-sm font-medium text-blue-800 mb-2">💡 プロフィールのメリット</h4>
-              <ul className="text-sm text-blue-700 space-y-1">
-                <li>• あなたの大学の情報が優先表示されます</li>
-                <li>• 同じ大学・学部の投稿が見つけやすくなります</li>
-                <li>• 関連度の高いトピックが表示されます</li>
-                <li>• より快適な検索体験を提供します</li>
-              </ul>
-            </div>
 
             {/* Demo Info */}
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 sm:p-4">
