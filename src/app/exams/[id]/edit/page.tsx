@@ -49,10 +49,8 @@ export default function EditExamPage({ params }: EditExamPageProps) {
     professor: '',
     year: new Date().getFullYear(),
     semester: '',
-    exam_type: '',
-    tags: [] as string[]
+    exam_type: ''
   })
-  const [newTag, setNewTag] = useState('')
 
   useEffect(() => {
     const loadExam = async () => {
@@ -77,8 +75,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
           professor: examData.professor,
           year: examData.year,
           semester: examData.semester,
-          exam_type: examData.exam_type,
-          tags: examData.tags || []
+          exam_type: examData.exam_type
         })
       } catch (error) {
         console.error('過去問取得エラー:', error)
@@ -101,22 +98,6 @@ export default function EditExamPage({ params }: EditExamPageProps) {
     }))
   }
 
-  const handleAddTag = () => {
-    if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        tags: [...prev.tags, newTag.trim()]
-      }))
-      setNewTag('')
-    }
-  }
-
-  const handleRemoveTag = (tagToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove)
-    }))
-  }
 
   const handleSave = async () => {
     if (!exam) return
@@ -138,7 +119,6 @@ export default function EditExamPage({ params }: EditExamPageProps) {
         year: formData.year,
         semester: formData.semester,
         exam_type: formData.exam_type,
-        tags: formData.tags,
         updated_at: new Date().toISOString()
       }
 
@@ -324,51 +304,6 @@ export default function EditExamPage({ params }: EditExamPageProps) {
               </select>
             </div>
 
-            {/* タグ */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                タグ
-              </label>
-              <div className="flex flex-wrap gap-2 mb-3">
-                {formData.tags.map((tag, index) => (
-                  <span
-                    key={index}
-                    className="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm flex items-center"
-                  >
-                    {tag}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveTag(tag)}
-                      className="ml-2 text-indigo-600 hover:text-indigo-800"
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={newTag}
-                  onChange={(e) => setNewTag(e.target.value)}
-                  placeholder="タグを入力"
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault()
-                      handleAddTag()
-                    }
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={handleAddTag}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-                >
-                  追加
-                </button>
-              </div>
-            </div>
 
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
