@@ -248,7 +248,12 @@ export function useAuth() {
         password
       })
 
-      if (error) throw error
+      if (error) {
+        // エラー時は即座に認証状態をリセット
+        setIsAuthenticating(false)
+        setAuthStep('idle')
+        throw error
+      }
 
       setAuthStep('profile-loading')
       
@@ -257,17 +262,8 @@ export function useAuth() {
 
       let userProfile = null
       if (data.user) {
-        // ユーザープロフィールを取得
-        const { data: profile, error: profileError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', data.user.id)
-          .single()
-        
-        if (!profileError && profile) {
-          userProfile = profile
-          setUser(profile)
-        }
+        // fetchUserProfile を使用（既存のロジックを活用）
+        await fetchUserProfile(data.user.id)
       }
 
       setAuthStep('redirecting')
@@ -280,6 +276,9 @@ export function useAuth() {
 
       return { data, error: null, user: userProfile }
     } catch (error) {
+      // エラー時も確実に認証状態をリセット
+      setIsAuthenticating(false)
+      setAuthStep('idle')
       return { data: null, error, user: null }
     }
   }
