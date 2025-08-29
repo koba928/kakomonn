@@ -846,18 +846,34 @@ export default function UploadPage() {
                       type="text"
                       value={teacherInput.teacherName}
                       onChange={(e) => setTeacherInput(prev => ({ ...prev, teacherName: e.target.value }))}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          handleAddTeacher()
+                        }
+                      }}
+                      onBlur={() => {
+                        if (teacherInput.teacherName.trim()) {
+                          handleAddTeacher()
+                        }
+                      }}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                      placeholder="例：山田太郎"
+                      placeholder="例：山田太郎（Enter押下または入力完了で追加）"
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                      教員名を入力してEnterを押すか、他の場所をクリックすると自動的に追加されます
+                    </p>
                   </div>
 
-                  <AnimatedButton
-                    variant="secondary"
-                    onClick={handleAddTeacher}
-                    className="w-full"
-                  >
-                    教員を追加
-                  </AnimatedButton>
+                  {teacherInput.teacherName.trim() && (
+                    <AnimatedButton
+                      variant="secondary"
+                      onClick={handleAddTeacher}
+                      className="w-full"
+                    >
+                      「{teacherInput.teacherName}」を追加
+                    </AnimatedButton>
+                  )}
                 </div>
               </div>
 
