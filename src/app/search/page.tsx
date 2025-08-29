@@ -547,9 +547,6 @@ function SearchPageClient() {
                 <span>{exam.university} {exam.faculty}</span>
                 <div className="flex items-center space-x-2">
                   <span>📥 {exam.download_count || 0}</span>
-                  {exam.difficulty && exam.difficulty > 0 && (
-                    <span>⭐ {exam.difficulty}/5</span>
-                  )}
                 </div>
               </div>
               <div className="mt-3 text-sm text-indigo-600 group-hover:text-indigo-800 transition-colors">

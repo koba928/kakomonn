@@ -230,8 +230,7 @@ export default function ExamDetailClient({ examData, initialComments }: ExamDeta
             <div className="flex-1">
               <p className="font-medium text-gray-900">{examData.file_name}</p>
               <p className="text-sm text-gray-500">
-                {downloadCount}回ダウンロード • 
-                難易度: {'★'.repeat(examData.difficulty || 3)}
+                {downloadCount}回ダウンロード
               </p>
             </div>
             <button 
