@@ -759,17 +759,11 @@ function SearchPageClient() {
                 </div>
               </Link>
             )}
-            <div className="text-sm text-gray-500 hidden md:block">
-              {query ? (
-                `"${query}" の検索結果${activeSection ? ` - ${activeSection === 'subject' ? '授業検索' : '教授検索'}` : ''}`
-              ) : activeSection ? (
-                activeSection === 'subject' 
-                  ? `授業検索${subjectType ? ` > ${subjectType === 'specialized' ? '専門科目' : '一般科目'}` : ''}`
-                  : '教授検索'
-              ) : (
-                'カテゴリを選択してください'
-              )}
-            </div>
+            {query && (
+              <div className="text-sm text-gray-500 hidden md:block">
+                {`"${query}" の検索結果${activeSection ? ` - ${activeSection === 'subject' ? '授業検索' : '教授検索'}` : ''}`}
+              </div>
+            )}
           </div>
         </div>
 
