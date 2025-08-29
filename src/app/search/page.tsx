@@ -224,27 +224,40 @@ function SearchPageClient() {
 
   // ログインユーザーのプロファイル情報を読み込む
   useEffect(() => {
-    const loadUserProfile = async () => {
-      if (!isLoggedIn || !user) {
-        setIsLoadingProfile(false)
-        return
-      }
+    if (!isLoggedIn || !user) {
+      setIsLoadingProfile(false)
+      return
+    }
 
+    const loadUserProfile = async () => {
       try {
+        console.log('👤 ログインユーザーのプロファイル情報を読み込み中...')
+        
+        // useAuthからユーザー情報を直接使用
+        if (user.university && user.faculty) {
+          console.log('✅ useAuthからユーザー情報取得済み')
+          
+          const userInfoData = {
+            university: user.university,
+            faculty: user.faculty,
+            department: user.department,
+            year: user.year + '年生',
+            penName: user.pen_name,
+            isLoggedIn: true,
+            completedAt: new Date().toISOString()
+          }
+          
+          setUserInfo(userInfoData)
+          setShowUniversityModal(false)
+          console.log('🎉 ログインユーザー情報設定完了')
+          return
+        }
+
+        // フォールバック: APIから取得
         const profile = await api.users.getById(user.id)
-        console.log('プロファイル取得結果:', profile)
+        console.log('📋 APIからプロファイル取得:', profile)
         
         if (profile) {
-          // 既存のプロファイル情報がある場合は自動的に設定
-          setAcademicInfo({
-            university: profile.university,
-            faculty: profile.faculty,
-            department: profile.department
-          })
-          setYear(profile.year.toString() + '年生')
-          setPenName(profile.pen_name)
-          
-          // ユーザー情報を設定して、モーダルを表示しない
           const userInfoData = {
             university: profile.university,
             faculty: profile.faculty,
@@ -256,22 +269,14 @@ function SearchPageClient() {
           }
           
           setUserInfo(userInfoData)
-          
-          // LocalStorageにも保存
-          localStorage.setItem('kakomonn_user', JSON.stringify(userInfoData))
-          
-          // ログインユーザーは常にモーダルを非表示にする（重複入力防止）
-          console.log('ログインユーザーのため、大学情報モーダルを非表示にします')
-          setShowUniversityModal(false)
-        } else {
-          // プロファイルがない場合でもログインユーザーはモーダルを表示しない
-          console.log('プロファイルなしでもログインユーザーのためモーダル非表示')
-          setShowUniversityModal(false)
+          console.log('✅ APIプロファイル情報設定完了')
         }
+        
+        setShowUniversityModal(false)
+        
       } catch (error) {
-        console.error('Failed to load user profile:', error)
+        console.error('❌ プロファイル読み込みエラー:', error)
         // エラーがあってもログインユーザーはモーダルを表示しない
-        console.log('エラーでもログインユーザーのためモーダル非表示')
         setShowUniversityModal(false)
       } finally {
         setIsLoadingProfile(false)
@@ -290,47 +295,52 @@ function SearchPageClient() {
   }, [searchParams, handleSearch])
 
   useEffect(() => {
-    // ログインユーザーの場合はモーダルを非表示にしてプロファイルロード完了まで待つ
-    if (isLoggedIn) {
-      console.log('ログインユーザーのためモーダル非表示＆プロファイルロード完了まで待機')
+    // ログインユーザーの場合はモーダルを完全に無効化
+    if (isLoggedIn && user) {
+      console.log('✅ ログインユーザー確認 - モーダルを無効化')
       setShowUniversityModal(false)
+      setIsLoadingProfile(false) // プロファイルロード完了扱い
       return
     }
     
     // ゲストユーザーの場合のみlocalStorageから情報を読み込み
-    console.log('ゲストユーザーのlocalStorage情報を確認')
-    const savedUserInfo = localStorage.getItem('kakomonn_user')
-    const guestUniversityInfo = localStorage.getItem('kakomonn_guest_university')
-    
-    if (savedUserInfo) {
-      try {
-        const parsed = JSON.parse(savedUserInfo)
-        console.log('localStorage からユーザー情報復元:', parsed)
-        setUserInfo(parsed)
-      } catch (error) {
-        console.error('Failed to parse user info:', error)
+    if (!isLoggedIn) {
+      console.log('🔍 ゲストユーザーのlocalStorage情報を確認')
+      const savedUserInfo = localStorage.getItem('kakomonn_user')
+      const guestUniversityInfo = localStorage.getItem('kakomonn_guest_university')
+      
+      if (savedUserInfo) {
+        try {
+          const parsed = JSON.parse(savedUserInfo)
+          console.log('📂 localStorage からユーザー情報復元:', parsed)
+          setUserInfo(parsed)
+          setShowUniversityModal(false)
+        } catch (error) {
+          console.error('❌ ユーザー情報解析エラー:', error)
+          setShowUniversityModal(true)
+        }
+      } else if (guestUniversityInfo) {
+        try {
+          const parsed = JSON.parse(guestUniversityInfo)
+          console.log('📂 localStorage からゲスト大学情報復元:', parsed)
+          setUserInfo({
+            ...parsed,
+            penName: 'ゲストユーザー',
+            isLoggedIn: false,
+            completedAt: new Date().toISOString()
+          })
+          setShowUniversityModal(false)
+        } catch (error) {
+          console.error('❌ ゲスト情報解析エラー:', error)
+          setShowUniversityModal(true)
+        }
+      } else {
+        // ゲストでも情報がない場合のみモーダル表示
+        console.log('ℹ️ ゲストユーザーで大学情報なし - モーダル表示')
         setShowUniversityModal(true)
       }
-    } else if (guestUniversityInfo) {
-      try {
-        const parsed = JSON.parse(guestUniversityInfo)
-        console.log('localStorage からゲスト大学情報復元:', parsed)
-        setUserInfo({
-          ...parsed,
-          penName: 'ゲストユーザー',
-          isLoggedIn: false,
-          completedAt: new Date().toISOString()
-        })
-      } catch (error) {
-        console.error('Failed to parse guest university info:', error)
-        setShowUniversityModal(true)
-      }
-    } else {
-      // ゲストでも情報がない場合のみモーダル表示
-      console.log('ゲストユーザーで大学情報なし - モーダル表示')
-      setShowUniversityModal(true)
     }
-  }, [isLoggedIn])
+  }, [isLoggedIn, user])
 
   const handleAcademicInfoChange = (newInfo: AcademicInfo) => {
     setAcademicInfo(newInfo)

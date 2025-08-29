@@ -21,22 +21,50 @@ export function useAuth() {
   const [authStep, setAuthStep] = useState<'idle' | 'signing-in' | 'verifying' | 'profile-loading' | 'redirecting'>('idle')
 
   useEffect(() => {
+    let isMounted = true
+
     // 現在のセッションを取得
     const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      setSession(session)
-      
-      if (session?.user) {
-        await fetchUserProfile(session.user.id)
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        
+        if (!isMounted) return
+        
+        if (error) {
+          console.error('セッション取得エラー:', error)
+          setLoading(false)
+          return
+        }
+
+        console.log('🔐 セッション確認:', { 
+          hasSession: !!session, 
+          userId: session?.user?.id?.substring(0, 8) + '...' 
+        })
+
+        setSession(session)
+        
+        if (session?.user) {
+          await fetchUserProfile(session.user.id)
+        }
+        
+        setLoading(false)
+      } catch (error) {
+        console.error('セッション初期化エラー:', error)
+        if (isMounted) {
+          setLoading(false)
+        }
       }
-      setLoading(false)
     }
 
     getSession()
 
     // 認証状態の変更を監視
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      async (event, session) => {
+        if (!isMounted) return
+
+        console.log('🔐 認証状態変更:', { event, hasSession: !!session })
+        
         setSession(session)
         
         if (session?.user) {
@@ -48,7 +76,10 @@ export function useAuth() {
       }
     )
 
-    return () => subscription.unsubscribe()
+    return () => {
+      isMounted = false
+      subscription.unsubscribe()
+    }
   }, [])
 
   const fetchUserProfile = async (userId: string) => {
