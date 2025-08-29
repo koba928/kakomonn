@@ -153,6 +153,10 @@ export const api = {
     async update(id: string, updates: Partial<PastExam>): Promise<PastExam> {
       console.log('API update開始:', { id, updates })
       
+      // 現在のユーザー情報を確認
+      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      console.log('現在のユーザー:', { userId: user?.id, authError })
+      
       // まず更新可能かチェック
       const { data: existingData, error: checkError } = await supabase
         .from('past_exams')
@@ -160,7 +164,14 @@ export const api = {
         .eq('id', id)
         .single()
       
-      console.log('既存データチェック:', { existingData, checkError })
+      console.log('既存データチェック:', { 
+        existingData: existingData ? {
+          id: existingData.id,
+          uploaded_by: existingData.uploaded_by,
+          title: existingData.title
+        } : null, 
+        checkError 
+      })
       
       if (checkError) {
         console.error('データ確認エラー:', checkError)
@@ -169,6 +180,11 @@ export const api = {
       
       if (!existingData) {
         throw new Error('更新対象の過去問が見つかりません')
+      }
+      
+      // 権限チェック
+      if (existingData.uploaded_by !== user?.id) {
+        throw new Error('この過去問を編集する権限がありません')
       }
       
       // 更新を実行
