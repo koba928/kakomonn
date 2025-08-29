@@ -149,8 +149,11 @@ export const api = {
     },
 
     async update(id: string, updates: Partial<PastExam>): Promise<PastExam> {
+      console.log('🔄 API更新開始:', { id, updates })
+      
       // 現在のユーザー情報を確認
       const { data: { user } } = await supabase.auth.getUser()
+      console.log('👤 現在のユーザー:', user?.id?.substring(0, 8) + '...')
       
       if (!user) {
         throw new Error('認証されていません')
@@ -163,6 +166,13 @@ export const api = {
         .eq('id', id)
         .single()
       
+      console.log('📋 既存データ:', {
+        found: !!existingData,
+        professor_before: existingData?.professor,
+        uploaded_by: existingData?.uploaded_by?.substring(0, 8) + '...',
+        checkError
+      })
+      
       if (checkError) {
         throw checkError
       }
@@ -173,16 +183,29 @@ export const api = {
       
       // 権限チェック
       if (existingData.uploaded_by !== user.id) {
+        console.error('❌ 権限エラー:', { 
+          uploaded_by: existingData.uploaded_by,
+          current_user: user.id,
+          match: existingData.uploaded_by === user.id
+        })
         throw new Error('この過去問を編集する権限がありません')
       }
       
+      console.log('✅ 権限確認OK - 更新実行中...')
+      
       // 更新実行
-      const { error } = await supabase
+      const { error, count } = await supabase
         .from('past_exams')
         .update(updates)
         .eq('id', id)
+        .eq('uploaded_by', user.id) // 追加の安全策
       
-      if (error) throw error
+      console.log('💾 更新実行結果:', { error, count, affected: count })
+      
+      if (error) {
+        console.error('❌ 更新エラー:', error)
+        throw error
+      }
       
       // 更新後にデータを再取得
       const { data: updatedData, error: fetchError } = await supabase
@@ -191,9 +214,17 @@ export const api = {
         .eq('id', id)
         .single()
       
+      console.log('🔍 更新後データ取得:', {
+        found: !!updatedData,
+        professor_after: updatedData?.professor,
+        updated_at: updatedData?.updated_at,
+        fetchError
+      })
+      
       if (fetchError) throw fetchError
       if (!updatedData) throw new Error('更新されたデータの取得に失敗しました')
       
+      console.log('✅ API更新完了')
       return updatedData
     },
 
