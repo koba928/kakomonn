@@ -151,12 +151,35 @@ export const api = {
     },
 
     async update(id: string, updates: Partial<PastExam>): Promise<PastExam> {
+      console.log('API update開始:', { id, updates })
+      
+      // まず更新可能かチェック
+      const { data: existingData, error: checkError } = await supabase
+        .from('past_exams')
+        .select('*')
+        .eq('id', id)
+        .single()
+      
+      console.log('既存データチェック:', { existingData, checkError })
+      
+      if (checkError) {
+        console.error('データ確認エラー:', checkError)
+        throw checkError
+      }
+      
+      if (!existingData) {
+        throw new Error('更新対象の過去問が見つかりません')
+      }
+      
+      // 更新を実行
       const { data, error } = await supabase
         .from('past_exams')
         .update(updates)
         .eq('id', id)
         .select()
         .single()
+      
+      console.log('更新結果:', { data, error })
       
       if (error) throw error
       return data
