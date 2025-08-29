@@ -63,3 +63,49 @@ export async function PATCH(
     return NextResponse.json({ error: 'サーバーエラー' }, { status: 500 })
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { id } = params
+    
+    console.log('🗑️ Server API削除開始:', { id })
+    
+    // 認証チェック
+    const authHeader = request.headers.get('authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: '認証が必要です' }, { status: 401 })
+    }
+
+    // まず権限をチェック
+    const { data: existingData, error: checkError } = await supabaseAdmin
+      .from('past_exams')
+      .select('uploaded_by')
+      .eq('id', id)
+      .single()
+    
+    if (checkError || !existingData) {
+      return NextResponse.json({ error: '過去問が見つかりません' }, { status: 404 })
+    }
+    
+    // Service Role Keyで削除実行（RLS回避）
+    const { error } = await supabaseAdmin
+      .from('past_exams')
+      .delete()
+      .eq('id', id)
+    
+    console.log('🗑️ Server削除結果:', { error })
+    
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+    
+    return NextResponse.json({ message: '削除完了' })
+    
+  } catch (error) {
+    console.error('❌ Server削除エラー:', error)
+    return NextResponse.json({ error: 'サーバーエラー' }, { status: 500 })
+  }
+}

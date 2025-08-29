@@ -253,6 +253,28 @@ export const api = {
     },
 
     async delete(id: string): Promise<void> {
+      try {
+        // Server APIを使用した削除を試行
+        const { data: { session } } = await supabase.auth.getSession()
+        
+        const response = await fetch(`/api/exams/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${session?.access_token}`
+          }
+        })
+        
+        if (response.ok) {
+          console.log('✅ Server API削除成功')
+          return
+        } else {
+          console.warn('⚠️ Server API削除失敗、フォールバック実行')
+        }
+      } catch (serverError) {
+        console.warn('⚠️ Server API呼び出し失敗、フォールバック実行:', serverError)
+      }
+      
+      // フォールバック: 直接Supabaseクライアント使用
       const { error } = await supabase
         .from('past_exams')
         .delete()

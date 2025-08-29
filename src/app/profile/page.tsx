@@ -47,6 +47,7 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(false)
   const [myUploads, setMyUploads] = useState<PastExam[]>([])
   const [isLoadingUploads, setIsLoadingUploads] = useState(true)
+  const [isDeleting, setIsDeleting] = useState<string | null>(null)
 
   useEffect(() => {
     // Load user information from localStorage
@@ -111,6 +112,26 @@ export default function ProfilePage() {
   const handleLogout = () => {
     localStorage.removeItem('kakomonn_user')
     window.location.href = '/'
+  }
+
+  const handleDeleteExam = async (examId: string, examTitle: string) => {
+    if (!confirm(`「${examTitle}」を削除してもよろしいですか？\n\nこの操作は取り消せません。`)) {
+      return
+    }
+
+    try {
+      setIsDeleting(examId)
+      await api.pastExams.delete(examId)
+      
+      // UIから削除
+      setMyUploads(prev => prev.filter(exam => exam.id !== examId))
+      alert('過去問を削除しました')
+    } catch (error) {
+      console.error('削除エラー:', error)
+      alert('削除に失敗しました')
+    } finally {
+      setIsDeleting(null)
+    }
   }
 
   const handleCancelEdit = () => {
@@ -396,6 +417,13 @@ export default function ProfilePage() {
                         >
                           編集
                         </Link>
+                        <button
+                          onClick={() => handleDeleteExam(exam.id, exam.title)}
+                          disabled={isDeleting === exam.id}
+                          className="text-sm text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-2 py-1 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isDeleting === exam.id ? '削除中...' : '削除'}
+                        </button>
                       </div>
                     </div>
                     <div className="text-sm text-gray-600 space-y-1">
