@@ -22,6 +22,7 @@ export default function ExamDetailHeader() {
     // Load user information from localStorage
     const savedUserInfo = localStorage.getItem('kakomonn_user')
     console.log('🔍 ExamDetailHeader - localStorage userInfo:', savedUserInfo)
+    console.log('🔍 ExamDetailHeader - useAuth状態:', { isLoggedIn, hasUser: !!user })
     
     if (savedUserInfo) {
       try {
@@ -31,6 +32,22 @@ export default function ExamDetailHeader() {
       } catch (error) {
         console.error('Failed to parse user info:', error)
       }
+    } else if (user) {
+      // localStorageにない場合は、useAuthのユーザー情報から生成
+      console.log('📝 ExamDetailHeader - useAuthからユーザー情報生成')
+      const userInfoFromAuth = {
+        university: user.university,
+        faculty: user.faculty,
+        department: user.department,
+        year: user.year.toString(),
+        penName: user.pen_name,
+        isLoggedIn: true,
+        completedAt: new Date().toISOString()
+      }
+      setUserInfo(userInfoFromAuth)
+      
+      // localStorageにも保存
+      localStorage.setItem('kakomonn_user', JSON.stringify(userInfoFromAuth))
     }
   }, [isLoggedIn, user])
 
@@ -51,7 +68,7 @@ export default function ExamDetailHeader() {
           </div>
           
           {/* User Info */}
-          {userInfo && (
+          {userInfo ? (
             <Link href="/profile">
               <div className="text-sm text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition-colors cursor-pointer flex items-center space-x-2">
                 <span>👤</span>
@@ -59,6 +76,10 @@ export default function ExamDetailHeader() {
                 <span className="text-xs text-indigo-500">({userInfo.university})</span>
               </div>
             </Link>
+          ) : (
+            <div className="text-sm text-gray-500 px-3 py-1.5">
+              読み込み中...
+            </div>
           )}
         </div>
       </div>
