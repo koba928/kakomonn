@@ -91,11 +91,9 @@ export const api = {
       let query = supabase
         .from('past_exams')
         .select('*')
+        .eq('university', '名古屋大学') // 名古屋大学のデータのみ
         .order('created_at', { ascending: false })
 
-      if (filters?.university) {
-        query = query.eq('university', filters.university)
-      }
       if (filters?.faculty) {
         query = query.eq('faculty', filters.faculty)
       }

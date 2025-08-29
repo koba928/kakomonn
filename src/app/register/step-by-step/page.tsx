@@ -311,31 +311,31 @@ export default function StepByStepRegisterPage() {
         )
 
       case 'university':
+        // 名古屋大学に固定
+        const nagoyaUniversity = universityDataDetailed.find(u => u.name === '名古屋大学')
+        if (!nagoyaUniversity) {
+          return <div>名古屋大学のデータが見つかりません</div>
+        }
+        
+        // 自動的に名古屋大学を選択
+        if (formData.university !== '名古屋大学') {
+          handleSelection('university', '名古屋大学')
+        }
+        
         return (
           <fieldset>
-            <legend className="sr-only">大学選択</legend>
+            <legend className="sr-only">大学確認</legend>
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2" id="university-heading">あなたの大学を選択してください</h2>
-              <p className="text-gray-600 mb-8">まずは通っている大学を教えてください</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2" id="university-heading">名古屋大学専用サービスです</h2>
+              <p className="text-gray-600 mb-8">このサービスは名古屋大学の学生向けの過去問共有サイトです</p>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-4xl mx-auto" role="group" aria-labelledby="university-heading">
-              {universityDataDetailed.map(university => (
-                <button
-                  key={university.id}
-                  onClick={() => handleSelection('university', university.name)}
-                  className={`p-6 rounded-xl border-2 transition-all duration-200 text-left hover:shadow-lg ${
-                    formData.university === university.name
-                      ? 'border-indigo-500 bg-indigo-50 shadow-lg'
-                      : 'border-gray-200 bg-white hover:border-indigo-300'
-                  }`}
-                  aria-pressed={formData.university === university.name}
-                  aria-describedby={`${university.id}-description`}
-                >
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">{university.name}</h3>
-                  <p id={`${university.id}-description`} className="text-sm text-gray-600">{university.faculties.length}学部</p>
-                </button>
-              ))}
+            <div className="max-w-md mx-auto">
+              <div className="p-6 rounded-xl border-2 border-indigo-500 bg-indigo-50 shadow-lg text-center">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">名古屋大学</h3>
+                <p className="text-sm text-gray-600">{nagoyaUniversity.faculties.length}学部</p>
+                <div className="mt-4 text-indigo-600 font-medium">✓ 選択済み</div>
+              </div>
             </div>
           </fieldset>
         )

@@ -126,9 +126,9 @@ export default function UploadPage() {
       const hasValidDepartment = user.department && user.department !== '未設定'
       const isComplete = hasValidUniversity && hasValidFaculty && hasValidDepartment
       
-      // フォームデータに反映
+      // フォームデータに反映（名古屋大学固定）
       const newFormData = {
-        university: hasValidUniversity ? user.university : '',
+        university: '名古屋大学', // 名古屋大学に固定
         faculty: hasValidFaculty ? user.faculty : '',
         department: hasValidDepartment ? user.department : '',
         author: hasValidFaculty ? `${user.faculty}${user.year ? user.year + '年' : ''}` : `${user.name || 'ユーザー'}${user.year ? user.year + '年' : ''}`
@@ -178,34 +178,34 @@ export default function UploadPage() {
   // }, [formData.university, formData.faculty])
 
 
-  // Get university options for autocomplete
-  const universityOptions = useMemo(() => {
-    return universityDataDetailed.map(u => ({
-      value: u.name,
-      label: u.name
-    }))
-  }, [])
+  // 名古屋大学に固定
+  const nagoyaUniversity = universityDataDetailed.find(u => u.name === '名古屋大学')
   
-  // Get faculty options based on selected university
+  // Get university options for autocomplete (名古屋大学のみ)
+  const universityOptions = useMemo(() => {
+    return nagoyaUniversity ? [{
+      value: nagoyaUniversity.name,
+      label: nagoyaUniversity.name
+    }] : []
+  }, [nagoyaUniversity])
+  
+  // Get faculty options for 名古屋大学
   const facultyOptions = useMemo(() => {
-    if (!formData.university) return []
-    const university = universityDataDetailed.find(u => u.name === formData.university)
-    return university?.faculties.map(f => ({
+    return nagoyaUniversity?.faculties.map(f => ({
       value: f.name,
       label: f.name
     })) || []
-  }, [formData.university])
+  }, [nagoyaUniversity])
   
-  // Get department options based on selected faculty
+  // Get department options for 名古屋大学の選択された学部
   const departmentOptions = useMemo(() => {
-    if (!formData.university || !formData.faculty) return []
-    const university = universityDataDetailed.find(u => u.name === formData.university)
-    const faculty = university?.faculties.find(f => f.name === formData.faculty)
+    if (!formData.faculty || !nagoyaUniversity) return []
+    const faculty = nagoyaUniversity.faculties.find(f => f.name === formData.faculty)
     return faculty?.departments.map(d => ({
       value: d.name,
       label: d.name
     })) || []
-  }, [formData.university, formData.faculty])
+  }, [formData.faculty, nagoyaUniversity])
 
   // Navigation functions
   const goToNextStep = () => {
