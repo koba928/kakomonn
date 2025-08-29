@@ -530,9 +530,13 @@ function SearchPageClient() {
         <h3 className="text-lg font-semibold text-gray-900">検索結果 ({searchResults.length}件)</h3>
         <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
           {searchResults.map((exam) => (
-            <div key={exam.id} className="bg-white rounded-lg shadow-md p-3 sm:p-4 border border-gray-200 hover:shadow-lg transition-shadow">
+            <a 
+              key={exam.id} 
+              href={`/exams/${exam.id}`}
+              className="bg-white rounded-lg shadow-md p-3 sm:p-4 border border-gray-200 hover:shadow-lg hover:border-indigo-300 transition-all cursor-pointer group block"
+            >
               <div className="flex items-start justify-between mb-2">
-                <h4 className="font-medium text-gray-900 truncate">{exam.title}</h4>
+                <h4 className="font-medium text-gray-900 truncate group-hover:text-indigo-700 transition-colors">{exam.title}</h4>
                 <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
                   {exam.year}年
                 </span>
@@ -542,47 +546,16 @@ function SearchPageClient() {
               <div className="flex items-center justify-between text-sm text-gray-500">
                 <span>{exam.university} {exam.faculty}</span>
                 <div className="flex items-center space-x-2">
-                  <span>📥 {exam.download_count}</span>
-                  {/* コメント数はAPI拡張時に復活させる */}
-                  <span>⭐ {exam.difficulty}/5</span>
+                  <span>📥 {exam.download_count || 0}</span>
+                  {exam.difficulty && exam.difficulty > 0 && (
+                    <span>⭐ {exam.difficulty}/5</span>
+                  )}
                 </div>
               </div>
-              <div className="mt-3 flex space-x-2">
-                <a
-                  href={`/exams/${exam.id}`}
-                  className="inline-flex items-center px-3 py-1 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
-                >
-                  <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                  詳細・コメント
-                </a>
-                <a
-                  href={exam.file_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={async () => {
-                    try {
-                      await api.pastExams.incrementDownloadCount(exam.id)
-                      // 検索結果を更新（ローカル状態を更新）
-                      setSearchResults(prev => prev.map(e => 
-                        e.id === exam.id 
-                          ? { ...e, download_count: (e.download_count || 0) + 1 }
-                          : e
-                      ))
-                    } catch (error) {
-                      console.error('ダウンロード数更新エラー:', error)
-                    }
-                  }}
-                  className="inline-flex items-center px-3 py-1 text-sm font-medium text-indigo-600 bg-indigo-50 rounded-md hover:bg-indigo-100 transition-colors"
-                >
-                  <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  ダウンロード
-                </a>
+              <div className="mt-3 text-sm text-indigo-600 group-hover:text-indigo-800 transition-colors">
+                クリックして詳細を表示 →
               </div>
-            </div>
+            </a>
           ))}
         </div>
       </div>
