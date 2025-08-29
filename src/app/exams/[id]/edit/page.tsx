@@ -138,17 +138,26 @@ export default function EditExamPage({ params }: EditExamPageProps) {
         year: formData.year,
         semester: formData.semester,
         exam_type: formData.exam_type,
-        tags: formData.tags
+        tags: formData.tags,
+        updated_at: new Date().toISOString()
       }
 
-      await api.pastExams.update(exam.id, updateData)
+      console.log('更新データ:', updateData)
+      console.log('更新対象ID:', exam.id)
+      
+      const result = await api.pastExams.update(exam.id, updateData)
+      console.log('更新結果:', result)
       
       // 成功メッセージを表示してリダイレクト
       alert('過去問を更新しました')
       router.push(`/exams/${exam.id}`)
     } catch (error) {
       console.error('更新エラー:', error)
-      setError('更新に失敗しました')
+      if (error instanceof Error) {
+        setError(`更新に失敗しました: ${error.message}`)
+      } else {
+        setError('更新に失敗しました')
+      }
     } finally {
       setIsSaving(false)
     }
