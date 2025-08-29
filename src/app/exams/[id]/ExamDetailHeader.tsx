@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import { useRouter } from 'next/navigation'
 
 interface UserInfo {
   university: string
@@ -17,6 +18,7 @@ interface UserInfo {
 export default function ExamDetailHeader() {
   const { user, isLoggedIn } = useAuth()
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
     // Load user information from localStorage
@@ -49,16 +51,17 @@ export default function ExamDetailHeader() {
           
           {/* User Info */}
           {userInfo && (
-            <div className="flex items-center space-x-4">
-              <Link 
-                href="/profile"
-                className="text-sm text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition-colors cursor-pointer flex items-center space-x-2"
-              >
-                <span>👤</span>
-                <span className="font-medium">{userInfo.penName || 'ゲストユーザー'}</span>
-                <span className="text-xs text-indigo-500">({userInfo.university})</span>
-              </Link>
-            </div>
+            <button
+              onClick={() => {
+                console.log('プロフィールリンククリック')
+                router.push('/profile')
+              }}
+              className="text-sm text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition-colors cursor-pointer flex items-center space-x-2"
+            >
+              <span>👤</span>
+              <span className="font-medium">{userInfo.penName || 'ゲストユーザー'}</span>
+              <span className="text-xs text-indigo-500">({userInfo.university})</span>
+            </button>
           )}
         </div>
       </div>
