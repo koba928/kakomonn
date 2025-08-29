@@ -38,7 +38,7 @@ function EmailAuthPageContent() {
       
       console.log('🔐 signIn結果:', { 
         hasError: !!result.error,
-        errorMessage: result.error?.message,
+        errorMessage: (result.error as any)?.message,
         hasUser: !!result.user 
       })
       
