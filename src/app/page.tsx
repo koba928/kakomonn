@@ -8,27 +8,52 @@ import { APP_CONFIG } from '@/constants/app'
 import { useAuth } from '@/hooks/useAuth'
 
 export default function Home() {
-  const { user, isLoggedIn, loading } = useAuth()
+  const { user, isLoggedIn, loading, session } = useAuth()
   const [mainButtonHref, setMainButtonHref] = useState('/auth/email')
+  const [isChecking, setIsChecking] = useState(true)
 
   useEffect(() => {
-    if (loading) {
-      // 認証状態読み込み中は待機
-      return
+    // 初回チェック
+    const checkAuth = async () => {
+      setIsChecking(true)
+      
+      // loadingが終わるまで待つ
+      if (loading) {
+        return
+      }
+
+      console.log('🏠 ホーム画面認証状態チェック:', { 
+        isLoggedIn, 
+        hasUser: !!user,
+        hasSession: !!session
+      })
+
+      // セッションが存在する、またはユーザーが存在する場合はログイン済み
+      if ((session && session.user) || (isLoggedIn && user)) {
+        console.log('✅ ログイン済みユーザー - 検索画面に誘導')
+        setMainButtonHref('/search')
+      } else {
+        console.log('❌ 未ログインユーザー - ログイン画面に誘導')
+        setMainButtonHref('/auth/email')
+      }
+      
+      setIsChecking(false)
     }
 
-    console.log('🏠 ホーム画面認証状態チェック:', { isLoggedIn, hasUser: !!user })
+    checkAuth()
+  }, [isLoggedIn, user, loading, session])
 
-    if (isLoggedIn && user) {
-      // ログイン済みユーザーは直接検索画面へ
-      console.log('✅ ログイン済みユーザー - 検索画面に誘導')
-      setMainButtonHref('/search')
-    } else {
-      // 未ログインユーザーはログイン画面へ
-      console.log('❌ 未ログインユーザー - ログイン画面に誘導')
-      setMainButtonHref('/auth/email')
-    }
-  }, [isLoggedIn, user, loading])
+  // 認証状態確認中の場合はローディング表示
+  if (loading || isChecking) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">読み込み中...</p>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main id="main-content" className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 relative overflow-hidden transition-colors duration-300">
