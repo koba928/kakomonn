@@ -151,7 +151,31 @@ export const api = {
     async update(id: string, updates: Partial<PastExam>): Promise<PastExam> {
       console.log('🔄 API更新開始:', { id, updates })
       
-      // 現在のユーザー情報を確認
+      try {
+        // Server APIを使用した更新を試行
+        const { data: { session } } = await supabase.auth.getSession()
+        
+        const response = await fetch(`/api/exams/${id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session?.access_token}`
+          },
+          body: JSON.stringify(updates)
+        })
+        
+        if (response.ok) {
+          const result = await response.json()
+          console.log('✅ Server API更新成功:', result)
+          return result
+        } else {
+          console.warn('⚠️ Server API失敗、フォールバック実行')
+        }
+      } catch (serverError) {
+        console.warn('⚠️ Server API呼び出し失敗、フォールバック実行:', serverError)
+      }
+      
+      // フォールバック: 直接Supabaseクライアント使用
       const { data: { user } } = await supabase.auth.getUser()
       console.log('👤 現在のユーザー:', user?.id?.substring(0, 8) + '...')
       
