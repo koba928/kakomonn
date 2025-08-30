@@ -28,8 +28,10 @@ export default function Home() {
         hasSession: !!session
       })
 
-      // セッションが存在する、またはユーザーが存在する場合はログイン済み
-      if ((session && session.user) || (isLoggedIn && user)) {
+      // より確実な認証状態チェック：セッション優先
+      const isAuthenticated = !!(session?.user) || !!(isLoggedIn && user)
+      
+      if (isAuthenticated) {
         console.log('✅ ログイン済みユーザー - 検索画面に誘導')
         setMainButtonHref('/search')
       } else {
@@ -40,7 +42,9 @@ export default function Home() {
       setIsChecking(false)
     }
 
-    checkAuth()
+    // わずかな遅延を追加して認証状態の安定化を待つ
+    const timer = setTimeout(checkAuth, 100)
+    return () => clearTimeout(timer)
   }, [isLoggedIn, user, loading, session])
 
   // 認証状態確認中の場合はローディング表示
