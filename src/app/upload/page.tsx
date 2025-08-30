@@ -110,6 +110,11 @@ export default function UploadPage() {
 
   // ユーザーログイン情報を自動入力
   useEffect(() => {
+    // 完了画面の場合はステップを変更しない
+    if (currentStep === 'complete') {
+      return
+    }
+    
     if (user && isLoggedIn) {
       console.log('=== 過去問投稿ページ: ユーザー情報デバッグ ===')
       console.log('👤 User object full:', JSON.stringify(user, null, 2))
@@ -1141,16 +1146,22 @@ export default function UploadPage() {
               あなたの貢献が他の学生の学習に役立ちます。
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/profile">
-                <AnimatedButton variant="secondary">
-                  投稿一覧を見る
-                </AnimatedButton>
-              </Link>
-              <Link href="/search">
-                <AnimatedButton variant="primary">
-                  過去問を探す
-                </AnimatedButton>
-              </Link>
+              <AnimatedButton 
+                variant="secondary"
+                onClick={() => {
+                  window.location.href = '/profile'
+                }}
+              >
+                投稿一覧を見る
+              </AnimatedButton>
+              <AnimatedButton 
+                variant="primary"
+                onClick={() => {
+                  window.location.href = '/search'
+                }}
+              >
+                過去問を探す
+              </AnimatedButton>
             </div>
           </div>
         )
