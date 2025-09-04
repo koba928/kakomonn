@@ -20,6 +20,29 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
 export interface Database {
   public: {
     Tables: {
+      profiles: {
+        Row: {
+          id: string
+          university: string
+          faculty: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          university?: string
+          faculty?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          university?: string
+          faculty?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
       users: {
         Row: {
           id: string

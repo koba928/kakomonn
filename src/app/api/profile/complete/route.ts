@@ -47,28 +47,27 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if profile already exists
+    // Check if profile already has faculty set
     const { data: existingProfile } = await supabaseAdmin
       .from('profiles')
-      .select('id')
+      .select('faculty')
       .eq('id', user.id)
       .single()
 
-    if (existingProfile) {
+    if (existingProfile?.faculty) {
       return NextResponse.json(
         { error: 'プロフィールは既に登録されています' },
         { status: 400 }
       )
     }
 
-    // Create profile with fixed university value
+    // Update profile with faculty (university is already set as default)
     const { data, error } = await supabaseAdmin
       .from('profiles')
-      .insert({
-        id: user.id,
-        university: '名古屋大学', // Always set server-side
+      .update({
         faculty: faculty.trim()
       })
+      .eq('id', user.id)
       .select()
       .single()
 

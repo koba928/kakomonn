@@ -142,38 +142,36 @@ export function useAuth() {
       // 3. ユーザー情報を設定（メタデータベース）
       setUser(userFromMetadata)
       
-      // 4. オプション: usersテーブルからの情報で補完を試行（失敗してもOK）
+      // 4. profilesテーブルからの情報で補完を試行（プライマリソース）
       try {
-        const { data: tableUser, error: tableError } = await supabase
-          .from('users')
-          .select('university, faculty, department, year, name, pen_name')
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('university, faculty')
           .eq('id', userId)
           .single()
 
-        if (!tableError && tableUser) {
-          console.log('📊 usersテーブルから補完情報取得:', tableUser)
+        if (!profileError && profileData) {
+          console.log('📊 profilesテーブルから情報取得:', profileData)
           
-          // テーブルに有効な情報がある場合のみ補完
+          // プロフィール情報で補完
           const enhancedUser = {
             ...userFromMetadata,
-            university: (tableUser.university && tableUser.university !== '未設定') ? tableUser.university : userFromMetadata.university,
-            faculty: (tableUser.faculty && tableUser.faculty !== '未設定') ? tableUser.faculty : userFromMetadata.faculty,
-            department: (tableUser.department && tableUser.department !== '未設定') ? tableUser.department : userFromMetadata.department,
-            year: tableUser.year || userFromMetadata.year,
-            name: tableUser.name || userFromMetadata.name,
-            pen_name: tableUser.pen_name || userFromMetadata.pen_name
+            university: profileData.university || '名古屋大学',
+            faculty: profileData.faculty || '未設定',
+            department: '未設定', // profilesテーブルにはdepartmentはない
+            year: 1, // デフォルト値
+            pen_name: userFromMetadata.name
           }
           
-          console.log('✨ テーブル情報で補完したユーザー情報:', {
+          console.log('✨ プロフィール情報で補完したユーザー情報:', {
             university: enhancedUser.university,
-            faculty: enhancedUser.faculty,
-            department: enhancedUser.department
+            faculty: enhancedUser.faculty
           })
           
           setUser(enhancedUser)
         }
-      } catch (tableError) {
-        console.log('ℹ️ usersテーブル補完失敗（問題ありません）:', tableError)
+      } catch (profileError) {
+        console.log('ℹ️ profilesテーブル取得失敗（問題ありません）:', profileError)
       }
       
         console.log('=== fetchUserProfile完了 ===')
@@ -198,102 +196,28 @@ export function useAuth() {
     }
   }
 
-  const signUp = async (email: string, password: string, userData: Omit<AuthUser, 'id'>) => {
+  const signUp = async (email: string, devMode = false) => {
     try {
-      console.log('signUp開始:', { email, userData })
+      console.log('signUp開始（メール認証フロー）:', { email, devMode })
       
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name: userData.name,
-            university: userData.university,
-            faculty: userData.faculty,
-            department: userData.department,
-            year: userData.year,
-            pen_name: userData.pen_name
-          },
-          emailRedirectTo: `${window.location.origin}/auth/callback`
-        }
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, devMode }),
       })
 
-      console.log('Supabase認証結果:', { 
-        data: data ? { 
-          user: data.user ? { 
-            id: data.user.id, 
-            email: data.user.email,
-            user_metadata: data.user.user_metadata 
-          } : null,
-          session: data.session ? 'session-exists' : null
-        } : null, 
-        error: error ? { message: error.message, status: error.status } : null 
-      })
+      const result = await response.json()
+
+      if (!response.ok) {
+        console.error('API signup エラー:', result.error)
+        return { data: null, error: new Error(result.error) }
+      }
+
+      console.log('✅ signup API 成功:', result.message)
+      return { data: result, error: null }
       
-      // 保存されたメタデータを詳細に確認
-      if (data.user) {
-        console.log('📋 保存されたuser_metadata詳細:', {
-          name: data.user.user_metadata?.name,
-          university: data.user.user_metadata?.university,
-          faculty: data.user.user_metadata?.faculty,
-          department: data.user.user_metadata?.department,
-          year: data.user.user_metadata?.year,
-          pen_name: data.user.user_metadata?.pen_name
-        })
-      }
-
-      if (error) {
-        console.error('Supabase認証エラー詳細:', {
-          message: error.message,
-          status: error.status,
-          name: error.name
-        })
-        throw error
-      }
-
-      // ユーザープロフィールを作成（メタデータベース）
-      if (data.user) {
-        console.log('🎉 ユーザー登録成功:', {
-          userId: data.user.id.substring(0, 8) + '...',
-          email: userData.email,
-          name: userData.name,
-          university: userData.university,
-          faculty: userData.faculty,
-          department: userData.department
-        })
-        
-        // プロフィール情報は user_metadata に保存されているので登録完了
-        console.log('✅ プロフィール情報は認証メタデータに保存されました')
-        
-        // オプション: usersテーブルに同期を試行（失敗してもシステムは動作）
-        try {
-          const { error: tableError } = await supabase
-            .from('users')
-            .insert({
-              id: data.user.id,
-              email: userData.email,
-              name: userData.name,
-              university: userData.university,
-              faculty: userData.faculty,
-              department: userData.department,
-              year: userData.year,
-              pen_name: userData.pen_name,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            })
-          
-          if (!tableError) {
-            console.log('🗃️ usersテーブル同期も成功しました')
-          } else {
-            console.log('ℹ️ usersテーブル同期失敗（システムは正常動作します）:', tableError.message)
-          }
-          
-        } catch (insertError) {
-          console.log('ℹ️ usersテーブル同期試行エラー（システムは正常動作します）:', insertError)
-        }
-      }
-
-      return { data, error: null }
     } catch (error) {
       console.error('signUp全体エラー:', error)
       return { data: null, error }

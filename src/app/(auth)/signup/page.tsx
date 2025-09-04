@@ -2,9 +2,13 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function SignupPage() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const [debugLink, setDebugLink] = useState<string | null>(null)
@@ -16,11 +20,24 @@ export default function SignupPage() {
     setMessage(null)
     setDebugLink(null)
 
+    // パスワード確認
+    if (password !== confirmPassword) {
+      setMessage({ type: 'error', text: 'パスワードが一致しません' })
+      setIsLoading(false)
+      return
+    }
+
+    if (password.length < 6) {
+      setMessage({ type: 'error', text: 'パスワードは6文字以上で入力してください' })
+      setIsLoading(false)
+      return
+    }
+
     try {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, devMode })
+        body: JSON.stringify({ email, password, devMode })
       })
 
       const data = await response.json()
@@ -32,13 +49,15 @@ export default function SignupPage() {
 
       setMessage({ type: 'success', text: data.message })
       
-      // For development only
-      if (data.debugLink) {
-        setDebugLink(data.debugLink)
-      }
-
-      // Clear email input on success
+      // Clear inputs on success
       setEmail('')
+      setPassword('')
+      setConfirmPassword('')
+      
+      // Success - redirect to login after 2 seconds
+      setTimeout(() => {
+        router.push('/auth/email')
+      }, 2000)
 
     } catch (error) {
       console.error('Signup error:', error)
@@ -79,21 +98,53 @@ export default function SignupPage() {
               <p className="text-xs text-gray-500 mt-1">
                 @s.thers.ac.jp のメールアドレスのみ登録可能です
               </p>
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                パスワード
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="6文字以上のパスワード"
+                required
+                disabled={isLoading}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                パスワード確認
+              </label>
+              <input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="パスワードを再入力"
+                required
+                disabled={isLoading}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
+              />
+            </div>
               
-              {/* Development Mode Toggle */}
-              <div className="mt-2">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={devMode}
-                    onChange={(e) => setDevMode(e.target.checked)}
-                    className="mr-2"
-                  />
-                  <span className="text-xs text-orange-600">
-                    開発モード（任意のメールアドレス可）
-                  </span>
-                </label>
-              </div>
+            {/* Development Mode Toggle */}
+            <div className="mt-2">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={devMode}
+                  onChange={(e) => setDevMode(e.target.checked)}
+                  className="mr-2"
+                />
+                <span className="text-xs text-orange-600">
+                  開発モード（任意のメールアドレス可）
+                </span>
+              </label>
             </div>
 
             {/* Message */}
@@ -125,7 +176,7 @@ export default function SignupPage() {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isLoading || !email}
+              disabled={isLoading || !email || !password || !confirmPassword}
               className={`
                 w-full px-6 py-3 sm:px-8 sm:py-4 text-base sm:text-lg rounded-xl
                 min-h-[48px] sm:min-h-[56px]
@@ -135,16 +186,16 @@ export default function SignupPage() {
                 hover:scale-105 active:scale-95
                 disabled:opacity-50 disabled:cursor-not-allowed
                 disabled:hover:scale-100
-                ${isLoading || !email ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                ${isLoading || !email || !password || !confirmPassword ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               `}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
-                  送信中...
+                  アカウント作成中...
                 </div>
               ) : (
-                '確認メールを送信'
+                'アカウントを作成'
               )}
             </button>
           </form>

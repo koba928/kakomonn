@@ -108,7 +108,7 @@ export default function Home() {
                   過去問を探す
                 </AnimatedButton>
               </Link>
-              <Link href="/auth/email?redirect=/upload" className="flex-1 sm:flex-initial">
+              <Link href="/signup" className="flex-1 sm:flex-initial">
                 <AnimatedButton variant="secondary" size="md" aria-label="過去問を投稿する" className="w-full justify-center max-w-xs mx-auto sm:mx-0">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

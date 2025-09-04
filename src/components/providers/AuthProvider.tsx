@@ -10,7 +10,7 @@ interface AuthContextType {
   isLoggedIn: boolean
   isAuthenticating: boolean
   authStep: 'idle' | 'signing-in' | 'verifying' | 'profile-loading' | 'redirecting'
-  signUp: (email: string, password: string, userData: Omit<AuthUser, 'id'>) => Promise<{ data: any; error: any }>
+  signUp: (email: string, devMode?: boolean) => Promise<{ data: any; error: any }>
   signIn: (email: string, password: string) => Promise<{ data: any; error: any }>
   signOut: () => Promise<void>
   updateProfile: (updates: Partial<AuthUser>) => Promise<{ error: any }>

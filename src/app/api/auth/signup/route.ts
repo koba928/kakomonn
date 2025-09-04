@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin, isValidNagoyaEmail, extractDomain } from '@/lib/supabase-admin'
+import crypto from 'crypto'
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,7 +23,7 @@ export async function POST(request: NextRequest) {
       console.log('❌ ドメインエラー:', { email, domain, allowedDomains: process.env.ALLOWED_EMAIL_DOMAINS })
       return NextResponse.json(
         { 
-          error: '名古屋大学のメールアドレス（@s.thers.ac.jp）のみ登録可能です',
+          error: '名古屋大学のメールアドレス（@s.thers.ac.jp、@nagoya-u.ac.jp、@i.nagoya-u.ac.jp）のみ登録可能です',
           domain: domain 
         },
         { status: 400 }
@@ -66,10 +67,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create user with email confirmation required
+    // Generate temporary password for user creation
+    const tempPassword = crypto.randomUUID()
+
+    // Create user and send confirmation email
     const { data, error } = await supabaseAdmin.auth.admin.createUser({
       email,
-      email_confirm: false,
+      password: tempPassword,
+      email_confirm: false, // メール認証を必要とする
       user_metadata: {
         university: '名古屋大学'
       }
@@ -83,54 +88,32 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('✅ ユーザー作成成功:', data.user.id)
-
-    // Generate magic link
-    console.log('🔗 マジックリンク生成中...')
-    const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
-      type: 'magiclink',
+    // Generate email confirmation link
+    const { error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+      type: 'signup',
       email,
+      password: tempPassword,
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/onboarding`
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`
       }
     })
 
     if (linkError) {
-      console.error('❌ Magic link generation error:', linkError)
+      console.error('Link generation error:', linkError)
+      // Clean up created user if link generation fails
+      await supabaseAdmin.auth.admin.deleteUser(data.user.id)
       return NextResponse.json(
-        { 
-          message: 'アカウントは作成されましたが、確認メールの送信に失敗しました。サポートにお問い合わせください。',
-          userId: data.user.id,
-          error: linkError.message
-        },
-        { status: 201 }
+        { error: 'メール送信に失敗しました' },
+        { status: 500 }
       )
     }
 
-    console.log('✅ マジックリンク生成成功')
-    console.log('🔗 Magic link for', email, ':', linkData.properties?.action_link)
-
-    // Send confirmation email using Supabase's built-in email
-    console.log('📧 確認メール送信試行中...')
-    try {
-      const { error: emailError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/onboarding`
-      })
-      
-      if (emailError) {
-        console.error('❌ メール送信エラー:', emailError)
-      } else {
-        console.log('✅ メール送信成功（invite method）')
-      }
-    } catch (inviteError) {
-      console.warn('⚠️ invite method失敗、マジックリンクを使用:', inviteError)
-    }
+    console.log('✅ ユーザー作成・メール送信成功:', data.user.id)
 
     return NextResponse.json({
-      message: '確認メールを送信しました。メールアドレスをご確認ください。',
-      // テスト用に常にリンクを表示
-      debugLink: linkData.properties?.action_link,
-      email: email
+      message: '確認メールを送信しました。メール内のリンクをクリックして登録を完了してください。',
+      success: true,
+      userId: data.user.id
     })
 
   } catch (error) {

@@ -163,19 +163,7 @@ export default function StepByStepRegisterPage() {
       setIsSubmitting(true)
 
       // Supabase認証でユーザー登録
-      const result = await signUp(
-        formData.email,
-        formData.password!,
-        {
-          email: formData.email,
-          name: formData.name,
-          university: formData.university,
-          faculty: formData.faculty,
-          department: formData.department,
-          year: formData.year,
-          pen_name: formData.pen_name || formData.name
-        }
-      )
+      const result = await signUp(formData.email)
 
       if (result.error) {
         formErrorHandler.handleSubmissionError(

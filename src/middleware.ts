@@ -40,10 +40,10 @@ export async function middleware(req: NextRequest) {
   } = await supabase.auth.getUser()
 
   // Protected routes that require authentication
-  const protectedRoutes = ['/upload', '/profile', '/onboarding']
+  const protectedRoutes = ['/upload', '/profile', '/search']
   const pathname = req.nextUrl.pathname
 
-  // Check if the current route is protected
+  // Check if the current route is protected (excluding onboarding)
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
 
   if (isProtectedRoute && !user) {
@@ -54,28 +54,28 @@ export async function middleware(req: NextRequest) {
   }
 
   // Check if user needs to complete profile
-  if (user && pathname !== '/onboarding') {
+  if (user && pathname !== '/onboarding' && !pathname.startsWith('/auth')) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('id')
+      .select('faculty')
       .eq('id', user.id)
       .single()
 
-    // If user doesn't have a profile and is not on onboarding page, redirect to onboarding
-    if (!profile && !pathname.startsWith('/auth') && pathname !== '/onboarding') {
+    // If user doesn't have a profile, redirect to onboarding
+    if (!profile?.faculty && pathname !== '/onboarding') {
       return NextResponse.redirect(new URL('/onboarding', req.url))
     }
   }
 
-  // If user has profile and tries to access onboarding, redirect to search
+  // If user has complete profile and tries to access onboarding, redirect to search
   if (user && pathname === '/onboarding') {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('id')
+      .select('faculty')
       .eq('id', user.id)
       .single()
 
-    if (profile) {
+    if (profile?.faculty) {
       return NextResponse.redirect(new URL('/search', req.url))
     }
   }
@@ -85,7 +85,7 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\..*|api/auth).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\..*|api/auth|onboarding).*)',
     '/api/:path*',
   ],
 }
