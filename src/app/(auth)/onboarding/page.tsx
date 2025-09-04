@@ -2,14 +2,17 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createBrowserClient } from '@supabase/ssr'
 import { AnimatedButton } from '@/components/ui/MicroInteractions'
 import { VirtualizedAutocompleteSelect } from '@/components/ui/VirtualizedAutocompleteSelect'
 import { universityDataDetailed } from '@/data/universityDataDetailed'
 
 export default function OnboardingPage() {
   const router = useRouter()
-  const supabase = createClientComponentClient()
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
   
   const [faculty, setFaculty] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -144,12 +147,20 @@ export default function OnboardingPage() {
             )}
 
             {/* Submit Button */}
-            <AnimatedButton
+            <button
               type="submit"
-              variant="primary"
-              size="lg"
               disabled={isLoading || !faculty}
-              className="w-full"
+              className={`
+                w-full px-6 py-3 sm:px-8 sm:py-4 text-base sm:text-lg rounded-xl
+                min-h-[48px] sm:min-h-[56px]
+                bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700
+                text-white font-medium
+                transition-all duration-200
+                hover:scale-105 active:scale-95
+                disabled:opacity-50 disabled:cursor-not-allowed
+                disabled:hover:scale-100
+                ${isLoading || !faculty ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+              `}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
@@ -159,7 +170,7 @@ export default function OnboardingPage() {
               ) : (
                 '登録を完了'
               )}
-            </AnimatedButton>
+            </button>
           </form>
 
           {/* Info */}

@@ -108,12 +108,20 @@ export default function SignupPage() {
             )}
 
             {/* Submit Button */}
-            <AnimatedButton
+            <button
               type="submit"
-              variant="primary"
-              size="lg"
               disabled={isLoading || !email}
-              className="w-full"
+              className={`
+                w-full px-6 py-3 sm:px-8 sm:py-4 text-base sm:text-lg rounded-xl
+                min-h-[48px] sm:min-h-[56px]
+                bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700
+                text-white font-medium
+                transition-all duration-200
+                hover:scale-105 active:scale-95
+                disabled:opacity-50 disabled:cursor-not-allowed
+                disabled:hover:scale-100
+                ${isLoading || !email ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+              `}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
@@ -123,7 +131,7 @@ export default function SignupPage() {
               ) : (
                 '確認メールを送信'
               )}
-            </AnimatedButton>
+            </button>
           </form>
 
           {/* Footer Links */}
