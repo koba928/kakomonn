@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       const domain = extractDomain(email)
       return NextResponse.json(
         { 
-          error: '名古屋大学のメールアドレス（@nagoya-u.ac.jp または @i.nagoya-u.ac.jp）のみ登録可能です',
+          error: '名古屋大学のメールアドレス（@s.thers.ac.jp）のみ登録可能です',
           domain: domain 
         },
         { status: 400 }
