@@ -27,5 +27,5 @@ export function isValidNagoyaEmail(email: string): boolean {
 
 export function extractDomain(email: string): string | null {
   const parts = email.split('@')
-  return parts.length === 2 ? parts[1] : null
+  return parts.length === 2 ? (parts[1] || null) : null
 }
