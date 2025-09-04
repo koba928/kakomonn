@@ -3,19 +3,23 @@ import { supabaseAdmin, isValidNagoyaEmail, extractDomain } from '@/lib/supabase
 
 export async function POST(request: NextRequest) {
   try {
-    const { email } = await request.json()
+    const { email, devMode } = await request.json()
+    
+    console.log('📧 新規登録リクエスト:', { email, devMode })
 
     // Validate email format
     if (!email || typeof email !== 'string' || !email.includes('@')) {
+      console.log('❌ メールフォーマットエラー')
       return NextResponse.json(
         { error: 'メールアドレスを正しく入力してください' },
         { status: 400 }
       )
     }
 
-    // Check if email domain is allowed
-    if (!isValidNagoyaEmail(email)) {
+    // Check if email domain is allowed (skip in dev mode)
+    if (!isValidNagoyaEmail(email) && !devMode) {
       const domain = extractDomain(email)
+      console.log('❌ ドメインエラー:', { email, domain, allowedDomains: process.env.ALLOWED_EMAIL_DOMAINS })
       return NextResponse.json(
         { 
           error: '名古屋大学のメールアドレス（@s.thers.ac.jp）のみ登録可能です',
@@ -23,6 +27,10 @@ export async function POST(request: NextRequest) {
         },
         { status: 400 }
       )
+    }
+    
+    if (devMode && process.env.NODE_ENV === 'development') {
+      console.log('🔧 開発モード: ドメイン制限をスキップ')
     }
 
     // Check if user already exists

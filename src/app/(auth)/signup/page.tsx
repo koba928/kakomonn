@@ -8,6 +8,7 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const [debugLink, setDebugLink] = useState<string | null>(null)
+  const [devMode, setDevMode] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -19,7 +20,7 @@ export default function SignupPage() {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email, devMode })
       })
 
       const data = await response.json()
@@ -78,6 +79,23 @@ export default function SignupPage() {
               <p className="text-xs text-gray-500 mt-1">
                 @s.thers.ac.jp のメールアドレスのみ登録可能です
               </p>
+              
+              {/* Development Mode Toggle */}
+              {process.env.NODE_ENV === 'development' && (
+                <div className="mt-2">
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={devMode}
+                      onChange={(e) => setDevMode(e.target.checked)}
+                      className="mr-2"
+                    />
+                    <span className="text-xs text-orange-600">
+                      開発モード（任意のメールアドレス可）
+                    </span>
+                  </label>
+                </div>
+              )}
             </div>
 
             {/* Message */}
