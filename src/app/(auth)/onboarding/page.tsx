@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
-import { AnimatedButton } from '@/components/ui/MicroInteractions'
 import { VirtualizedAutocompleteSelect } from '@/components/ui/VirtualizedAutocompleteSelect'
 import { universityDataDetailed } from '@/data/universityDataDetailed'
 

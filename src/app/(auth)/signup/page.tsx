@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { AnimatedButton } from '@/components/ui/MicroInteractions'
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')
