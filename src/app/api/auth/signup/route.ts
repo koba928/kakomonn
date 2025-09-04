@@ -4,7 +4,7 @@ import crypto from 'crypto'
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, devMode } = await request.json()
+    const { email, password, devMode } = await request.json()
     
     console.log('📧 新規登録リクエスト:', { email, devMode })
 
@@ -67,13 +67,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate temporary password for user creation
-    const tempPassword = crypto.randomUUID()
+    // Use provided password or generate temporary one
+    const userPassword = password || crypto.randomUUID()
 
     // Create user and send confirmation email
     const { data, error } = await supabaseAdmin.auth.admin.createUser({
       email,
-      password: tempPassword,
+      password: userPassword,
       email_confirm: false, // メール認証を必要とする
       user_metadata: {
         university: '名古屋大学'
@@ -92,9 +92,9 @@ export async function POST(request: NextRequest) {
     const { error: linkError } = await supabaseAdmin.auth.admin.generateLink({
       type: 'signup',
       email,
-      password: tempPassword,
+      password: userPassword,
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/callback`
       }
     })
 
