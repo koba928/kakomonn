@@ -81,21 +81,19 @@ export default function SignupPage() {
               </p>
               
               {/* Development Mode Toggle */}
-              {process.env.NODE_ENV === 'development' && (
-                <div className="mt-2">
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={devMode}
-                      onChange={(e) => setDevMode(e.target.checked)}
-                      className="mr-2"
-                    />
-                    <span className="text-xs text-orange-600">
-                      開発モード（任意のメールアドレス可）
-                    </span>
-                  </label>
-                </div>
-              )}
+              <div className="mt-2">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={devMode}
+                    onChange={(e) => setDevMode(e.target.checked)}
+                    className="mr-2"
+                  />
+                  <span className="text-xs text-orange-600">
+                    開発モード（任意のメールアドレス可）
+                  </span>
+                </label>
+              </div>
             </div>
 
             {/* Message */}

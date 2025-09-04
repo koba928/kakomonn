@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    if (devMode && process.env.NODE_ENV === 'development') {
+    if (devMode) {
       console.log('🔧 開発モード: ドメイン制限をスキップ')
     }
 
