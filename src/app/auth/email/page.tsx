@@ -102,8 +102,8 @@ function EmailAuthPageContent() {
             メールアドレスとパスワードでログイン
           </p>
           <p className="text-sm text-gray-500 mt-2">
-            アカウントをお持ちでない方は
-            <Link href="/register" className="text-indigo-600 hover:underline ml-1">
+            名古屋大学の方は
+            <Link href="/signup" className="text-indigo-600 hover:underline ml-1">
               新規登録
             </Link>
           </p>
