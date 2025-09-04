@@ -26,10 +26,32 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user already exists
-    const { data: existingUser } = await supabaseAdmin.auth.admin.listUsers()
+    console.log('🔍 既存ユーザーチェック中:', email)
+    const { data: existingUser, error: listError } = await supabaseAdmin.auth.admin.listUsers()
+    
+    if (listError) {
+      console.error('❌ ユーザー一覧取得エラー:', listError)
+      return NextResponse.json(
+        { error: 'ユーザー確認中にエラーが発生しました' },
+        { status: 500 }
+      )
+    }
+    
     const userExists = existingUser.users.some(user => user.email === email)
+    console.log('📊 ユーザー存在チェック:', { 
+      email, 
+      userExists, 
+      totalUsers: existingUser.users.length,
+      matchingUsers: existingUser.users.filter(u => u.email === email).length
+    })
 
     if (userExists) {
+      const existingUserData = existingUser.users.find(user => user.email === email)
+      console.log('❌ 既存ユーザー詳細:', {
+        id: existingUserData?.id,
+        email: existingUserData?.email,
+        created_at: existingUserData?.created_at
+      })
       return NextResponse.json(
         { error: 'このメールアドレスは既に登録されています' },
         { status: 400 }
