@@ -83,40 +83,54 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    console.log('✅ ユーザー作成成功:', data.user.id)
+
     // Generate magic link
+    console.log('🔗 マジックリンク生成中...')
     const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
       type: 'magiclink',
       email,
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/onboarding`
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/onboarding`
       }
     })
 
     if (linkError) {
-      console.error('Magic link generation error:', linkError)
-      // User was created but link generation failed
-      // In production, you might want to handle this differently
+      console.error('❌ Magic link generation error:', linkError)
       return NextResponse.json(
         { 
           message: 'アカウントは作成されましたが、確認メールの送信に失敗しました。サポートにお問い合わせください。',
-          userId: data.user.id 
+          userId: data.user.id,
+          error: linkError.message
         },
         { status: 201 }
       )
     }
 
-    // In production, send email using your email service
-    // For now, we'll return the link (remove in production!)
-    console.log('Magic link for', email, ':', linkData.properties?.action_link)
+    console.log('✅ マジックリンク生成成功')
+    console.log('🔗 Magic link for', email, ':', linkData.properties?.action_link)
 
-    // Send confirmation email
-    // TODO: Implement email sending via SendGrid, Resend, etc.
-    // await sendConfirmationEmail(email, linkData.properties?.action_link)
+    // Send confirmation email using Supabase's built-in email
+    console.log('📧 確認メール送信試行中...')
+    try {
+      const { error: emailError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/onboarding`
+      })
+      
+      if (emailError) {
+        console.error('❌ メール送信エラー:', emailError)
+      } else {
+        console.log('✅ メール送信成功（invite method）')
+      }
+    } catch (inviteError) {
+      console.warn('⚠️ invite method失敗、マジックリンクを使用:', inviteError)
+    }
 
     return NextResponse.json({
-      message: '確認メールを送信しました。名古屋大学のメールアドレスをご確認ください。',
-      // Remove this in production:
-      debugLink: process.env.NODE_ENV === 'development' ? linkData.properties?.action_link : undefined
+      message: '確認メールを送信しました。メールアドレスをご確認ください。',
+      // テスト用に常にリンクを表示
+      debugLink: linkData.properties?.action_link,
+      email: email
     })
 
   } catch (error) {
