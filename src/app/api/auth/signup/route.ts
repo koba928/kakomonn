@@ -89,17 +89,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate email confirmation link
-    const { error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+    console.log('📧 メールリンク生成中... redirectTo:', 'https://kakomonn.vercel.app/auth/callback')
+    const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
       type: 'signup',
       email,
       password: userPassword,
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/callback`
+        redirectTo: 'https://kakomonn.vercel.app/auth/callback'
       }
     })
 
     if (linkError) {
-      console.error('Link generation error:', linkError)
+      console.error('❌ Link generation error:', linkError)
       // Clean up created user if link generation fails
       await supabaseAdmin.auth.admin.deleteUser(data.user.id)
       return NextResponse.json(
@@ -108,6 +109,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    console.log('✅ メールリンク生成成功:', linkData?.properties?.action_link)
     console.log('✅ ユーザー作成・メール送信成功:', data.user.id)
 
     return NextResponse.json({
