@@ -110,12 +110,19 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('✅ メールリンク生成成功:', linkData?.properties?.action_link)
+    console.log('✅ OTPコード:', linkData?.properties?.email_otp)
     console.log('✅ ユーザー作成・メール送信成功:', data.user.id)
 
     return NextResponse.json({
-      message: '確認メールを送信しました。メール内のリンクをクリックして登録を完了してください。',
+      message: 'アカウントを作成しました。メール認証を完了してください。',
       success: true,
-      userId: data.user.id
+      userId: data.user.id,
+      email: email,
+      // Development mode: OTPを返す（本番では削除）
+      ...(devMode && { 
+        otp: linkData?.properties?.email_otp,
+        debugInfo: 'OTPコードが生成されました。メールが届かない場合はこのコードを使用してください。'
+      })
     })
 
   } catch (error) {

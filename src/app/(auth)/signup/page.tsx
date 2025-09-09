@@ -49,14 +49,17 @@ export default function SignupPage() {
 
       setMessage({ type: 'success', text: data.message })
       
-      // Clear inputs on success
-      setEmail('')
-      setPassword('')
-      setConfirmPassword('')
+      // Show OTP if in dev mode
+      if (data.otp) {
+        setMessage({ 
+          type: 'success', 
+          text: `${data.message}\n\nデバッグ用OTP: ${data.otp}\n\n${data.debugInfo}` 
+        })
+      }
       
-      // Success - redirect to login after 2 seconds
+      // Success - redirect to OTP verification
       setTimeout(() => {
-        router.push('/auth/email')
+        router.push(`/auth/verify-otp?email=${encodeURIComponent(email)}`)
       }, 2000)
 
     } catch (error) {
