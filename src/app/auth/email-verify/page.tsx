@@ -27,7 +27,7 @@ interface FormData {
 }
 
 export default function EmailVerifyPage() {
-  const { user, session, loading: authLoading } = useAuth()
+  const { session, loading: authLoading } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   
@@ -57,6 +57,22 @@ export default function EmailVerifyPage() {
     const validDomains = ['s.thers.ac.jp', 'nagoya-u.ac.jp', 'i.nagoya-u.ac.jp']
     return validDomains.some(domain => email.endsWith('@' + domain))
   }, [])
+
+  // 既存ユーザーのリダイレクトカウントダウン
+  const startRedirectCountdown = useCallback(() => {
+    const timer = setInterval(() => {
+      setRedirectCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer)
+          router.push('/search')
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [router])
 
   // メイン判定ロジック
   const verifyEmailAndUser = useCallback(async () => {
@@ -144,23 +160,7 @@ export default function EmailVerifyPage() {
       setState('error')
       setErrorMessage('認証中にエラーが発生しました')
     }
-  }, [searchParams, isValidNagoyaEmail])
-
-  // 既存ユーザーのリダイレクトカウントダウン
-  const startRedirectCountdown = useCallback(() => {
-    const timer = setInterval(() => {
-      setRedirectCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer)
-          router.push('/search')
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [router])
+  }, [searchParams, isValidNagoyaEmail, startRedirectCountdown])
 
   // 初期認証プロセス実行
   useEffect(() => {
