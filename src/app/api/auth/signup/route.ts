@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
         console.log('⚠️ Resend経由メール送信失敗（Supabaseメールにフォールバック）')
       }
     } catch (emailError) {
-      console.log('⚠️ Resend経由メール送信エラー:', emailError.message)
+      console.log('⚠️ Resend経由メール送信エラー:', emailError instanceof Error ? emailError.message : emailError)
     }
 
     console.log('✅ ユーザー作成・メール送信成功:', data.user.id)
