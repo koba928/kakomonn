@@ -33,6 +33,9 @@ export default function SignupSuccessPage() {
 
       return () => clearInterval(timer)
     }
+
+    // デフォルトのクリーンアップ関数を返す
+    return undefined
   }, [loading, session, user, router])
 
   // ローディング中
