@@ -5,12 +5,19 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export async function POST(request: NextRequest) {
   try {
-    const { faculty } = await request.json()
+    const { faculty, year } = await request.json()
 
-    // Validate faculty input
+    // Validate faculty and year input
     if (!faculty || typeof faculty !== 'string' || faculty.trim().length === 0) {
       return NextResponse.json(
-        { error: '学部を入力してください' },
+        { error: '学部を選択してください' },
+        { status: 400 }
+      )
+    }
+
+    if (!year || typeof year !== 'string' || !['1年', '2年', '3年', '4年'].includes(year)) {
+      return NextResponse.json(
+        { error: '学年を選択してください' },
         { status: 400 }
       )
     }
@@ -50,22 +57,23 @@ export async function POST(request: NextRequest) {
     // Check if profile already has faculty set
     const { data: existingProfile } = await supabaseAdmin
       .from('profiles')
-      .select('faculty')
+      .select('faculty, year')
       .eq('id', user.id)
       .single()
 
-    if (existingProfile?.faculty) {
+    if (existingProfile?.faculty && existingProfile?.year) {
       return NextResponse.json(
         { error: 'プロフィールは既に登録されています' },
         { status: 400 }
       )
     }
 
-    // Update profile with faculty (university is already set as default)
+    // Update profile with faculty and year (university is already set as default)
     const { data, error } = await supabaseAdmin
       .from('profiles')
       .update({
-        faculty: faculty.trim()
+        faculty: faculty.trim(),
+        year: year
       })
       .eq('id', user.id)
       .select()
@@ -86,6 +94,7 @@ export async function POST(request: NextRequest) {
         user_metadata: {
           university: '名古屋大学',
           faculty: faculty.trim(),
+          year: year,
           profile_completed: true
         }
       }

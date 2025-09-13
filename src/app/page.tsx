@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/useAuth'
 
 export default function Home() {
   const { user, isLoggedIn, loading, session } = useAuth()
-  const [mainButtonHref, setMainButtonHref] = useState('/auth/email')
+  const [mainButtonHref, setMainButtonHref] = useState('/signup')
   const [isChecking, setIsChecking] = useState(true)
 
   useEffect(() => {
@@ -28,15 +28,21 @@ export default function Home() {
         hasSession: !!session
       })
 
-      // より確実な認証状態チェック：セッション優先
+      // 段階的アクセス制御の実装
       const isAuthenticated = !!(session?.user) || !!(isLoggedIn && user)
       
       if (isAuthenticated) {
-        console.log('✅ ログイン済みユーザー - 検索画面に誘導')
-        setMainButtonHref('/search')
+        // 認証済みだがプロフィールが未完成の場合
+        if (user && (!user.faculty || user.faculty === '未設定' || !user.year || user.year === '未設定')) {
+          console.log('⚠️ 認証済みだがプロフィール未完成 - オンボーディングに誘導')
+          setMainButtonHref('/onboarding')
+        } else {
+          console.log('✅ フル登録ユーザー - 検索画面に誘導')
+          setMainButtonHref('/search')
+        }
       } else {
-        console.log('❌ 未ログインユーザー - ログイン画面に誘導')
-        setMainButtonHref('/auth/email')
+        console.log('❌ 未ログインユーザー - サインアップ画面に誘導')
+        setMainButtonHref('/signup')
       }
       
       setIsChecking(false)

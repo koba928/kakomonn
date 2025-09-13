@@ -9,7 +9,7 @@ export interface AuthUser {
   university: string
   faculty: string
   department: string
-  year: number
+  year: string
   pen_name: string
 }
 
@@ -126,7 +126,7 @@ export function useAuth() {
         university: authUser.user_metadata?.university || '未設定',
         faculty: authUser.user_metadata?.faculty || '未設定',
         department: authUser.user_metadata?.department || '未設定',
-        year: authUser.user_metadata?.year || 1,
+        year: authUser.user_metadata?.year || '未設定',
         pen_name: authUser.user_metadata?.pen_name || authUser.user_metadata?.name || 'ユーザー'
       }
 
@@ -146,7 +146,7 @@ export function useAuth() {
       try {
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('university, faculty')
+          .select('university, faculty, year')
           .eq('id', userId)
           .single()
 
@@ -159,13 +159,14 @@ export function useAuth() {
             university: profileData.university || '名古屋大学',
             faculty: profileData.faculty || '未設定',
             department: '未設定', // profilesテーブルにはdepartmentはない
-            year: 1, // デフォルト値
+            year: profileData.year || '未設定',
             pen_name: userFromMetadata.name
           }
           
           console.log('✨ プロフィール情報で補完したユーザー情報:', {
             university: enhancedUser.university,
-            faculty: enhancedUser.faculty
+            faculty: enhancedUser.faculty,
+            year: enhancedUser.year
           })
           
           setUser(enhancedUser)
@@ -186,7 +187,7 @@ export function useAuth() {
           university: '未設定',
           faculty: '未設定', 
           department: '未設定',
-          year: 1,
+          year: '未設定',
           pen_name: 'ユーザー'
         })
       }

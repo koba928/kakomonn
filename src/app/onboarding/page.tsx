@@ -11,6 +11,8 @@ export default function OnboardingPage() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [selectedFaculty, setSelectedFaculty] = useState('')
+  const [selectedYear, setSelectedYear] = useState('')
 
   // Get Nagoya University faculties
   const nagoyaUniversity = useMemo(() => {
@@ -18,21 +20,35 @@ export default function OnboardingPage() {
   }, [])
 
   useEffect(() => {
+    console.log('🎯 オンボーディング画面アクセス:', {
+      loading,
+      hasSession: !!session,
+      hasUser: !!user,
+      faculty: user?.faculty,
+      year: user?.year
+    })
+
     // Check authentication status
     if (!loading && !session) {
+      console.log('❌ 未認証 → サインアップにリダイレクト')
       router.push('/signup')
       return
     }
 
     // Check if profile is already completed
-    if (!loading && user && user.faculty && user.faculty !== '未設定') {
+    if (!loading && user && user.faculty && user.faculty !== '未設定' && user.year && user.year !== '未設定') {
+      console.log('✅ プロフィール完成済み → 検索画面にリダイレクト')
       router.push('/search')
       return
     }
+
+    if (!loading && session && user) {
+      console.log('⏳ オンボーディング開始準備完了')
+    }
   }, [loading, session, user, router])
 
-  const handleFacultySelect = async (facultyName: string) => {
-    if (isSubmitting) return
+  const handleSubmit = async () => {
+    if (isSubmitting || !selectedFaculty || !selectedYear) return
     
     setError('')
     setIsSubmitting(true)
@@ -44,7 +60,8 @@ export default function OnboardingPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          faculty: facultyName
+          faculty: selectedFaculty,
+          year: selectedYear
         }),
       })
 
@@ -112,7 +129,7 @@ export default function OnboardingPage() {
               ようこそ、名古屋大学へ！
             </h2>
             <p className="text-gray-600">
-              所属している学部を選択してください
+              所属学部と学年を選択してください
             </p>
           </div>
 
@@ -123,31 +140,77 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* 学部選択 */}
+          {/* 学部・学年選択 */}
           <div className="bg-white/90 backdrop-blur-sm p-8 sm:p-12 rounded-2xl shadow-xl border border-gray-100">
             <div className="text-center mb-8">
               <span className="text-sm text-indigo-600 font-medium">名古屋大学</span>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">学部を選択</h3>
-              <p className="text-gray-600">学部を選択すると、その学部の過去問や掲示板にアクセスできます</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">学部・学年を選択</h3>
+              <p className="text-gray-600">学部と学年を選択すると、その学部の過去問や掲示板にアクセスできます</p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {nagoyaUniversity.faculties.map(faculty => (
-                <button
-                  key={faculty.id}
-                  onClick={() => handleFacultySelect(faculty.name)}
-                  disabled={isSubmitting}
-                  className={`p-6 rounded-xl border-2 transition-all duration-200 text-left hover:shadow-lg border-gray-200 bg-white hover:border-indigo-300 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">{faculty.name}</h3>
-                  <p className="text-sm text-gray-600">{faculty.departments.length}学科</p>
-                  {isSubmitting && (
-                    <div className="mt-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600"></div>
-                    </div>
-                  )}
-                </button>
-              ))}
+            {/* 学部選択 */}
+            <div className="mb-8">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">学部</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {nagoyaUniversity.faculties.map(faculty => (
+                  <button
+                    key={faculty.id}
+                    onClick={() => setSelectedFaculty(faculty.name)}
+                    disabled={isSubmitting}
+                    className={`p-4 rounded-lg border-2 transition-all duration-200 text-left hover:shadow-md ${
+                      selectedFaculty === faculty.name 
+                        ? 'border-indigo-500 bg-indigo-50 text-indigo-900' 
+                        : 'border-gray-200 bg-white hover:border-indigo-300'
+                    } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    <h5 className="font-semibold mb-1">{faculty.name}</h5>
+                    <p className="text-sm text-gray-600">{faculty.departments.length}学科</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 学年選択 */}
+            <div className="mb-8">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">学年</h4>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {['1年', '2年', '3年', '4年'].map(year => (
+                  <button
+                    key={year}
+                    onClick={() => setSelectedYear(year)}
+                    disabled={isSubmitting}
+                    className={`p-4 rounded-lg border-2 transition-all duration-200 text-center font-medium ${
+                      selectedYear === year 
+                        ? 'border-indigo-500 bg-indigo-50 text-indigo-900' 
+                        : 'border-gray-200 bg-white hover:border-indigo-300'
+                    } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    {year}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 完了ボタン */}
+            <div className="text-center">
+              <button
+                onClick={handleSubmit}
+                disabled={isSubmitting || !selectedFaculty || !selectedYear}
+                className={`px-8 py-3 rounded-xl font-medium transition-all duration-200 ${
+                  selectedFaculty && selectedYear && !isSubmitting
+                    ? 'bg-indigo-600 text-white hover:bg-indigo-700 hover:scale-105 active:scale-95'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    設定中...
+                  </div>
+                ) : (
+                  'プロフィール設定を完了'
+                )}
+              </button>
             </div>
 
             {/* 注意事項 */}
@@ -160,13 +223,14 @@ export default function OnboardingPage() {
                 </div>
                 <div className="ml-3">
                   <h3 className="text-sm font-medium text-blue-800">
-                    学部選択について
+                    プロフィール設定について
                   </h3>
                   <div className="mt-2 text-sm text-blue-700">
                     <ul className="list-disc list-inside space-y-1">
-                      <li>後から学部は変更できます</li>
+                      <li>後から学部・学年は変更できます</li>
                       <li>学部に関係なく全ての過去問を閲覧可能です</li>
                       <li>選択した学部の掲示板が優先表示されます</li>
+                      <li>学年情報は統計目的でのみ使用されます</li>
                     </ul>
                   </div>
                 </div>

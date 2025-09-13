@@ -21,7 +21,7 @@ export default function StepByStepRegisterPage() {
     university: '',
     faculty: '',
     department: '',
-    year: 1,
+    year: '1年',
     email: '',
     password: '',
     pen_name: ''
@@ -149,7 +149,8 @@ export default function StepByStepRegisterPage() {
       if (!formData.name.trim()) {
         validationErrors.push('名前が入力されていません')
       }
-      if (formData.year < 1 || formData.year > 6) {
+      const validYears = ['1年', '2年', '3年', '4年', '5年', '6年']
+      if (!validYears.includes(formData.year)) {
         validationErrors.push('学年が正しく選択されていません')
       }
 
@@ -194,7 +195,7 @@ export default function StepByStepRegisterPage() {
       case 'department':
         return formData.department !== ''
       case 'year':
-        return formData.year >= 1 && formData.year <= 6
+        return ['1年', '2年', '3年', '4年', '5年', '6年'].includes(formData.year)
       case 'name':
         return formData.name.trim() !== ''
       default:

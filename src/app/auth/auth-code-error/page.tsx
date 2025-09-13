@@ -16,10 +16,10 @@ export default function AuthCodeErrorPage() {
             {APP_CONFIG.name}
           </Link>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            認証エラー
+            新規登録で問題が発生しました
           </h1>
           <p className="text-gray-600">
-            メール認証リンクに問題がありました
+            メール認証での新規登録に失敗しました
           </p>
         </div>
 
@@ -33,15 +33,15 @@ export default function AuthCodeErrorPage() {
             </div>
             <div className="ml-3">
               <h3 className="text-sm font-medium text-red-800">
-                認証に失敗しました
+                メール認証に失敗しました
               </h3>
               <div className="mt-2 text-sm text-red-700">
-                <p>以下の原因が考えられます：</p>
+                <p>新規登録でメール認証がうまくいきませんでした。以下の原因が考えられます：</p>
                 <ul className="mt-2 list-disc list-inside space-y-1">
-                  <li>認証リンクの有効期限が切れている</li>
-                  <li>認証リンクが正しくない</li>
-                  <li>認証リンクが既に使用済み</li>
+                  <li>認証リンクの有効期限が切れている（24時間以内にクリックしてください）</li>
+                  <li>古いメールのリンクを使用している（最新のメールを使用してください）</li>
                   <li>ブラウザのCookieが無効になっている</li>
+                  <li>メールアドレスが名古屋大学のドメイン以外</li>
                 </ul>
               </div>
             </div>
@@ -54,9 +54,10 @@ export default function AuthCodeErrorPage() {
             対処法
           </h3>
           <div className="text-sm text-blue-700 space-y-2">
-            <p>1. 再度新規登録を行ってください</p>
-            <p>2. 送信されたメール内の最新のリンクをクリックしてください</p>
+            <p>1. 新規登録からやり直してください</p>
+            <p>2. メール内の最新のリンクを使用してください</p>
             <p>3. ブラウザのCookieを有効にしてから再試行してください</p>
+            <p>4. メールアドレスが正しい名古屋大学のドメインであることを確認してください</p>
           </div>
         </div>
 
@@ -70,10 +71,10 @@ export default function AuthCodeErrorPage() {
           </Link>
           
           <Link
-            href="/auth/email"
+            href="/signup"
             className="w-full inline-flex justify-center items-center px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
           >
-            ログイン画面に戻る
+            新規登録画面に戻る
           </Link>
         </div>
 

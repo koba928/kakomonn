@@ -47,22 +47,22 @@ export async function middleware(req: NextRequest) {
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
 
   if (isProtectedRoute && !user) {
-    // Redirect to login page with return URL
-    const redirectUrl = new URL('/auth/email', req.url)
+    // Redirect to signup page for unauthenticated users
+    const redirectUrl = new URL('/signup', req.url)
     redirectUrl.searchParams.set('redirect', pathname)
     return NextResponse.redirect(redirectUrl)
   }
 
-  // Check if user needs to complete profile
-  if (user && pathname !== '/onboarding' && !pathname.startsWith('/auth')) {
+  // Check if user needs to complete profile (faculty and year)
+  if (user && pathname !== '/onboarding' && !pathname.startsWith('/auth') && isProtectedRoute) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('faculty')
+      .select('faculty, year')
       .eq('id', user.id)
       .single()
 
-    // If user doesn't have a profile, redirect to onboarding
-    if (!profile?.faculty && pathname !== '/onboarding') {
+    // If user doesn't have complete profile (missing faculty or year), redirect to onboarding
+    if (!profile?.faculty || !profile?.year) {
       return NextResponse.redirect(new URL('/onboarding', req.url))
     }
   }
@@ -71,11 +71,11 @@ export async function middleware(req: NextRequest) {
   if (user && pathname === '/onboarding') {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('faculty')
+      .select('faculty, year')
       .eq('id', user.id)
       .single()
 
-    if (profile?.faculty) {
+    if (profile?.faculty && profile?.year) {
       return NextResponse.redirect(new URL('/search', req.url))
     }
   }
@@ -85,7 +85,7 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\..*|api/auth|onboarding|auth/verify-otp).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\..*|api/auth|auth/verify-otp|signup|signup-success).*)',
     '/api/:path*',
   ],
 }

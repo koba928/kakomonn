@@ -18,12 +18,12 @@ export const UI_CONFIG = {
     ]
   },
   yearOptions: [
-    { value: 1, label: '1年生' },
-    { value: 2, label: '2年生' },
-    { value: 3, label: '3年生' },
-    { value: 4, label: '4年生' },
-    { value: 5, label: '5年生' },
-    { value: 6, label: '6年生' }
+    { value: '1年', label: '1年生' },
+    { value: '2年', label: '2年生' },
+    { value: '3年', label: '3年生' },
+    { value: '4年', label: '4年生' },
+    { value: '5年', label: '5年生' },
+    { value: '6年', label: '6年生' }
   ]
 }
 

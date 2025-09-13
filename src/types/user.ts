@@ -5,7 +5,7 @@ export interface UserProfile {
   university: string
   faculty: string
   department: string
-  year: number // 学年 (1-4 for undergraduate, 5-6 for graduate)
+  year: string // 学年 (1年-4年 for undergraduate)
   createdAt: string
   updatedAt: string
 }
@@ -15,7 +15,7 @@ export interface UserRegistrationData {
   university: string
   faculty: string
   department: string
-  year: number
+  year: string
   email: string
   password?: string
   pen_name?: string
