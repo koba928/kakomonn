@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { createClient } from '@supabase/supabase-js'
@@ -26,7 +26,7 @@ interface FormData {
   agreeToTerms: boolean
 }
 
-export default function EmailVerifyPage() {
+function EmailVerifyContent() {
   const { loading: authLoading } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -533,5 +533,27 @@ export default function EmailVerifyPage() {
         </div>
       </div>
     </main>
+  )
+}
+
+export default function EmailVerifyPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            メールリンクを確認中です...
+          </h1>
+          <p className="text-gray-600">
+            認証情報を確認しています。しばらくお待ちください。
+          </p>
+        </div>
+      </main>
+    }>
+      <EmailVerifyContent />
+    </Suspense>
   )
 }
