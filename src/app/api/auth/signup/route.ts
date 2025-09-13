@@ -111,10 +111,32 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ メールリンク生成成功:', linkData?.properties?.action_link)
     console.log('✅ OTPコード:', linkData?.properties?.email_otp)
+
+    // Resend経由でもメール送信を試行
+    try {
+      const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://kakomonn.vercel.app'}/api/auth/send-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          confirmationUrl: linkData?.properties?.action_link?.replace('https://fuyou-sigma.vercel.app', 'https://kakomonn.vercel.app'),
+          otp: linkData?.properties?.email_otp
+        })
+      })
+
+      if (emailResponse.ok) {
+        console.log('✅ Resend経由メール送信成功')
+      } else {
+        console.log('⚠️ Resend経由メール送信失敗（Supabaseメールにフォールバック）')
+      }
+    } catch (emailError) {
+      console.log('⚠️ Resend経由メール送信エラー:', emailError.message)
+    }
+
     console.log('✅ ユーザー作成・メール送信成功:', data.user.id)
 
     return NextResponse.json({
-      message: 'アカウントを作成しました。メール認証を完了してください。',
+      message: 'アカウントを作成しました。メール認証を完了してください。受信トレイとスパムフォルダの両方をご確認ください。',
       success: true,
       userId: data.user.id,
       email: email,
