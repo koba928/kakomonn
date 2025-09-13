@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
         data: {
           university: '名古屋大学'
         },
-        emailRedirectTo: 'https://kakomonn.vercel.app/auth/callback'
+        emailRedirectTo: `https://kakomonn.vercel.app/auth/email-verify?email=${encodeURIComponent(email)}`
       }
     })
     
@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
           email,
           password: userPassword,
           options: {
-            redirectTo: 'https://kakomonn.vercel.app/auth/callback'
+            redirectTo: `https://kakomonn.vercel.app/auth/email-verify?email=${encodeURIComponent(email)}`
           }
         })
 
