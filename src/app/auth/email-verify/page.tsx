@@ -27,7 +27,7 @@ interface FormData {
 }
 
 export default function EmailVerifyPage() {
-  const { session, loading: authLoading } = useAuth()
+  const { loading: authLoading } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   
