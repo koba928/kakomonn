@@ -138,7 +138,7 @@ export default function EmailVerifyPage() {
         .eq('id', currentUser.id)
         .single()
 
-      if (profileError && profileError.code !== 'PGRST116') {
+      if (profileError && (profileError as any).code !== 'PGRST116') {
         console.error('❌ プロフィール取得エラー:', profileError)
         setState('error')
         setErrorMessage('プロフィール確認中にエラーが発生しました')
@@ -146,7 +146,7 @@ export default function EmailVerifyPage() {
       }
 
       // 7. 初回 vs 既存判定
-      if (!profile || profileError?.code === 'PGRST116') {
+      if (!profile || (profileError as any)?.code === 'PGRST116') {
         console.log('🆕 初回ユーザー → 登録フォーム表示')
         setState('new_user_form')
       } else {
