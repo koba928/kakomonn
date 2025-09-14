@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { APP_CONFIG } from '@/constants/app'
 
 export default function VerifySuccessPage() {
   const router = useRouter()
