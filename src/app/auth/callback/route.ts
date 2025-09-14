@@ -98,15 +98,10 @@ export async function GET(request: NextRequest) {
       const forwardedHost = request.headers.get('x-forwarded-host')
       const isLocalEnv = process.env.NODE_ENV === 'development'
       
-      // 新規登録フローなので、成功時は新規登録成功画面を経由
-      let redirectUrl = '/signup-success'
-      if (profileData?.faculty && profileData?.year) {
-        console.log('✅ プロフィール完成済み → 新規登録成功画面経由で検索画面へ')
-        redirectUrl = '/signup-success'
-      } else {
-        console.log('⏳ 新規登録完了 → 新規登録成功画面へ')
-        redirectUrl = '/signup-success'
-      }
+      // 新しい認証フロー: 認証完了画面→ログイン画面
+      let redirectUrl = '/auth/verify-success'
+      console.log('✅ メール認証完了 → 認証完了画面へ')
+      redirectUrl = '/auth/verify-success'
       
       console.log('🔄 リダイレクト実行:', redirectUrl)
       
