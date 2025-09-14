@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin, isValidNagoyaEmail, extractDomain } from '@/lib/supabase-admin'
+import { supabaseAdmin, isValidNagoyaEmail } from '@/lib/supabase-admin'
+// import { extractDomain } from '@/lib/supabase-admin' // 一時的にコメントアウト
 import { createClient } from '@supabase/supabase-js'
 import crypto from 'crypto'
 
