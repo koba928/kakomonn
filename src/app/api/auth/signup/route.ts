@@ -25,7 +25,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if email domain is allowed (skip in dev mode)
-    if (!isValidNagoyaEmail(email) && !devMode) {
+    const isDevelopment = process.env.NODE_ENV === 'development'
+    if (!isValidNagoyaEmail(email) && !devMode && !isDevelopment) {
       const domain = extractDomain(email)
       console.log('❌ ドメインエラー:', { email, domain, allowedDomains: process.env.ALLOWED_EMAIL_DOMAINS })
       return NextResponse.json(
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    if (devMode) {
+    if (devMode || isDevelopment) {
       console.log('🔧 開発モード: ドメイン制限をスキップ')
     }
 

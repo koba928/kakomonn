@@ -22,8 +22,14 @@ export default function SignupPage() {
     return undefined
   }, [resendCooldown])
 
-  // メールドメインチェック
+  // メールドメインチェック（開発モードでは制限なし）
   const isValidNagoyaEmail = (email: string) => {
+    // 開発モードでは全てのドメインを許可
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔧 開発モード: ドメイン制限をスキップ')
+      return true
+    }
+    
     const validDomains = ['s.thers.ac.jp', 'nagoya-u.ac.jp', 'i.nagoya-u.ac.jp']
     return validDomains.some(domain => email.endsWith('@' + domain))
   }
@@ -35,7 +41,13 @@ export default function SignupPage() {
     }
 
     if (!isValidNagoyaEmail(email)) {
-      setMessage({ type: 'error', text: '名古屋大学のメールアドレスのみご利用いただけます' })
+      const isDev = process.env.NODE_ENV === 'development'
+      setMessage({ 
+        type: 'error', 
+        text: isDev 
+          ? '有効なメールアドレスを入力してください（開発モード）' 
+          : '名古屋大学のメールアドレスのみご利用いただけます' 
+      })
       return
     }
 
@@ -129,7 +141,11 @@ export default function SignupPage() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  @s.thers.ac.jp、@nagoya-u.ac.jp、@i.nagoya-u.ac.jp のいずれかのメールアドレス
+                  {process.env.NODE_ENV === 'development' ? (
+                    '🔧 開発モード: 任意のメールアドレスが使用可能'
+                  ) : (
+                    '@s.thers.ac.jp、@nagoya-u.ac.jp、@i.nagoya-u.ac.jp のいずれかのメールアドレス'
+                  )}
                 </p>
               </div>
 

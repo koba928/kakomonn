@@ -52,8 +52,14 @@ function EmailVerifyContent() {
 
   const years = ['1年', '2年', '3年', '4年']
 
-  // ドメイン制限チェック
+  // ドメイン制限チェック（開発モードでは制限なし）
   const isValidNagoyaEmail = useCallback((email: string) => {
+    // 開発モードでは全てのドメインを許可
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔧 開発モード: ドメイン制限をスキップ')
+      return true
+    }
+    
     const validDomains = ['s.thers.ac.jp', 'nagoya-u.ac.jp', 'i.nagoya-u.ac.jp']
     return validDomains.some(domain => email.endsWith('@' + domain))
   }, [])
@@ -92,7 +98,12 @@ function EmailVerifyContent() {
       // 2. ドメイン制限チェック
       if (!isValidNagoyaEmail(emailQuery)) {
         console.error('❌ 許可されていないドメイン:', emailQuery)
-        setErrorMessage('名古屋大学のメールアドレスのみ利用可能です')
+        const isDev = process.env.NODE_ENV === 'development'
+        setErrorMessage(
+          isDev 
+            ? '有効なメールアドレスを入力してください（開発モード）' 
+            : '名古屋大学のメールアドレスのみ利用可能です'
+        )
         setState('error')
         return
       }
