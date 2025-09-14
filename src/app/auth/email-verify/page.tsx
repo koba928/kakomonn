@@ -54,9 +54,9 @@ function EmailVerifyContent() {
 
   // ドメイン制限チェック（開発モードでは制限なし）
   const isValidNagoyaEmail = useCallback((email: string) => {
-    // 開発モードでは全てのドメインを許可
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔧 開発モード: ドメイン制限をスキップ')
+    // 開発モードまたはテストモードでは全てのドメインを許可
+    if (process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_TEST_MODE === 'true') {
+      console.log('🔧 開発/テストモード: ドメイン制限をスキップ')
       return true
     }
     

@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if email domain is allowed (skip in dev mode)
-    const isDevelopment = process.env.NODE_ENV === 'development'
+    const isDevelopment = process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_TEST_MODE === 'true'
     if (!isValidNagoyaEmail(email) && !devMode && !isDevelopment) {
       const domain = extractDomain(email)
       console.log('❌ ドメインエラー:', { email, domain, allowedDomains: process.env.ALLOWED_EMAIL_DOMAINS })
