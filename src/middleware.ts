@@ -40,15 +40,15 @@ export async function middleware(req: NextRequest) {
   } = await supabase.auth.getUser()
 
   // Protected routes that require authentication
-  const protectedRoutes = ['/upload', '/profile', '/search']
+  const protectedRoutes = ['/upload', '/profile', '/search', '/dashboard', '/onboarding']
   const pathname = req.nextUrl.pathname
 
-  // Check if the current route is protected (excluding onboarding)
+  // Check if the current route is protected
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
 
   if (isProtectedRoute && !user) {
-    // Redirect to signup page for unauthenticated users
-    const redirectUrl = new URL('/signup', req.url)
+    // Redirect to login page for unauthenticated users
+    const redirectUrl = new URL('/login', req.url)
     redirectUrl.searchParams.set('redirect', pathname)
     return NextResponse.redirect(redirectUrl)
   }
@@ -67,7 +67,7 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  // If user has complete profile and tries to access onboarding, redirect to search
+  // If user has complete profile and tries to access onboarding, redirect to dashboard
   if (user && pathname === '/onboarding') {
     const { data: profile } = await supabase
       .from('profiles')
@@ -76,7 +76,7 @@ export async function middleware(req: NextRequest) {
       .single()
 
     if (profile?.faculty && profile?.year) {
-      return NextResponse.redirect(new URL('/search', req.url))
+      return NextResponse.redirect(new URL('/dashboard', req.url))
     }
   }
 
@@ -85,7 +85,7 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\..*|api/auth|auth/verify-otp|auth/email-verify|signup|signup-success).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\..*|api/auth|auth/verify-success|signup|login|signup/confirm).*)',
     '/api/:path*',
   ],
 }

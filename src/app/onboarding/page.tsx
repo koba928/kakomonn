@@ -30,15 +30,15 @@ export default function OnboardingPage() {
 
     // Check authentication status
     if (!loading && !session) {
-      console.log('❌ 未認証 → サインアップにリダイレクト')
-      router.push('/signup')
+      console.log('❌ 未認証 → ログインにリダイレクト')
+      router.push('/login')
       return
     }
 
     // Check if profile is already completed
     if (!loading && user && user.faculty && user.faculty !== '未設定' && user.year && user.year !== '未設定') {
-      console.log('✅ プロフィール完成済み → 検索画面にリダイレクト')
-      router.push('/search')
+      console.log('✅ プロフィール完成済み → ダッシュボードにリダイレクト')
+      router.push('/dashboard')
       return
     }
 
@@ -72,8 +72,8 @@ export default function OnboardingPage() {
         return
       }
 
-      // Success - redirect to search page
-      router.push('/search')
+      // Success - redirect to dashboard
+      router.push('/dashboard')
       
     } catch (error) {
       console.error('Profile completion error:', error)
@@ -126,10 +126,10 @@ export default function OnboardingPage() {
               {APP_CONFIG.name}
             </h1>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              ようこそ、名古屋大学へ！
+              プロフィール設定
             </h2>
             <p className="text-gray-600">
-              所属学部と学年を選択してください
+              所属学部と学年を選択してサービスを開始しましょう
             </p>
           </div>
 
