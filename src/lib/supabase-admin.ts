@@ -18,7 +18,8 @@ export const supabaseAdmin = createClient<Database>(
 export const ALLOWED_EMAIL_DOMAINS = process.env.ALLOWED_EMAIL_DOMAINS?.split(',') || [
   's.thers.ac.jp',
   'nagoya-u.ac.jp',
-  'i.nagoya-u.ac.jp'
+  'i.nagoya-u.ac.jp',
+  'icloud.com'
 ]
 
 export function isValidNagoyaEmail(email: string): boolean {

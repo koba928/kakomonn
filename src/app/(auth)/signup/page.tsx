@@ -30,7 +30,7 @@ export default function SignupPage() {
       return true
     }
     
-    const validDomains = ['s.thers.ac.jp', 'nagoya-u.ac.jp', 'i.nagoya-u.ac.jp']
+    const validDomains = ['s.thers.ac.jp', 'nagoya-u.ac.jp', 'i.nagoya-u.ac.jp', 'icloud.com']
     return validDomains.some(domain => email.endsWith('@' + domain))
   }
 
