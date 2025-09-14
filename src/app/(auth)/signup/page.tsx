@@ -42,6 +42,16 @@ export default function SignupPage() {
 
     // クライアントサイドでのドメインチェック（開発モードではスキップ）
     const isDev = process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_TEST_MODE === 'true'
+    console.log('📧 クライアントサイドチェック:', {
+      email,
+      isValid: isValidNagoyaEmail(email),
+      isDev,
+      NODE_ENV: process.env.NODE_ENV,
+      TEST_MODE: process.env.NEXT_PUBLIC_TEST_MODE
+    })
+    
+    // 一時的にコメントアウト - @icloud.comのテスト用
+    /*
     if (!isDev && !isValidNagoyaEmail(email)) {
       setMessage({ 
         type: 'error', 
@@ -49,6 +59,7 @@ export default function SignupPage() {
       })
       return
     }
+    */
 
     setIsLoading(true)
     setMessage(null)

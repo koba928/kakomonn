@@ -35,6 +35,8 @@ export async function POST(request: NextRequest) {
       TEST_MODE: process.env.NEXT_PUBLIC_TEST_MODE
     })
     
+    // 一時的にコメントアウト - @icloud.comのテスト用
+    /*
     if (!isValidNagoyaEmail(email) && !devMode && !isDevelopment) {
       const domain = extractDomain(email)
       console.log('❌ ドメインエラー:', { email, domain, allowedDomains: process.env.ALLOWED_EMAIL_DOMAINS })
@@ -46,6 +48,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
+    */
     
     if (devMode || isDevelopment) {
       console.log('🔧 開発モード: ドメイン制限をスキップ')
