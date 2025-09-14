@@ -102,7 +102,7 @@ function EmailVerifyContent() {
         setErrorMessage(
           isDev 
             ? '有効なメールアドレスを入力してください（開発モード）' 
-            : '名古屋大学のメールアドレスのみ利用可能です'
+            : '許可されたメールアドレス（@s.thers.ac.jp、@nagoya-u.ac.jp、@i.nagoya-u.ac.jp、@icloud.com）のみ利用可能です'
         )
         setState('error')
         return

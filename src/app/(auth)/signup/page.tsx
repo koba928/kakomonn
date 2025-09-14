@@ -45,7 +45,7 @@ export default function SignupPage() {
     if (!isDev && !isValidNagoyaEmail(email)) {
       setMessage({ 
         type: 'error', 
-        text: '名古屋大学のメールアドレスのみご利用いただけます' 
+        text: '許可されたメールアドレス（@s.thers.ac.jp、@nagoya-u.ac.jp、@i.nagoya-u.ac.jp、@icloud.com）のみご利用いただけます' 
       })
       return
     }
@@ -143,7 +143,7 @@ export default function SignupPage() {
                   {process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_TEST_MODE === 'true' ? (
                     '🔧 開発/テストモード: 任意のメールアドレスが使用可能'
                   ) : (
-                    '@s.thers.ac.jp、@nagoya-u.ac.jp、@i.nagoya-u.ac.jp のいずれかのメールアドレス'
+                    '@s.thers.ac.jp、@nagoya-u.ac.jp、@i.nagoya-u.ac.jp、@icloud.com のいずれかのメールアドレス'
                   )}
                 </p>
               </div>

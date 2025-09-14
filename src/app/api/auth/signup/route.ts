@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       console.log('❌ ドメインエラー:', { email, domain, allowedDomains: process.env.ALLOWED_EMAIL_DOMAINS })
       return NextResponse.json(
         { 
-          error: '名古屋大学のメールアドレス（@s.thers.ac.jp、@nagoya-u.ac.jp、@i.nagoya-u.ac.jp）のみ登録可能です',
+          error: '許可されたメールアドレス（@s.thers.ac.jp、@nagoya-u.ac.jp、@i.nagoya-u.ac.jp、@icloud.com）のみ登録可能です',
           domain: domain 
         },
         { status: 400 }
