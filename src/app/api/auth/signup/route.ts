@@ -121,7 +121,8 @@ export async function POST(request: NextRequest) {
         data: {
           university: '名古屋大学'
         },
-        emailRedirectTo: `https://kakomonn.vercel.app/auth/email-verify?email=${encodeURIComponent(email)}`
+        emailRedirectTo: `https://kakomonn.vercel.app/auth/callback`
+        // emailRedirectTo: `https://kakomonn.vercel.app/auth/email-verify?email=${encodeURIComponent(email)}` // 404エラーのため一時的に無効化
       }
     })
     
@@ -156,7 +157,8 @@ export async function POST(request: NextRequest) {
           email,
           password: userPassword,
           options: {
-            redirectTo: `https://kakomonn.vercel.app/auth/email-verify?email=${encodeURIComponent(email)}`
+            redirectTo: `https://kakomonn.vercel.app/auth/callback`
+            // redirectTo: `https://kakomonn.vercel.app/auth/email-verify?email=${encodeURIComponent(email)}` // 404エラーのため一時的に無効化
           }
         })
 
