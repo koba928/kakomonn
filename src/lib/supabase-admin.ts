@@ -23,13 +23,23 @@ export const ALLOWED_EMAIL_DOMAINS = process.env.ALLOWED_EMAIL_DOMAINS?.split(',
 
 export function isValidNagoyaEmail(email: string): boolean {
   // 開発モードまたはテストモードでは全てのメールを許可
-  if (process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_TEST_MODE === 'true') {
+  const isDev = process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_TEST_MODE === 'true'
+  console.log('🔍 isValidNagoyaEmail チェック:', {
+    email,
+    isDev,
+    NODE_ENV: process.env.NODE_ENV,
+    TEST_MODE: process.env.NEXT_PUBLIC_TEST_MODE
+  })
+  
+  if (isDev) {
     console.log('🔧 supabase-admin: 開発/テストモードでドメイン制限をスキップ')
     return true
   }
   
   const domain = email.toLowerCase().split('@')[1]
-  return ALLOWED_EMAIL_DOMAINS.some(allowed => domain === allowed.toLowerCase())
+  const isValid = ALLOWED_EMAIL_DOMAINS.some(allowed => domain === allowed.toLowerCase())
+  console.log('📧 ドメインチェック結果:', { domain, isValid, ALLOWED_EMAIL_DOMAINS })
+  return isValid
 }
 
 export function extractDomain(email: string): string | null {

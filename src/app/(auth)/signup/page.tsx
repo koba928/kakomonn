@@ -40,13 +40,12 @@ export default function SignupPage() {
       return
     }
 
-    if (!isValidNagoyaEmail(email)) {
-      const isDev = process.env.NODE_ENV === 'development'
+    // クライアントサイドでのドメインチェック（開発モードではスキップ）
+    const isDev = process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_TEST_MODE === 'true'
+    if (!isDev && !isValidNagoyaEmail(email)) {
       setMessage({ 
         type: 'error', 
-        text: isDev 
-          ? '有効なメールアドレスを入力してください（開発モード）' 
-          : '名古屋大学のメールアドレスのみご利用いただけます' 
+        text: '名古屋大学のメールアドレスのみご利用いただけます' 
       })
       return
     }
@@ -60,7 +59,7 @@ export default function SignupPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           email,
-          devMode: process.env.NODE_ENV === 'development' // 開発モードでOTPを表示
+          devMode: process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_TEST_MODE === 'true' // 開発モードでOTPを表示
         })
       })
 
