@@ -39,11 +39,22 @@ export default function LoginPage() {
       if (error) throw error
 
       // プロフィール情報を確認
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('faculty, year')
-        .eq('id', data.user.id)
-        .single()
+      let profile = null
+      let profileError = null
+      
+      try {
+        const profileResponse = await supabase
+          .from('profiles')
+          .select('faculty, year')
+          .eq('id', data.user.id)
+          .single()
+        
+        profile = profileResponse.data
+        profileError = profileResponse.error
+      } catch (error) {
+        console.error('❌ プロフィール確認でエラー（テーブルが存在しない可能性）:', error)
+        profileError = { code: 'TABLE_NOT_FOUND' }
+      }
 
       console.log('👤 ログイン後プロフィール確認:', {
         hasProfile: !!profile,
@@ -52,35 +63,19 @@ export default function LoginPage() {
         year: profile?.year
       })
 
-      // プロフィールが存在しない場合は作成
-      if (profileError?.code === 'PGRST116' || !profile) {
-        console.log('🆕 プロフィールレコード作成中...')
-        try {
-          const { error: createError } = await supabase
-            .from('profiles')
-            .insert({
-              id: data.user.id,
-              university: '名古屋大学',
-              faculty: null,
-              year: null
-            })
-          
-          if (createError) {
-            console.error('❌ プロフィール作成エラー:', createError)
-          } else {
-            console.log('✅ 基本プロフィールレコード作成完了')
-          }
-        } catch (insertError) {
-          console.error('❌ プロフィール挿入エラー:', insertError)
-        }
+      // プロフィールテーブルが存在しない場合、または、プロフィールが存在しない場合はオンボーディングへ
+      if (profileError?.code === 'TABLE_NOT_FOUND' || profileError?.code === 'PGRST116' || !profile) {
+        console.log('⚠️ プロフィールテーブルまたはレコードが存在しません → オンボーディングへ')
+        router.push('/onboarding')
+        return
       }
 
       // プロフィールが未完成なら、オンボーディングへ
-      if (!profile || !profile.faculty || !profile.year) {
-        console.log('⏳ オンボーディングへリダイレクト')
+      if (!profile.faculty || !profile.year) {
+        console.log('⏳ プロフィール未完成 → オンボーディングへリダイレクト')
         router.push('/onboarding')
       } else {
-        console.log('✅ ダッシュボードへリダイレクト')
+        console.log('✅ プロフィール完成済み → ダッシュボードへリダイレクト')
         router.push('/dashboard')
       }
 

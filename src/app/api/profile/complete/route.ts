@@ -54,35 +54,65 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if profile already has faculty set
-    const { data: existingProfile } = await supabaseAdmin
-      .from('profiles')
-      .select('faculty, year')
-      .eq('id', user.id)
-      .single()
+    // Check if profiles table exists and profile has faculty set
+    let existingProfile = null
+    try {
+      const profileResponse = await supabaseAdmin
+        .from('profiles')
+        .select('faculty, year')
+        .eq('id', user.id)
+        .single()
+      
+      existingProfile = profileResponse.data
 
-    if (existingProfile?.faculty && existingProfile?.year) {
-      return NextResponse.json(
-        { error: 'プロフィールは既に登録されています' },
-        { status: 400 }
-      )
+      if (existingProfile?.faculty && existingProfile?.year) {
+        return NextResponse.json(
+          { error: 'プロフィールは既に登録されています' },
+          { status: 400 }
+        )
+      }
+    } catch (error) {
+      console.log('⚠️ プロフィールテーブルまたはレコードが存在しません。新規作成を試みます。')
     }
 
-    // Update profile with faculty and year (university is already set as default)
-    const { data, error } = await supabaseAdmin
-      .from('profiles')
-      .update({
-        faculty: faculty.trim(),
-        year: year
-      })
-      .eq('id', user.id)
-      .select()
-      .single()
+    // Try to update existing profile, or create new one if it doesn't exist
+    let data, error
+    
+    if (existingProfile) {
+      // Update existing profile
+      const updateResponse = await supabaseAdmin
+        .from('profiles')
+        .update({
+          faculty: faculty.trim(),
+          year: year
+        })
+        .eq('id', user.id)
+        .select()
+        .single()
+      
+      data = updateResponse.data
+      error = updateResponse.error
+    } else {
+      // Create new profile
+      const insertResponse = await supabaseAdmin
+        .from('profiles')
+        .insert({
+          id: user.id,
+          university: '名古屋大学',
+          faculty: faculty.trim(),
+          year: year
+        })
+        .select()
+        .single()
+      
+      data = insertResponse.data
+      error = insertResponse.error
+    }
 
     if (error) {
-      console.error('Profile creation error:', error)
+      console.error('Profile creation/update error:', error)
       return NextResponse.json(
-        { error: 'プロフィールの作成に失敗しました' },
+        { error: 'プロフィールの保存に失敗しました' },
         { status: 500 }
       )
     }
