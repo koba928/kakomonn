@@ -39,16 +39,48 @@ export default function LoginPage() {
       if (error) throw error
 
       // プロフィール情報を確認
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('faculty, year')
         .eq('id', data.user.id)
         .single()
 
+      console.log('👤 ログイン後プロフィール確認:', {
+        hasProfile: !!profile,
+        profileError: profileError?.code,
+        faculty: profile?.faculty,
+        year: profile?.year
+      })
+
+      // プロフィールが存在しない場合は作成
+      if (profileError?.code === 'PGRST116' || !profile) {
+        console.log('🆕 プロフィールレコード作成中...')
+        try {
+          const { error: createError } = await supabase
+            .from('profiles')
+            .insert({
+              id: data.user.id,
+              university: '名古屋大学',
+              faculty: null,
+              year: null
+            })
+          
+          if (createError) {
+            console.error('❌ プロフィール作成エラー:', createError)
+          } else {
+            console.log('✅ 基本プロフィールレコード作成完了')
+          }
+        } catch (insertError) {
+          console.error('❌ プロフィール挿入エラー:', insertError)
+        }
+      }
+
       // プロフィールが未完成なら、オンボーディングへ
       if (!profile || !profile.faculty || !profile.year) {
+        console.log('⏳ オンボーディングへリダイレクト')
         router.push('/onboarding')
       } else {
+        console.log('✅ ダッシュボードへリダイレクト')
         router.push('/dashboard')
       }
 
