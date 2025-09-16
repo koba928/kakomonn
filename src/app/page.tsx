@@ -11,8 +11,25 @@ export default function Home() {
   const { user, isLoggedIn, loading, session } = useAuth()
   const [mainButtonHref, setMainButtonHref] = useState('/signup')
   const [isChecking, setIsChecking] = useState(true)
+  const [authMessage, setAuthMessage] = useState('')
 
   useEffect(() => {
+    // URLパラメータをチェックして認証成功を検出
+    const urlParams = new URLSearchParams(window.location.search)
+    const emailConfirmed = urlParams.get('email_confirmed')
+    
+    if (emailConfirmed === 'true') {
+      setAuthMessage('✅ メール認証が完了しました！ログイン画面からサービスをご利用ください。')
+      // URLパラメータをクリーンアップ
+      window.history.replaceState({}, '', '/')
+      
+      // 5秒後にログイン画面へリダイレクト
+      setTimeout(() => {
+        window.location.href = '/login'
+      }, 5000)
+      return
+    }
+
     // 初回チェック
     const checkAuth = async () => {
       setIsChecking(true)
@@ -105,6 +122,18 @@ export default function Home() {
             <p className="sm:hidden text-sm text-gray-600 mb-6 mx-auto animate-fade-in leading-relaxed">
               過去問を探して、話し合える場所
             </p>
+
+            {/* 認証メッセージの表示 */}
+            {authMessage && (
+              <div className="mb-8 bg-green-50 border border-green-200 rounded-lg p-4 text-center max-w-md mx-auto animate-fade-in">
+                <p className="text-green-800">{authMessage}</p>
+                <div className="mt-3">
+                  <Link href="/login" className="text-indigo-600 hover:text-indigo-500 font-medium">
+                    ログイン画面へ →
+                  </Link>
+                </div>
+              </div>
+            )}
 
             {/* メインアクション - モバイル最適化 */}
             <nav className="flex flex-col gap-3 sm:flex-row sm:justify-center sm:gap-4 animate-fade-in max-w-sm mx-auto sm:max-w-none" aria-label="メインナビゲーション">
