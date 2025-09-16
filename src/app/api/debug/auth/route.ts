@@ -16,15 +16,31 @@ export async function GET() {
       .select('*', { count: 'exact', head: true })
 
     // 3. RLS状態の確認（生SQLクエリ）
-    const { data: rlsStatus, error: rlsError } = await supabaseAdmin.rpc('get_table_rls_status', {
-      table_name: 'profiles'
-    }).single()
+    let rlsStatus: any = null
+    let rlsError: any = null
+    try {
+      const result = await supabaseAdmin.rpc('get_table_rls_status', {
+        table_name: 'profiles'
+      }).single()
+      rlsStatus = result.data
+      rlsError = result.error
+    } catch (e) {
+      rlsError = { message: 'RLS status check not available' }
+    }
 
     // 4. トリガーの確認
-    const { data: triggers, error: triggersError } = await supabaseAdmin
-      .from('information_schema.triggers')
-      .select('trigger_name, event_object_table')
-      .eq('trigger_schema', 'public')
+    let triggers: any[] = []
+    let triggersError: any = null
+    try {
+      const result = await supabaseAdmin
+        .from('information_schema.triggers')
+        .select('trigger_name, event_object_table')
+        .eq('trigger_schema', 'public')
+      triggers = result.data || []
+      triggersError = result.error
+    } catch (e) {
+      triggersError = { message: 'Triggers check not available' }
+    }
 
     return NextResponse.json({
       status: 'ok',
