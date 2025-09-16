@@ -1,124 +1,58 @@
-import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  const error = searchParams.get('error')
-  const error_description = searchParams.get('error_description')
 
   console.log('🔗 認証コールバック受信:', {
     hasCode: !!code,
-    error,
-    error_description,
     origin
   })
 
-  if (error) {
-    console.error('❌ 認証エラー:', { error, error_description })
-    // 新規登録フローなので、エラー時は新規登録に特化したエラーページへ
-    return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+  if (!code) {
+    console.log('❌ 認証コードなし → ログインへ')
+    return NextResponse.redirect(`${origin}/login`)
   }
 
-  if (code) {
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              )
-            } catch {
-              // The `setAll` method was called from a Server Component.
-            }
-          },
-        },
-      }
-    )
-
+  try {
+    const supabase = await createClient()
+    
+    // セッション交換
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     
-    if (error) {
+    if (error || !data.session?.user) {
       console.error('❌ セッション交換エラー:', error)
-      // 新規登録中のエラーなので、新規登録向けエラーページへ
-      return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+      return NextResponse.redirect(`${origin}/login`)
     }
-    
-    if (data.session) {
-      console.log('🔐 メール認証成功:', {
-        userId: data.session.user.id,
-        email: data.session.user.email
-      })
 
-      // Check if user has completed profile setup (both faculty and year required)
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('faculty, year')
-        .eq('id', data.session.user.id)
-        .single()
-      
-      console.log('👤 プロフィール確認:', {
-        hasProfile: !!profileData,
-        profileError: profileError?.code,
-        faculty: profileData?.faculty,
-        year: profileData?.year
-      })
+    const userId = data.session.user.id
+    console.log('✅ セッション確立:', userId)
 
-      // If no profile exists, create one with basic university info
-      if (profileError?.code === 'PGRST116' || !profileData) {
-        console.log('🆕 プロフィールレコード作成中...')
-        try {
-          const { error: createError } = await supabase
-            .from('profiles')
-            .insert({
-              id: data.session.user.id,
-              university: '名古屋大学',
-              faculty: null,
-              year: null
-            })
-          
-          if (createError) {
-            console.error('❌ プロフィール作成エラー:', createError)
-          } else {
-            console.log('✅ 基本プロフィールレコード作成完了')
-          }
-        } catch (insertError) {
-          console.error('❌ プロフィール挿入エラー:', insertError)
-        }
-      }
-      
-      const forwardedHost = request.headers.get('x-forwarded-host')
-      const isLocalEnv = process.env.NODE_ENV === 'development'
-      
-      // 新しい認証フロー: メール認証完了→登録完了画面
-      let redirectUrl = '/auth/complete-registration'
-      console.log('✅ メール認証完了 → 登録完了画面へ')
-      
-      console.log('🔄 リダイレクト実行:', redirectUrl)
-      
-      if (isLocalEnv) {
-        return NextResponse.redirect(`${origin}${redirectUrl}`)
-      } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${redirectUrl}`)
-      } else {
-        return NextResponse.redirect(`${origin}${redirectUrl}`)
-      }
+    // プロフィール存在チェック
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', userId)
+      .single()
+
+    console.log('👤 プロフィール確認:', {
+      hasProfile: !!profile,
+      profileError: profileError?.code
+    })
+
+    if (profileError?.code === 'PGRST116' || !profile) {
+      // プロフィールなし → 新規ユーザー
+      console.log('🆕 新規ユーザー → /signup')
+      return NextResponse.redirect(`${origin}/signup`)
     } else {
-      console.error('❌ セッションデータが不正:', { hasData: !!data, hasSession: !!data?.session })
+      // プロフィールあり → 既存ユーザー
+      console.log('👤 既存ユーザー → /')
+      return NextResponse.redirect(`${origin}/`)
     }
-  } else {
-    console.error('❌ 認証コードが見つかりません')
-  }
 
-  // Return the user to the signup-friendly error page
-  console.log('🔄 新規登録エラーページにリダイレクト')
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+  } catch (error) {
+    console.error('❌ コールバック処理エラー:', error)
+    return NextResponse.redirect(`${origin}/login`)
+  }
 }

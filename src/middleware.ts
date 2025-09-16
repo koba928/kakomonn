@@ -5,6 +5,13 @@ import type { NextRequest } from 'next/server'
 export async function middleware(req: NextRequest) {
   let res = NextResponse.next()
   
+  const pathname = req.nextUrl.pathname
+
+  // auth/callback は常に通す（認証処理のため）
+  if (pathname === '/auth/callback') {
+    return res
+  }
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -39,44 +46,47 @@ export async function middleware(req: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Protected routes that require authentication
+  // 保護対象ルート
   const protectedRoutes = ['/upload', '/profile', '/search', '/dashboard', '/onboarding']
-  const pathname = req.nextUrl.pathname
-
-  // Check if the current route is protected
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
 
   if (isProtectedRoute && !user) {
-    // Redirect to login page for unauthenticated users
-    const redirectUrl = new URL('/login', req.url)
-    redirectUrl.searchParams.set('redirect', pathname)
-    return NextResponse.redirect(redirectUrl)
+    return NextResponse.redirect(new URL('/login', req.url))
   }
 
-  // Check if user needs to complete profile (faculty and year)
-  if (user && pathname !== '/onboarding' && !pathname.startsWith('/auth') && isProtectedRoute) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('faculty, year')
-      .eq('id', user.id)
-      .single()
+  // プロフィール完成チェック（認証済みユーザーのみ）
+  if (user && isProtectedRoute && pathname !== '/onboarding') {
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('faculty, year')
+        .eq('id', user.id)
+        .single()
 
-    // If user doesn't have complete profile (missing faculty or year), redirect to onboarding
-    if (!profile?.faculty || !profile?.year) {
+      // プロフィールが未完成なら、オンボーディングへ
+      if (!profile?.faculty || !profile?.year) {
+        return NextResponse.redirect(new URL('/onboarding', req.url))
+      }
+    } catch (error) {
+      // プロフィールテーブルが存在しない場合もオンボーディングへ
       return NextResponse.redirect(new URL('/onboarding', req.url))
     }
   }
 
-  // If user has complete profile and tries to access onboarding, redirect to dashboard
+  // 完成済みユーザーがオンボーディングにアクセスした場合、ダッシュボードへ
   if (user && pathname === '/onboarding') {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('faculty, year')
-      .eq('id', user.id)
-      .single()
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('faculty, year')
+        .eq('id', user.id)
+        .single()
 
-    if (profile?.faculty && profile?.year) {
-      return NextResponse.redirect(new URL('/dashboard', req.url))
+      if (profile?.faculty && profile?.year) {
+        return NextResponse.redirect(new URL('/dashboard', req.url))
+      }
+    } catch (error) {
+      // プロフィールテーブルが存在しない場合はオンボーディングを通す
     }
   }
 
@@ -85,7 +95,6 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\..*|api/auth|auth/verify-success|auth/complete-registration|signup|login|signup/confirm).*)',
-    '/api/:path*',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\..*|api|auth/callback|auth/verify-success|signup/confirm).*)',
   ],
 }
