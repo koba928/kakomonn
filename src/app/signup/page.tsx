@@ -3,13 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@supabase/supabase-js'
 import { APP_CONFIG } from '@/constants/app'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+import { supabase } from '@/lib/supabase'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -36,16 +31,35 @@ export default function SignupPage() {
     setError('')
 
     try {
+      console.log('🚀 新規登録開始:', { email })
+      
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
+          data: {
+            university: '名古屋大学'
+          },
           emailRedirectTo: `${window.location.origin}/auth/verify-success`
         }
       })
 
-      if (error) throw error
+      if (error) {
+        console.error('❌ 新規登録エラー:', error)
+        
+        // エラーメッセージを日本語化
+        if (error.message.includes('Database error saving new user')) {
+          throw new Error('データベースエラーが発生しました。しばらく待ってから再度お試しください。')
+        } else if (error.message.includes('User already registered')) {
+          throw new Error('このメールアドレスは既に登録されています。')
+        } else if (error.message.includes('Password should be at least')) {
+          throw new Error('パスワードは8文字以上で入力してください。')
+        } else {
+          throw error
+        }
+      }
 
+      console.log('✅ 新規登録成功 → 確認画面へ')
       // 成功したら確認画面へ
       router.push('/signup/confirm')
 

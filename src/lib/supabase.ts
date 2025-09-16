@@ -25,6 +25,7 @@ export interface Database {
           id: string
           university: string
           faculty: string | null
+          year: string | null
           created_at: string
           updated_at: string
         }
@@ -32,6 +33,7 @@ export interface Database {
           id: string
           university?: string
           faculty?: string | null
+          year?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -39,6 +41,7 @@ export interface Database {
           id?: string
           university?: string
           faculty?: string | null
+          year?: string | null
           created_at?: string
           updated_at?: string
         }

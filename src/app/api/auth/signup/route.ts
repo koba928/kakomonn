@@ -1,14 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin, isValidNagoyaEmail } from '@/lib/supabase-admin'
 // import { extractDomain } from '@/lib/supabase-admin' // 一時的にコメントアウト
-import { createClient } from '@supabase/supabase-js'
+import { supabase as supabasePublic } from '@/lib/supabase'
 import crypto from 'crypto'
-
-// 通常のSupabaseクライアント（メール認証用）
-const supabasePublic = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
 
 export async function POST(request: NextRequest) {
   try {
